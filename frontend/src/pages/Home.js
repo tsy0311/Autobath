@@ -97,6 +97,9 @@ const Home = () => {
             <Link to="/booking" className="btn btn-secondary flex items-center gap-2">
               <FaCalendarAlt /> Book Now
             </Link>
+            <Link to="/specified-request" className="text-sm underline text-white/90 hover:text-white">
+              {'Specified Request'}
+            </Link>
           </div>
         </div>
         <div className="relative z-10 flex flex-wrap gap-3 sm:gap-6 md:gap-8 justify-center max-w-2xl mx-auto px-4">
