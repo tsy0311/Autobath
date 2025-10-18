@@ -27,6 +27,7 @@ const paymentRoutes = require('./routes/payments');
 
 // Import database
 const { initDatabase } = require('./database/init');
+const { verifyEmailTransport } = require('./services/emailService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -107,6 +108,18 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Dev-only endpoint to verify email transport configuration
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/api/_email/verify', async (req, res) => {
+    try {
+      const result = await verifyEmailTransport();
+      res.json({ success: result.ok, ...result, user: process.env.EMAIL_USER || '' });
+    } catch (e) {
+      res.status(500).json({ success: false, error: e.message || String(e) });
+    }
+  });
+}
+
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')));
@@ -141,11 +154,24 @@ console.log('- EMAIL_USER:', process.env.EMAIL_USER || 'not set');
 initDatabase()
   .then(() => {
     console.log('✅ Database initialized successfully');
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`🚗 AUTOBATH Backend running on port ${PORT}`);
       console.log(`📧 Email service configured for: autobath36@gmail.com`);
       console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'not set'}`);
+      // Attempt to verify email transport at startup in non-prod
+      if (process.env.NODE_ENV !== 'production') {
+        try {
+          const result = await verifyEmailTransport();
+          if (result.ok) {
+            console.log('✅ Email transport verified');
+          } else {
+            console.warn('⚠️ Email transport verification failed:', result.message || result.reason);
+          }
+        } catch (err) {
+          console.warn('⚠️ Email transport verification error:', err && err.message ? err.message : String(err));
+        }
+      }
     });
   })
   .catch((error) => {

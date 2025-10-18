@@ -45,6 +45,20 @@ const createTransporter = () => {
   });
 };
 
+// Verify transporter connectivity (useful for diagnostics)
+const verifyEmailTransport = async () => {
+  const transporter = createTransporter();
+  if (!transporter) {
+    return { ok: false, reason: 'disabled', message: 'Email disabled: missing credentials' };
+  }
+  try {
+    await transporter.verify();
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, reason: 'verify_failed', message: err && err.message ? err.message : String(err) };
+  }
+};
+
 // Email templates
 const templates = {
   contact: (data) => ({
@@ -303,5 +317,6 @@ const sendEmail = async (emailData) => {
 };
 
 module.exports = {
-  sendEmail
+  sendEmail,
+  verifyEmailTransport
 };
