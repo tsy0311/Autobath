@@ -96,9 +96,6 @@ const Home = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12">
             <Link to="/booking" className="btn btn-primary flex items-center gap-2">
-              <FaCar /> Book Appointment
-            </Link>
-            <Link to="/booking" className="btn btn-secondary flex items-center gap-2">
               <FaCalendarAlt /> Book Now
             </Link>
           </div>
@@ -479,7 +476,7 @@ const Home = () => {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <Link to="/booking" className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 flex items-center gap-2 w-full sm:w-auto justify-center max-w-xs">
-              <FaCalendarAlt /> {"Book Appointment"}
+              <FaCalendarAlt /> {"Book Now"}
             </Link>
             <Link to="/contact" className="btn btn-secondary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 flex items-center gap-2 w-full sm:w-auto justify-center max-w-xs">
               <FaUsers /> {"Contact Us"}
