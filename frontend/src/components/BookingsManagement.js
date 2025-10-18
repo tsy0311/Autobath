@@ -35,14 +35,19 @@ const BookingsManagement = () => {
   };
 
   const updateBookingStatus = async (bookingId, newStatus) => {
+    // Optimistic UI: update local state without page reload
+    const previous = bookings;
+    const updated = bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b);
+    setBookings(updated);
     try {
       await api.put(`/api/bookings/${bookingId}`, { status: newStatus });
       toast.success(`Booking ${newStatus} successfully!`);
-      fetchBookings();
       setSelectedBooking(null);
     } catch (error) {
       console.error('Error updating booking:', error);
       toast.error('Failed to update booking status');
+      // Revert on failure
+      setBookings(previous);
     }
   };
 
@@ -232,6 +237,16 @@ const BookingsManagement = () => {
                         >
                           <FaTimes /> Cancel
                         </button>
+                        {/* Quick WhatsApp message */}
+                        {booking.customer_phone && (
+                          <a
+                            href={`https://wa.me/${booking.customer_phone.replace(/\D/g,'')}`} 
+                            target="_blank" rel="noopener noreferrer"
+                            className="px-4 py-2 bg-[#25D366] text-white rounded-lg font-semibold hover:opacity-90 transition-colors flex items-center justify-center gap-2"
+                          >
+                            WhatsApp Customer
+                          </a>
+                        )}
                       </>
                     )}
                     {booking.status === 'confirmed' && (

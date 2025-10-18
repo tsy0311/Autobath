@@ -484,7 +484,7 @@ router.post('/generate-link', (req, res) => {
 // PUT /api/bookings/:id - Update booking status (admin endpoint)
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, reason } = req.body;
 
   if (!status) {
     return res.status(400).json({
@@ -524,10 +524,55 @@ router.put('/:id', (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      message: `Booking status updated to ${status}`
-    });
+    // Fetch booking to get customer email for notifications
+    db.get(
+      `SELECT customer_name, customer_email, service_name, date, time_slot FROM bookings WHERE id = ?`,
+      [id],
+      async (fetchErr, row) => {
+        if (fetchErr) {
+          console.error('Database error:', fetchErr);
+          return res.json({ success: true, message: `Booking status updated to ${status}` });
+        }
+
+        // Notify customer via email depending on status
+        const shouldNotify = ['confirmed', 'cancelled'].includes(status) && row && row.customer_email;
+        if (shouldNotify) {
+          try {
+            if (status === 'confirmed') {
+              await sendEmail({
+                to: row.customer_email,
+                subject: 'Booking Confirmed - AUTOBATH',
+                template: 'bookingStatusUpdate',
+                data: {
+                  statusLabel: 'Confirmed',
+                  name: row.customer_name,
+                  service: row.service_name,
+                  date: row.date,
+                  timeSlot: row.time_slot,
+                }
+              });
+            } else if (status === 'cancelled') {
+              await sendEmail({
+                to: row.customer_email,
+                subject: 'Booking Cancelled - AUTOBATH',
+                template: 'bookingCancelled',
+                data: {
+                  name: row.customer_name,
+                  service: row.service_name,
+                  date: row.date,
+                  timeSlot: row.time_slot,
+                  reason: reason || ''
+                }
+              });
+            }
+          } catch (e) {
+            console.error('Status email failed:', e && e.message ? e.message : e);
+          }
+        }
+
+        res.json({ success: true, message: `Booking status updated to ${status}` });
+      }
+    );
   });
 
   stmt.finalize();

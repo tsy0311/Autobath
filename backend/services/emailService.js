@@ -269,6 +269,61 @@ const templates = {
       </div>
     `
   })
+  ,
+
+  // Booking status update (e.g., confirmed)
+  bookingStatusUpdate: (data) => ({
+    subject: `Your Booking Status: ${data.statusLabel}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #000; color: #C19A6B; padding: 20px; text-align: center;">
+          <h1 style="margin: 0; font-size: 24px;">AUTOBATH</h1>
+          <p style="margin: 5px 0 0 0; font-size: 14px;">DETAILING & ACCESSORIES</p>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #000; margin-bottom: 20px;">Booking ${data.statusLabel}</h2>
+          <div style="background: white; padding: 20px; border-radius: 5px;">
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Service:</strong> ${data.service}</p>
+            <p><strong>Date:</strong> ${data.date}</p>
+            <p><strong>Time:</strong> ${data.timeSlot}</p>
+            <p style="margin-top: 12px;">Thank you for choosing AUTOBATH. We look forward to serving you.</p>
+          </div>
+        </div>
+        <div style="background: #000; color: #C19A6B; padding: 15px; text-align: center; font-size: 12px;">
+          <p style="margin: 0;">AUTOBATH - Premium Car Detailing Services</p>
+          <p style="margin: 5px 0 0 0;">13 jalan rakan 12/2 Cheras, 43200 Kajang, Selangor</p>
+        </div>
+      </div>
+    `
+  }),
+
+  // Booking cancelled
+  bookingCancelled: (data) => ({
+    subject: 'Your Booking Has Been Cancelled',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #000; color: #C19A6B; padding: 20px; text-align: center;">
+          <h1 style="margin: 0; font-size: 24px;">AUTOBATH</h1>
+          <p style="margin: 5px 0 0 0; font-size: 14px;">DETAILING & ACCESSORIES</p>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #000; margin-bottom: 20px;">Booking Cancelled</h2>
+          <div style="background: white; padding: 20px; border-radius: 5px;">
+            <p>Hi ${data.name},</p>
+            <p>Your booking for <strong>${data.service}</strong> on <strong>${data.date}</strong> at <strong>${data.timeSlot}</strong> has been cancelled.</p>
+            ${data.reason ? `<p><strong>Reason:</strong> ${data.reason}</p>` : ''}
+            <p style="margin-top: 12px;">If you believe this was a mistake or you’d like to reschedule, please contact us.</p>
+            <p style="margin-top: 12px;">Phone: (+60) 163399533 | Email: autobath36@gmail.com</p>
+          </div>
+        </div>
+        <div style="background: #000; color: #C19A6B; padding: 15px; text-align: center; font-size: 12px;">
+          <p style="margin: 0;">AUTOBATH - Premium Car Detailing Services</p>
+          <p style="margin: 5px 0 0 0;">13 jalan rakan 12/2 Cheras, 43200 Kajang, Selangor</p>
+        </div>
+      </div>
+    `
+  })
 };
 
 // Send email function
