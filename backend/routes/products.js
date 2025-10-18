@@ -7,12 +7,12 @@ const { authenticateToken, requireAdmin } = require('../middleware/auth');
 router.get('/', (req, res) => {
   const query = `
     SELECT 
-      p.id, p.name, p.description, p.price, p.image_url, p.category, p.stock,
+      p.id, p.name, p.description, p.price, p.image_url, p.category, p.brand, p.stock,
       IFNULL(SUM(oi.quantity), 0) AS sold
     FROM products p
     LEFT JOIN order_items oi ON oi.product_id = p.id
     GROUP BY p.id
-    ORDER BY p.category, p.name
+    ORDER BY p.brand, p.name
   `;
 
   db.all(query, [], (err, rows) => {
@@ -37,7 +37,7 @@ router.get('/:id', (req, res) => {
 
   const query = `
     SELECT 
-      p.id, p.name, p.description, p.price, p.image_url, p.category, p.stock,
+      p.id, p.name, p.description, p.price, p.image_url, p.category, p.brand, p.stock,
       IFNULL((SELECT SUM(oi.quantity) FROM order_items oi WHERE oi.product_id = p.id), 0) AS sold
     FROM products p
     WHERE p.id = ?
@@ -72,7 +72,7 @@ router.get('/category/:category', (req, res) => {
 
   const query = `
     SELECT 
-      p.id, p.name, p.description, p.price, p.image_url, p.category, p.stock,
+      p.id, p.name, p.description, p.price, p.image_url, p.category, p.brand, p.stock,
       IFNULL(SUM(oi.quantity), 0) AS sold
     FROM products p
     LEFT JOIN order_items oi ON oi.product_id = p.id
@@ -123,32 +123,60 @@ router.get('/categories/list', (req, res) => {
   });
 });
 
+// Get all brands
+router.get('/brands/list', (req, res) => {
+  const query = `
+    SELECT DISTINCT brand
+    FROM products
+    WHERE brand IS NOT NULL AND TRIM(brand) != ''
+    ORDER BY brand
+  `;
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        error: 'Database error',
+        message: 'Failed to fetch brands'
+      });
+    }
+
+    const brands = rows.map(row => row.brand);
+    
+    res.json({
+      success: true,
+      brands
+    });
+  });
+});
+
 // Create new product (admin endpoint)
 router.post('/', authenticateToken, requireAdmin, (req, res) => {
-  const { name, description, price, image_url, category, stock } = req.body;
+  const { name, description, price, image_url, category, brand, stock } = req.body;
 
   // Validate required fields
-  if (!name || !price || !category) {
+  if (!name || !brand) {
     return res.status(400).json({
       error: 'Missing required fields',
-      message: 'Name, price, and category are required'
+      message: 'Name and brand are required'
     });
   }
 
-  // Validate price
-  if (isNaN(price) || price <= 0) {
+  // Normalize price (optional; default 0)
+  const normalizedPrice = (price === undefined || price === null || price === '') ? 0 : Number(price);
+  if (Number.isNaN(normalizedPrice) || normalizedPrice < 0) {
     return res.status(400).json({
       error: 'Invalid price',
-      message: 'Price must be a positive number'
+      message: 'Price must be a non-negative number'
     });
   }
 
   const stmt = db.prepare(`
-    INSERT INTO products (name, description, price, image_url, category, stock)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO products (name, description, price, image_url, category, brand, stock)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
-  stmt.run(name, description || null, price, image_url || null, category, stock || 0, function(err) {
+  stmt.run(name, description || null, normalizedPrice, image_url || null, category || null, brand, stock || 0, function(err) {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({
@@ -170,15 +198,23 @@ router.post('/', authenticateToken, requireAdmin, (req, res) => {
 // Update product (admin endpoint)
 router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
   const { id } = req.params;
-  const { name, description, price, image_url, category, stock } = req.body;
+  const { name, description, price, image_url, category, brand, stock } = req.body;
+
+  const normalizedPrice = (price === undefined || price === null || price === '') ? 0 : Number(price);
+  if (Number.isNaN(normalizedPrice) || normalizedPrice < 0) {
+    return res.status(400).json({
+      error: 'Invalid price',
+      message: 'Price must be a non-negative number'
+    });
+  }
 
   const stmt = db.prepare(`
     UPDATE products 
-    SET name = ?, description = ?, price = ?, image_url = ?, category = ?, stock = ?, updated_at = CURRENT_TIMESTAMP
+    SET name = ?, description = ?, price = ?, image_url = ?, category = ?, brand = ?, stock = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `);
 
-  stmt.run(name, description, price, image_url, category, stock, id, function(err) {
+  stmt.run(name, description, normalizedPrice, image_url, category || null, brand, stock, id, function(err) {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({

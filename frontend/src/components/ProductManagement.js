@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaDollarSign, FaWarehouse } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -7,23 +7,32 @@ const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    category: '',
+    brand: '',
     stock: '',
     image_url: ''
   });
-
-  const categories = ['Cleaning', 'Detailing', 'Protection', 'Interior', 'Accessories'];
+  const [brands, setBrands] = useState([]);
 
   useEffect(() => {
     fetchProducts();
+    fetchBrands();
   }, []);
+
+  const fetchBrands = async () => {
+    try {
+      const res = await api.get('/api/products/brands/list');
+      setBrands(res.data.brands || []);
+    } catch (e) {
+      console.error('Failed to load brands', e);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -45,7 +54,7 @@ const ProductManagement = () => {
         name: product.name,
         description: product.description || '',
         price: product.price,
-        category: product.category,
+        brand: product.brand || '',
         stock: product.stock,
         image_url: product.image_url || ''
       });
@@ -55,7 +64,7 @@ const ProductManagement = () => {
         name: '',
         description: '',
         price: '',
-        category: categories[0],
+        brand: brands[0] || '',
         stock: '',
         image_url: ''
       });
@@ -70,7 +79,7 @@ const ProductManagement = () => {
       name: '',
       description: '',
       price: '',
-      category: '',
+      brand: '',
       stock: '',
       image_url: ''
     });
@@ -79,7 +88,7 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.price || !formData.category) {
+    if (!formData.name || !formData.brand || formData.price === '') {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -118,8 +127,8 @@ const ProductManagement = () => {
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
+    return matchesSearch && matchesBrand;
   });
 
   if (loading) {
@@ -162,15 +171,15 @@ const ProductManagement = () => {
             />
           </div>
 
-          {/* Category Filter */}
+          {/* Brand Filter */}
           <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
           >
-            <option value="all">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            <option value="all">All Brands</option>
+            {brands.map(b => (
+              <option key={b} value={b}>{b}</option>
             ))}
           </select>
         </div>
@@ -182,11 +191,11 @@ const ProductManagement = () => {
           <FaBox className="text-6xl text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-600 mb-2">No Products Found</h3>
           <p className="text-gray-500 mb-6">
-            {searchTerm || selectedCategory !== 'all' 
+            {searchTerm || selectedBrand !== 'all' 
               ? 'Try adjusting your filters'
               : 'Start by adding your first product'}
           </p>
-          {!searchTerm && selectedCategory === 'all' && (
+          {!searchTerm && selectedBrand === 'all' && (
             <button
               onClick={() => handleOpenModal()}
               className="btn bg-gradient-to-r from-secondary to-secondary-dark text-white"
@@ -221,9 +230,11 @@ const ProductManagement = () => {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-primary mb-1">{product.name}</h3>
-                    <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary text-xs font-semibold rounded-full">
-                      {product.category}
-                    </span>
+                    {product.brand && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-secondary/10 text-secondary text-xs font-semibold rounded-full">
+                        <FaTags /> {product.brand}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -234,7 +245,7 @@ const ProductManagement = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <FaDollarSign className="text-green-600" />
-                    <span className="text-2xl font-bold text-primary">RM {product.price}</span>
+                    <span className="text-2xl font-bold text-primary">RM {Number(product.price).toFixed(2)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <FaWarehouse className="text-blue-600" />
@@ -300,22 +311,19 @@ const ProductManagement = () => {
                   />
                 </div>
 
-                {/* Category */}
+                {/* Brand */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Category *
+                    Brand *
                   </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  <input
+                    type="text"
+                    value={formData.brand}
+                    onChange={(e) => setFormData({...formData, brand: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+                    placeholder="e.g., Meguiar's"
                     required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 {/* Price */}
@@ -333,6 +341,8 @@ const ProductManagement = () => {
                     required
                   />
                 </div>
+
+                
 
                 {/* Stock */}
                 <div>
@@ -364,19 +374,40 @@ const ProductManagement = () => {
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Image */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Image URL
+                  Image
                 </label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                  placeholder="https://example.com/image.jpg"
-                />
-                <p className="text-xs text-gray-500 mt-1">Optional: Link to product image</p>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const data = new FormData();
+                      data.append('image', file);
+                      try {
+                        const res = await api.post('/api/upload', data, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        setFormData({ ...formData, image_url: res.data.url });
+                        toast.success('Image uploaded');
+                      } catch (err) {
+                        console.error('Upload failed', err);
+                        toast.error('Image upload failed');
+                      }
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  {formData.image_url && (
+                    <img src={formData.image_url} alt="preview" className="w-16 h-16 object-cover rounded" />
+                  )}
+                </div>
+                {formData.image_url && (
+                  <p className="text-xs text-gray-500 mt-1 break-all">{formData.image_url}</p>
+                )}
               </div>
 
               {/* Buttons */}

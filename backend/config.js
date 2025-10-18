@@ -1,4 +1,11 @@
 // Backend Configuration
+const resolvedDbPath = (() => {
+  const envPath = process.env.DB_PATH || './database.sqlite';
+  // Guard against common typo and enforce default filename in dev
+  if (envPath.includes('databse.sqlite')) return './database.sqlite';
+  return envPath;
+})();
+
 module.exports = {
   // Server Configuration
   PORT: process.env.PORT || 5000,
@@ -19,7 +26,7 @@ module.exports = {
   },
   
   // Database
-  DB_PATH: process.env.DB_PATH || './database.sqlite',
+  DB_PATH: resolvedDbPath,
   
   // CORS
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',

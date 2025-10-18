@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaSoap, FaSprayCan, FaPumpSoap, FaTint, FaWind, FaSpa } from 'react-icons/fa';
+import { FaShoppingCart, FaPumpSoap, FaTags } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import api from '../services/api';
@@ -8,24 +8,16 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [categories, setCategories] = useState(['All']);
+  const [selectedBrand, setSelectedBrand] = useState('All');
+  const [brands, setBrands] = useState(['All']);
   const [searchQuery, setSearchQuery] = useState('');
   const { addToCart } = useCart();
 
-  // Icon mapping for products
-  const productIcons = {
-    'Cleaning': FaSoap,
-    'Detailing': FaSprayCan,
-    'Protection': FaTint,
-    'Accessories': FaWind,
-    'Interior': FaSpa,
-    'default': FaPumpSoap
-  };
+  const ProductIcon = FaPumpSoap;
 
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
+    fetchBrands();
   }, []);
 
   const fetchProducts = async () => {
@@ -41,12 +33,12 @@ const Products = () => {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchBrands = async () => {
     try {
-      const response = await api.get('/api/products/categories/list');
-      setCategories(['All', ...response.data.categories]);
+      const response = await api.get('/api/products/brands/list');
+      setBrands(['All', ...(response.data.brands || [])]);
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      console.error('Error fetching brands:', err);
     }
   };
 
@@ -55,12 +47,9 @@ const Products = () => {
     toast.success(`${product.name} added to cart!`);
   };
 
-  const allText = 'All';
-  const categoryFiltered = selectedCategory === allText || selectedCategory === 'All'
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
-
-  const filteredProducts = categoryFiltered.filter(p =>
+  const filteredProducts = products
+    .filter(product => selectedBrand === 'All' || product.brand === selectedBrand)
+    .filter(p =>
     p.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
 
@@ -114,20 +103,20 @@ const Products = () => {
           <div className="text-center text-gray-600 mb-6">{filteredProducts.length} results found</div>
         )}
 
-        {/* Category Filter */}
+        {/* Brand Filter */}
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
-          {categories.map(category => {
-            const displayText = category === 'All' ? 'All' : category;
-            const isSelected = selectedCategory === category || (category === 'All' && selectedCategory === 'All');
+          {brands.map(brand => {
+            const displayText = brand === 'All' ? 'All' : brand;
+            const isSelected = selectedBrand === brand || (brand === 'All' && selectedBrand === 'All');
             return (
               <button
-                key={category}
+                key={brand}
                 className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 ${
                   isSelected
                     ? 'bg-secondary text-white shadow-lg' 
                     : 'bg-gray-200 text-gray-700 hover:bg-secondary hover:text-white'
                 }`}
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => setSelectedBrand(brand)}
               >
                 {displayText}
               </button>
@@ -138,18 +127,18 @@ const Products = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map(product => {
-            const IconComponent = productIcons[product.category] || productIcons.default;
-            
             return (
               <div key={product.id} className="card">
                 <div className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20">
-                  <IconComponent className="text-6xl text-secondary" />
+                  <ProductIcon className="text-6xl text-secondary" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-primary mb-3">{product.name}</h3>
                   <p className="text-gray-600 mb-4 leading-relaxed">{product.description}</p>
                   <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
-                    <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full">{product.category}</span>
+                    <span className="inline-flex items-center gap-1 bg-secondary/10 text-secondary px-3 py-1 rounded-full">
+                      <FaTags /> {product.brand || 'Unbranded'}
+                    </span>
                     <span>Stock: {product.stock}</span>
                   </div>
                   <div className="text-sm text-gray-500 mb-4">Sold: {product.sold ?? 0}</div>

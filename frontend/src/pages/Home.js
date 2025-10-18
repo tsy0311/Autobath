@@ -8,7 +8,6 @@ import {
 } from 'react-icons/fa';
 import api from '../services/api';
 import Testimonials from '../components/Testimonials';
-import GalleryPreview from '../components/GalleryPreview';
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -17,6 +16,8 @@ const Home = () => {
     averageRating: 0,
     totalReviews: 0
   });
+  const [servicesList, setServicesList] = useState([]);
+  const [packagesList, setPackagesList] = useState([]);
 
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
@@ -48,8 +49,11 @@ const Home = () => {
         api.get('/api/service-packages')
       ]);
 
-      const services = servicesRes.data.services;
-      const packages = packagesRes.data.packages;
+      const services = servicesRes.data.services || [];
+      const packages = packagesRes.data.packages || [];
+
+      setServicesList(services);
+      setPackagesList(packages);
 
       // Calculate statistics
       setStats({
@@ -219,8 +223,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Basic Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-base line-through opacity-70">RM 45.00</span>
-                  <span className="text-4xl font-bold">RM 40.50</span>
+                  <span className="text-4xl font-bold">RM 80.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -229,9 +232,7 @@ const Home = () => {
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 1h 15m
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {"Save"} RM 4.50
-                  </div>
+                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
                 </div>
                 <Link to="/booking?package=1&type=package" className="btn btn-primary w-full text-center">
                   {"Book Basic Package"}
@@ -247,8 +248,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Premium Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-base line-through opacity-70">RM 120.00</span>
-                  <span className="text-4xl font-bold">RM 102.00</span>
+                  <span className="text-4xl font-bold">RM 138.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -257,9 +257,7 @@ const Home = () => {
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 3h 0m
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {"Save"} RM 18.00
-                  </div>
+                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
                 </div>
                 <Link to="/booking?package=2&type=package" className="btn btn-primary w-full text-center">
                   {"Book Premium Package"}
@@ -272,8 +270,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Ultra Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-base line-through opacity-70">RM 450.00</span>
-                  <span className="text-4xl font-bold">RM 360.00</span>
+                  <span className="text-4xl font-bold">RM 258.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -282,9 +279,7 @@ const Home = () => {
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 8h 0m
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {"Save"} RM 90.00
-                  </div>
+                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
                 </div>
                 <Link to="/booking?package=3&type=package" className="btn btn-primary w-full text-center">
                   {"Book Ultra Package"}
@@ -361,8 +356,39 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Gallery Preview */}
-      <GalleryPreview />
+      {/* Instagram Feeds (3 posts) */}
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
+        <div className="container">
+          <div className="section-title">
+            <h2>{"Instagram Feeds"}</h2>
+            <p>{"Follow our latest work on Instagram"}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1,2,3].map((i) => (
+              <a
+                key={i}
+                href="https://www.instagram.com/autobath_my/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
+              >
+                <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
+                  <img
+                    src={require('../img/placeholder.jpg')}
+                    alt="Instagram preview"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Testimonials */}
       <Testimonials />
@@ -412,25 +438,42 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Individual Services (Optional) */}
+          {/* Individual Services (Synced with Booking) */}
           <div className="mb-10">
             <h3 className="text-2xl font-bold mb-6">{"Individual Services"}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <Link to="/booking?service=exterior&type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <h4 className="text-xl font-bold mb-2">{"Exterior Detailing"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Complete exterior cleaning and protection"}</p>
-                <div className="text-2xl font-bold">{"From"} RM 85.00</div>
-              </Link>
-              <Link to="/booking?service=interior&type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <h4 className="text-xl font-bold mb-2">{"Interior Detailing"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Deep cleaning and protection for your interior"}</p>
-                <div className="text-2xl font-bold">{"From"} RM 75.00</div>
-              </Link>
-              <Link to="/booking?service=paint&type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <h4 className="text-xl font-bold mb-2">{"Protection Services"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Long-lasting protection for your vehicle"}</p>
-                <div className="text-2xl font-bold">{"From"} RM 299.00</div>
-              </Link>
+              {(() => {
+                const engine = servicesList.find(s => s.name === 'Engine Bay Wash & Protect');
+                const interior5 = servicesList.find(s => s.name === 'Interior Detailing & Protect (5-seater)');
+                const interior7 = servicesList.find(s => s.name === 'Interior Detailing & Protect (7-seater)');
+                const spray = servicesList.find(s => s.name === 'S002 Spray Sealant');
+                const interiorPrice = (interior5?.base_price ?? interior7?.base_price ?? 0).toFixed(2);
+                return (
+                  <>
+                    {engine && (
+                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                        <h4 className="text-xl font-bold mb-2">{engine.name}</h4>
+                        <p className="text-sm opacity-80 mb-3">Engine bay cleaning and protection</p>
+                        <div className="text-2xl font-bold">RM {Number(engine.base_price).toFixed(2)}</div>
+                      </Link>
+                    )}
+                    {(interior5 || interior7) && (
+                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                        <h4 className="text-xl font-bold mb-2">Interior Detailing & Protect</h4>
+                        <p className="text-sm opacity-80 mb-3">5 or 7 seater options</p>
+                        <div className="text-2xl font-bold">From RM {interiorPrice}</div>
+                      </Link>
+                    )}
+                    {spray && (
+                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+                        <h4 className="text-xl font-bold mb-2">{spray.name}</h4>
+                        <p className="text-sm opacity-80 mb-3">Quick spray sealant application</p>
+                        <div className="text-2xl font-bold">RM {Number(spray.base_price).toFixed(2)}</div>
+                      </Link>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

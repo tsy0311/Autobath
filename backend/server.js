@@ -9,6 +9,8 @@ const rateLimit = require('express-rate-limit');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -53,6 +55,35 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+
+// Static serving for uploaded files
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+app.use('/uploads', express.static(uploadsDir));
+
+// Simple local upload handling (single image)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage });
+
+app.post('/api/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  const publicUrl = `/uploads/${req.file.filename}`;
+  const absoluteUrl = `${req.protocol}://${req.get('host')}${publicUrl}`;
+  res.json({ success: true, url: absoluteUrl, path: publicUrl });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

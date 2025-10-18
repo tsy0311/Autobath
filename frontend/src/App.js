@@ -16,7 +16,6 @@ import Login from './pages/Login';
 import Contact from './pages/Contact';
 import Cart from './pages/Cart';
 import Booking from './pages/Booking';
-import PaymentTestPage from './pages/PaymentTestPage';
 import QuickBooking from './pages/QuickBooking';
 import Gallery from './pages/Gallery';
 import FAQ from './pages/FAQ';
@@ -42,7 +41,7 @@ function App() {
             <Route path="/gallery" element={<><Header /><Gallery /><Footer /><FloatingBookButton /></>} />
             <Route path="/faq" element={<><Header /><FAQ /><Footer /></>} />
             <Route path="/my-bookings" element={<><Header /><MyBookings /><Footer /></>} />
-            <Route path="/payment-test" element={<><Header /><PaymentTestPage /><Footer /></>} />
+            {/* Payment test route removed */}
             <Route path="/quick-booking/:token" element={<><Header /><QuickBooking /><Footer /></>} />
             
             {/* Auth Routes (No Header/Footer) */}

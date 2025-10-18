@@ -28,6 +28,7 @@ const initDatabase = () => {
           price DECIMAL(10,2) NOT NULL,
           image_url TEXT,
           category TEXT,
+          brand TEXT,
           stock INTEGER DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -214,7 +215,7 @@ const initDatabase = () => {
           reject(err);
         } else {
           console.log('Database tables initialized successfully');
-          // Insert sample data
+          // Skip inserting sample products going forward
           insertSampleData()
             .then(() => resolve())
             .catch(reject);
@@ -227,75 +228,12 @@ const initDatabase = () => {
 // Insert sample data
 const insertSampleData = () => {
   return new Promise((resolve, reject) => {
-    const products = [
-      {
-        name: 'Koch Chemie Car Soap',
-        description: 'Premium pH-neutral shampoo that safely cleans without stripping wax or sealants.',
-        price: 24.99,
-        category: 'Cleaning',
-        stock: 50
-      },
-      {
-        name: 'Quick Detailer Spray',
-        description: 'Spray wax and detailer in one for maintaining that just-detailed look between washes.',
-        price: 18.99,
-        category: 'Detailing',
-        stock: 30
-      },
-      {
-        name: 'Wheel Cleaner',
-        description: 'Powerful yet safe cleaner that removes brake dust and grime from all wheel types.',
-        price: 22.99,
-        category: 'Cleaning',
-        stock: 25
-      },
-      {
-        name: 'Ceramic Coating Kit',
-        description: 'Professional-grade ceramic coating that provides long-lasting protection for your paint.',
-        price: 89.99,
-        category: 'Protection',
-        stock: 15
-      },
-      {
-        name: 'Microfiber Towels (6-pack)',
-        description: 'Premium ultra-soft microfiber towels for safe washing and drying.',
-        price: 19.99,
-        category: 'Accessories',
-        stock: 40
-      },
-      {
-        name: 'Leather Conditioner',
-        description: 'Restores and protects leather surfaces with UV protection.',
-        price: 26.99,
-        category: 'Interior',
-        stock: 20
-      }
-    ];
-
-    const stmt = db.prepare(`
-      INSERT OR IGNORE INTO products (name, description, price, category, stock)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-
-    products.forEach(product => {
-      stmt.run(product.name, product.description, product.price, product.category, product.stock);
-    });
-
-    stmt.finalize((err) => {
-      if (err) {
-        console.error('Error inserting sample products:', err.message);
-        reject(err);
-      } else {
-        console.log('Sample products inserted successfully');
-        
-        // Insert sample services
-        insertSampleServices()
-          .then(() => insertSampleServicePackages())
-          .then(() => insertSampleProductBundles())
-          .then(() => resolve())
-          .catch(reject);
-      }
-    });
+    // Do not insert sample products anymore
+    insertSampleServices()
+      .then(() => insertSampleServicePackages())
+      .then(() => insertSampleProductBundles())
+      .then(() => resolve())
+      .catch(reject);
   });
 };
 

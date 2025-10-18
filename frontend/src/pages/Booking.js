@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { FaClock, FaCheck, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
@@ -26,6 +26,7 @@ const Booking = () => {
   const [packages, setPackages] = useState([]);
   const [vehicleType, setVehicleType] = useState('sedan');
   const [serviceType, setServiceType] = useState('package'); // package or individual
+  const [motorcycleCategory, setMotorcycleCategory] = useState('normal'); // normal | sport
 
   // Customer details
   const [name, setName] = useState('');
@@ -34,6 +35,41 @@ const Booking = () => {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Hidden native date input to avoid showing YYYY-MM-DD UI
+  const dateInputRef = useRef(null);
+  const openDatePicker = () => {
+    if (dateInputRef.current) {
+      // Modern browsers support showPicker on date inputs
+      if (typeof dateInputRef.current.showPicker === 'function') {
+        dateInputRef.current.showPicker();
+      } else {
+        dateInputRef.current.click();
+      }
+    }
+  };
+
+  // Individual services to show (from backend), merge 5/7-seater into one selectable card
+  const interior5 = useMemo(() => (services || []).find(s => s.name === 'Interior Detailing & Protect (5-seater)'), [services]);
+  const interior7 = useMemo(() => (services || []).find(s => s.name === 'Interior Detailing & Protect (7-seater)'), [services]);
+  const engineBay = useMemo(() => (services || []).find(s => s.name === 'Engine Bay Wash & Protect'), [services]);
+  const spraySealant = useMemo(() => (services || []).find(s => s.name === 'S002 Spray Sealant'), [services]);
+
+  const [interiorSeatOption, setInteriorSeatOption] = useState('5'); // '5' or '7'
+
+  const individualServices = useMemo(() => {
+    const list = [];
+    if (engineBay) list.push(engineBay);
+    if (interior5 || interior7) {
+      list.push({
+        merged: true,
+        name: 'Interior Detailing & Protect',
+        variants: [interior5, interior7].filter(Boolean)
+      });
+    }
+    if (spraySealant) list.push(spraySealant);
+    return list;
+  }, [engineBay, interior5, interior7, spraySealant]);
 
 
   // Load services and packages on component mount
@@ -139,7 +175,7 @@ const Booking = () => {
       .finally(() => setSlotsLoading(false));
   }, [date, selectedPackage, selectedService]);
 
-  const canProceedStep1 = selectedPackage || (selectedService && selectedService.type); // Packages or individual services
+  const canProceedStep1 = selectedPackage || !!selectedService; // Packages or individual services
   const canProceedStep2 = date && slot;
   const canProceedStep3 = name && email;
 
@@ -173,7 +209,7 @@ const Booking = () => {
         vehicleType,
         serviceType,
         packageId: selectedPackage?.id,
-        serviceId: selectedService?.type || selectedService?.id,
+        serviceId: selectedService?.id,
         duration
       });
       toast.success('Booking request submitted! We will confirm shortly.');
@@ -277,216 +313,243 @@ const Booking = () => {
                       onChange={(e) => setVehicleType(e.target.value)}
                       className="form-control max-w-xs mx-auto"
                     >
+                      <option value="motorcycle">Motorcycle</option>
+                      <option value="hatchback">Hatchback</option>
                       <option value="sedan">Sedan</option>
                       <option value="suv">SUV</option>
+                      <option value="mpv">MPV</option>
                       <option value="truck">Truck</option>
                     </select>
                   </div>
 
-                  {/* Service Type Selection */}
-                  <div className="mb-6">
-                    <div className="flex justify-center space-x-4">
-                      <button
-                        type="button"
-                        className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                          serviceType === 'package'
-                            ? 'bg-secondary text-white shadow-lg'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                        onClick={() => {
-                          setServiceType('package');
-                          setSelectedService(null);
-                        }}
-                      >
-                        Service Packages
-                      </button>
-                      <button
-                        type="button"
-                        className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                          serviceType === 'individual'
-                            ? 'bg-secondary text-white shadow-lg'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                        onClick={() => {
-                          setServiceType('individual');
-                          setSelectedPackage(null);
-                        }}
-                      >
-                        Individual Services
-                      </button>
-                    </div>
-                  </div>
+                  {vehicleType === 'motorcycle' ? (
+                    <>
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Motorcycle Category</label>
+                        <div className="flex justify-center gap-3">
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg font-medium ${motorcycleCategory === 'normal' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
+                            onClick={() => { setMotorcycleCategory('normal'); setSelectedService(null); }}
+                          >
+                            Normal Bike
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg font-medium ${motorcycleCategory === 'sport' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
+                            onClick={() => { setMotorcycleCategory('sport'); setSelectedService(null); }}
+                          >
+                            Sport Bike
+                          </button>
+                        </div>
+                      </div>
 
-                  {/* Service Packages */}
-                  {serviceType === 'package' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {packages.map(packageData => (
-                        <div 
-                          key={packageData.id}
-                          className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                            selectedPackage?.id === packageData.id 
-                              ? 'border-secondary bg-secondary/5 shadow-lg' 
-                              : 'border-gray-200 hover:border-secondary hover:shadow-md'
-                          }`}
-                          onClick={() => setSelectedPackage(packageData)}
-                        >
-                          {packageData.is_popular === 1 && (
-                            <div className="absolute -top-2 -right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                              Popular
-                            </div>
-                          )}
-                          <div className="flex flex-col justify-between h-full">
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex-1">
-                                <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
-                                <p className="text-gray-600">{packageData.description}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                          { key: 'moto-basic', name: 'Basic Wash', priceNormal: 25, priceSport: 35, duration: 45 },
+                          { key: 'moto-detail', name: 'Detailing + Wax', priceNormal: 55, priceSport: 75, duration: 90 },
+                          { key: 'moto-polish', name: 'Polishing Service', priceNormal: 130, priceSport: 230, duration: 120 },
+                        ].map((svc) => {
+                          const price = motorcycleCategory === 'sport' ? svc.priceSport : svc.priceNormal;
+                          const selected = selectedService && selectedService.metaKey === svc.key;
+                          return (
+                            <div
+                              key={svc.key}
+                              className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${selected ? 'border-secondary bg-secondary/5 shadow-lg' : 'border-gray-200 hover:border-secondary hover:shadow-md'}`}
+                              onClick={() => setSelectedService({
+                                metaKey: svc.key,
+                                name: `Motorcycle ${svc.name} - ${motorcycleCategory === 'sport' ? 'Sport Bike' : 'Normal Bike'}`,
+                                base_price: price,
+                                duration_minutes: svc.duration
+                              })}
+                            >
+                              <div className="flex flex-col justify-between h-full">
+                                <div className="flex justify-between items-start mb-4">
+                                  <div className="flex-1">
+                                    <h4 className="text-lg font-semibold text-primary mb-2">{svc.name}</h4>
+                                  </div>
+                                </div>
+                                <div className="space-y-2 text-sm mt-auto">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-secondary text-lg">RM {price.toFixed(2)}</span>
+                                    <span className="text-gray-600">{Math.floor(svc.duration/60)}h {svc.duration%60}m</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Service Type Selection */}
+                      <div className="mb-6">
+                        <div className="flex justify-center space-x-4">
+                          <button
+                            type="button"
+                            className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                              serviceType === 'package'
+                                ? 'bg-secondary text-white shadow-lg'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                            onClick={() => {
+                              setServiceType('package');
+                              setSelectedService(null);
+                            }}
+                          >
+                            Service Packages
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                              serviceType === 'individual'
+                                ? 'bg-secondary text-white shadow-lg'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                            onClick={() => {
+                              setServiceType('individual');
+                              setSelectedPackage(null);
+                            }}
+                          >
+                            Individual Services
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Service Packages */}
+                      {serviceType === 'package' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {packages.map(packageData => (
+                            <div 
+                              key={packageData.id}
+                              className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
                                 selectedPackage?.id === packageData.id 
-                                  ? 'bg-secondary text-white' 
-                                  : 'border-2 border-gray-300'
-                              }`}>
-                                {selectedPackage?.id === packageData.id && <FaCheck className="text-sm" />}
+                                  ? 'border-secondary bg-secondary/5 shadow-lg' 
+                                  : 'border-gray-200 hover:border-secondary hover:shadow-md'
+                              }`}
+                              onClick={() => setSelectedPackage(packageData)}
+                            >
+                              {packageData.is_popular === 1 && (
+                                <div className="absolute -top-2 -right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                  Popular
+                                </div>
+                              )}
+                              <div className="flex flex-col justify-between h-full">
+                                <div className="flex justify-between items-start mb-4">
+                                  <div className="flex-1">
+                                    <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
+                                    <p className="text-gray-600">{packageData.description}</p>
+                                  </div>
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
+                                    selectedPackage?.id === packageData.id 
+                                      ? 'bg-secondary text-white' 
+                                      : 'border-2 border-gray-300'
+                                  }`}>
+                                    {selectedPackage?.id === packageData.id && <FaCheck className="text-sm" />}
+                                  </div>
+                                </div>
+                                <div className="space-y-2 text-sm mt-auto">
+                                  <div className="flex items-center gap-1 text-gray-500">
+                                    <FaClock /> {formatDuration(packageData.duration_minutes)}
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-secondary text-lg">RM {packageData.finalPrice?.toFixed(2) || '0.00'}</span>
+                                    <span className="text-green-600 font-medium">Save RM {packageData.savings?.toFixed(2) || '0.00'}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <div className="space-y-2 text-sm mt-auto">
-                              <div className="flex items-center gap-1 text-gray-500">
-                                <FaClock /> {formatDuration(packageData.duration_minutes)}
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Individual Services (dynamic from backend) */}
+                      {serviceType === 'individual' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {individualServices.length === 0 ? (
+                            <div className="col-span-full text-center text-gray-600">
+                              No individual services found. Please refresh.
+                            </div>
+                          ) : (
+                            individualServices.map((svc) => (
+                              <div
+                                key={svc.merged ? 'interior-merged' : svc.id}
+                                className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
+                                  (svc.merged ? selectedService?.name === 'Interior Detailing & Protect' : selectedService?.id === svc.id)
+                                    ? 'border-secondary bg-secondary/5 shadow-lg'
+                                    : 'border-gray-200 hover:border-secondary hover:shadow-md'
+                                }`}
+                                onClick={() => {
+                                  if (svc.merged) {
+                                    // choose current variant by seat option
+                                    const chosen = interiorSeatOption === '7'
+                                      ? (interior7 || interior5)
+                                      : (interior5 || interior7);
+                                    if (chosen) setSelectedService(chosen);
+                                  } else {
+                                    setSelectedService(svc);
+                                  }
+                                }}
+                              >
+                                <div className="flex flex-col justify-between h-full">
+                                  <div className="flex justify-between items-start mb-4">
+                                    <div className="flex-1">
+                                      <h4 className="text-lg font-semibold text-primary mb-2">{svc.merged ? 'Interior Detailing & Protect' : svc.name}</h4>
+                                      {!svc.merged && svc.description && (
+                                        <p className="text-gray-600">{svc.description}</p>
+                                      )}
+                                    </div>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
+                                      (svc.merged ? (selectedService && selectedService.name?.startsWith('Interior Detailing')) : (selectedService?.id === svc.id)) ? 'bg-secondary text-white' : 'border-2 border-gray-300'
+                                    }`}>
+                                      {selectedService?.id === svc.id && <FaCheck className="text-sm" />}
+                                    </div>
+                                  </div>
+                                  <div className="space-y-2 text-sm mt-auto">
+                                    {svc.merged ? (
+                                      (selectedService && selectedService.name?.startsWith('Interior Detailing')) ? (
+                                        <>
+                                          <div className="mb-2">
+                                            <label className="block text-xs font-semibold text-gray-700 mb-1">Seat Option</label>
+                                            <select
+                                              value={interiorSeatOption}
+                                              onChange={(e) => {
+                                                setInteriorSeatOption(e.target.value);
+                                                const chosen = e.target.value === '7' ? (interior7 || interior5) : (interior5 || interior7);
+                                                if (chosen) setSelectedService(chosen);
+                                              }}
+                                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                            >
+                                              <option value="5">5-seater (RM {(interior5?.base_price ?? interior7?.base_price ?? 0).toFixed(2)})</option>
+                                              <option value="7">7-seater (RM {(interior7?.base_price ?? interior5?.base_price ?? 0).toFixed(2)})</option>
+                                            </select>
+                                          </div>
+                                          <div className="flex items-center gap-1 text-gray-500">
+                                            <FaClock /> {formatDuration((interiorSeatOption === '7' ? interior7?.duration_minutes : interior5?.duration_minutes) || 60)}
+                                          </div>
+                                        </>
+                                      ) : (
+                                        <div className="text-gray-600 text-sm">Tap to choose 5 or 7 seater</div>
+                                      )
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-1 text-gray-500">
+                                          <FaClock /> {formatDuration(svc.duration_minutes || 60)}
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                          <span className="font-semibold text-secondary text-lg">From RM {(svc.base_price ?? 0).toFixed(2)}</span>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-secondary text-lg">RM {packageData.finalPrice?.toFixed(2) || '0.00'}</span>
-                                <span className="text-green-600 font-medium">Save RM {packageData.savings?.toFixed(2) || '0.00'}</span>
-                              </div>
-                            </div>
-                          </div>
+                            ))
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Individual Services */}
-                  {serviceType === 'individual' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Exterior Detailing */}
-                      <div 
-                        className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                          selectedService?.type === 'exterior' 
-                            ? 'border-secondary bg-secondary/5 shadow-lg' 
-                            : 'border-gray-200 hover:border-secondary hover:shadow-md'
-                        }`}
-                        onClick={() => setSelectedService({
-                          type: 'exterior',
-                          name: 'Exterior Detailing',
-                          description: 'Complete exterior wash, wax, and paint correction',
-                          base_price: 85.00,
-                          duration_minutes: 120
-                        })}
-                      >
-                        <div className="flex flex-col justify-between h-full">
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-primary mb-2">Exterior Detailing</h4>
-                              <p className="text-gray-600">Complete exterior wash, wax, and paint correction</p>
-                            </div>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
-                              selectedService?.type === 'exterior' 
-                                ? 'bg-secondary text-white' 
-                                : 'border-2 border-gray-300'
-                            }`}>
-                              {selectedService?.type === 'exterior' && <FaCheck className="text-sm" />}
-                            </div>
-                          </div>
-                          <div className="space-y-2 text-sm mt-auto">
-                            <div className="flex items-center gap-1 text-gray-500">
-                              <FaClock /> {formatDuration(120)}
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="font-semibold text-secondary text-lg">From RM 85.00</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Interior Detailing */}
-                      <div 
-                        className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                          selectedService?.type === 'interior' 
-                            ? 'border-secondary bg-secondary/5 shadow-lg' 
-                            : 'border-gray-200 hover:border-secondary hover:shadow-md'
-                        }`}
-                        onClick={() => setSelectedService({
-                          type: 'interior',
-                          name: 'Interior Detailing',
-                          description: 'Deep interior cleaning and leather treatment',
-                          base_price: 75.00,
-                          duration_minutes: 90
-                        })}
-                      >
-                        <div className="flex flex-col justify-between h-full">
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-primary mb-2">Interior Detailing</h4>
-                              <p className="text-gray-600">Deep interior cleaning and leather treatment</p>
-                            </div>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
-                              selectedService?.type === 'interior' 
-                                ? 'bg-secondary text-white' 
-                                : 'border-2 border-gray-300'
-                            }`}>
-                              {selectedService?.type === 'interior' && <FaCheck className="text-sm" />}
-                            </div>
-                          </div>
-                          <div className="space-y-2 text-sm mt-auto">
-                            <div className="flex items-center gap-1 text-gray-500">
-                              <FaClock /> {formatDuration(90)}
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="font-semibold text-secondary text-lg">From RM 75.00</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Paint Protection */}
-                      <div 
-                        className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                          selectedService?.type === 'paint' 
-                            ? 'border-secondary bg-secondary/5 shadow-lg' 
-                            : 'border-gray-200 hover:border-secondary hover:shadow-md'
-                        }`}
-                        onClick={() => setSelectedService({
-                          type: 'paint',
-                          name: 'Paint Protection',
-                          description: 'Ceramic coating and paint protection film',
-                          base_price: 299.00,
-                          duration_minutes: 360
-                        })}
-                      >
-                        <div className="flex flex-col justify-between h-full">
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex-1">
-                              <h4 className="text-lg font-semibold text-primary mb-2">Paint Protection</h4>
-                              <p className="text-gray-600">Ceramic coating and paint protection film</p>
-                            </div>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
-                              selectedService?.type === 'paint' 
-                                ? 'bg-secondary text-white' 
-                                : 'border-2 border-gray-300'
-                            }`}>
-                              {selectedService?.type === 'paint' && <FaCheck className="text-sm" />}
-                            </div>
-                          </div>
-                          <div className="space-y-2 text-sm mt-auto">
-                            <div className="flex items-center gap-1 text-gray-500">
-                              <FaClock /> {formatDuration(360)}
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="font-semibold text-secondary text-lg">From RM 299.00</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                    </>
                   )}
 
                 </div>
@@ -518,13 +581,28 @@ const Booking = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="form-group">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Select date</label>
+                      {/* Hidden native input; opened via button to avoid YYYY-MM-DD placeholder */}
                       <input
+                        ref={dateInputRef}
                         type="date"
-                        className="form-control"
+                        className="hidden"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                         min={new Date().toISOString().split('T')[0]}
                       />
+                      <button
+                        type="button"
+                        onClick={openDatePicker}
+                        className={`w-full px-4 py-3 border-2 rounded-lg font-medium transition-all ${
+                          date
+                            ? 'border-secondary text-secondary hover:bg-secondary/5'
+                            : 'border-gray-300 text-gray-700 hover:border-secondary hover:bg-secondary/5'
+                        }`}
+                      >
+                        {date
+                          ? new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                          : 'Choose date'}
+                      </button>
                     </div>
                     <div className="form-group">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Selected Service</label>
