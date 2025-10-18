@@ -15,7 +15,7 @@ const Home = () => {
     averageRating: 0,
     totalReviews: 0
   });
-  const [servicesList, setServicesList] = useState([]);
+  
 
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
@@ -49,9 +49,6 @@ const Home = () => {
 
       const services = servicesRes.data.services || [];
       const packages = packagesRes.data.packages || [];
-
-      setServicesList(services);
-      setPackagesList(packages);
 
       // Calculate statistics
       setStats({
