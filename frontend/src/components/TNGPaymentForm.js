@@ -92,7 +92,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
     } finally {
       setLoading(false);
     }
-  }, [orderData.total, orderData.id, orderData.customerInfo, orderData.qrCode, onError]);
+  }, [orderData.total, orderData.id, orderData.customerInfo, onError, startPaymentPolling]);
 
   useEffect(() => {
     createTNGPayment();
