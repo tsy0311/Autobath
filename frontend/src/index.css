@@ -29,7 +29,7 @@ body {
   }
   
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-light;
+    @apply bg-secondary text-white hover:bg-secondary-light;
   }
   
   .btn-secondary {
