@@ -29,7 +29,7 @@ services:
       - key: BILLPLZ_COLLECTION_ID
         sync: false
 
-  - type: static
+  - type: web
     name: autobath-frontend
     env: static
     rootDir: frontend
