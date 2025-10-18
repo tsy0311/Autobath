@@ -2,7 +2,6 @@ services:
   - type: web
     name: autobath-backend
     env: node
-    plan: starter
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
@@ -33,7 +32,6 @@ services:
   - type: static
     name: autobath-frontend
     env: static
-    plan: starter
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
