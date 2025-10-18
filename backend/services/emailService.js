@@ -122,7 +122,7 @@ const templates = {
             <ul>
               <li>Visit our website for more information about our services</li>
               <li>Follow us on social media for updates and tips</li>
-              <li>Call us directly at (+60) 163399533 for urgent inquiries</li>
+              <li>Call us directly at (+60) 167700033 for urgent inquiries</li>
             </ul>
           </div>
           
@@ -138,7 +138,7 @@ const templates = {
         <div style="background: #000; color: #C19A6B; padding: 15px; text-align: center; font-size: 12px;">
           <p style="margin: 0;">AUTOBATH - Premium Car Detailing Services</p>
           <p style="margin: 5px 0 0 0;">13 jalan rakan 12/2 Cheras, 43200 Kajang, Selangor</p>
-          <p style="margin: 5px 0 0 0;">Phone: (+60) 163399533 | Email: autobath36@gmail.com</p>
+          <p style="margin: 5px 0 0 0;">Phone: (+60) 167700033 | Email: autobath36@gmail.com</p>
         </div>
       </div>
     `
@@ -256,7 +256,7 @@ const templates = {
           
           <div style="margin-top: 20px; text-align: center;">
             <p>Need to make changes? Contact us:</p>
-            <p><strong>Phone:</strong> (+60) 163399533</p>
+            <p><strong>Phone:</strong> (+60) 167700033</p>
             <p><strong>Email:</strong> autobath36@gmail.com</p>
           </div>
         </div>
@@ -264,7 +264,7 @@ const templates = {
         <div style="background: #000; color: #C19A6B; padding: 15px; text-align: center; font-size: 12px;">
           <p style="margin: 0;">AUTOBATH - Premium Car Detailing Services</p>
           <p style="margin: 5px 0 0 0;">13 jalan rakan 12/2 Cheras, 43200 Kajang, Selangor</p>
-          <p style="margin: 5px 0 0 0;">Phone: (+60) 163399533 | Email: autobath36@gmail.com</p>
+          <p style="margin: 5px 0 0 0;">Phone: (+60) 167700033 | Email: autobath36@gmail.com</p>
         </div>
       </div>
     `
@@ -314,7 +314,7 @@ const templates = {
             <p>Your booking for <strong>${data.service}</strong> on <strong>${data.date}</strong> at <strong>${data.timeSlot}</strong> has been cancelled.</p>
             ${data.reason ? `<p><strong>Reason:</strong> ${data.reason}</p>` : ''}
             <p style="margin-top: 12px;">If you believe this was a mistake or you’d like to reschedule, please contact us.</p>
-            <p style="margin-top: 12px;">Phone: (+60) 163399533 | Email: autobath36@gmail.com</p>
+            <p style="margin-top: 12px;">Phone: (+60) 167700033 | Email: autobath36@gmail.com</p>
           </div>
         </div>
         <div style="background: #000; color: #C19A6B; padding: 15px; text-align: center; font-size: 12px;">

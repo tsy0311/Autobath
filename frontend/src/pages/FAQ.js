@@ -203,7 +203,7 @@ const FAQ = () => {
           <p className="mb-6">{"Our team is here to help you"}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href="https://wa.me/60163399533?text=Hi%20AUTOBATH%2C%20I%20have%20a%20question"
+              href="https://wa.me/60167700033?text=Hi%20AUTOBATH%2C%20I%20have%20a%20question"
               target="_blank"
               rel="noopener noreferrer"
               className="btn bg-green-500 text-white hover:bg-green-600"

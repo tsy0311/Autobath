@@ -134,7 +134,7 @@ const Header = () => {
                 <p className="text-sm text-gray-600 mb-3">Quick Contact</p>
               <div className="space-y-2">
                 <a 
-                  href="https://wa.me/60163399533"
+                  href="https://wa.me/60167700033"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-green-600 hover:text-green-700 font-semibold"

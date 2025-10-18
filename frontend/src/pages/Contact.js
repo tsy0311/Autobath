@@ -93,7 +93,7 @@ const Contact = () => {
               <p>
                 <FaWhatsapp /> 
                 <a 
-                  href="https://wa.me/60163399533?text=Hi%20AUTOBATH%2C%20I%27d%20like%20to%20inquire%20about%20your%20services"
+                  href="https://wa.me/60167700033?text=Hi%20AUTOBATH%2C%20I%27d%20like%20to%20inquire%20about%20your%20services"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-green-500 transition-colors font-semibold"

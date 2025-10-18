@@ -86,7 +86,7 @@ const Footer = () => {
                 <span className="group-hover:underline">autobath36@gmail.com</span>
               </a>
               <a 
-                href="https://wa.me/60163399533?text=Hi%20AUTOBATH%2C%20I%27d%20like%20to%20book%20a%20service"
+                href="https://wa.me/60167700033?text=Hi%20AUTOBATH%2C%20I%27d%20like%20to%20book%20a%20service"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-green-400 transition-colors flex items-center gap-2 group font-semibold"

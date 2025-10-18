@@ -196,7 +196,7 @@ const MyBookings = () => {
                           {booking.status === 'pending' && (
                             <>
                               <a
-                                href={`https://wa.me/60163399533?text=Hi%2C%20I%20need%20to%20reschedule%20my%20booking%20%23${booking.id}`}
+                                href={`https://wa.me/60167700033?text=Hi%2C%20I%20need%20to%20reschedule%20my%20booking%20%23${booking.id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn btn-outline flex-1 text-center"
@@ -204,7 +204,7 @@ const MyBookings = () => {
                                 Reschedule
                               </a>
                               <a
-                                href={`https://wa.me/60163399533?text=Hi%2C%20I%20need%20to%20cancel%20my%20booking%20%23${booking.id}`}
+                                href={`https://wa.me/60167700033?text=Hi%2C%20I%20need%20to%20cancel%20my%20booking%20%23${booking.id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn btn-outline text-red-600 border-red-600 hover:bg-red-600 hover:text-white flex-1 text-center"
