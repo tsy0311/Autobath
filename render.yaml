@@ -10,9 +10,13 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
+        value: 10000
       - key: FRONTEND_URL
-        value: https://autobath-frontend-arbl.onrender.com
+        value: https://autobath-frontend.onrender.com
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
       - key: EMAIL_USER
         sync: false
       - key: EMAIL_PASS
@@ -21,8 +25,12 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
+      - key: BILLPLZ_API_KEY
+        sync: false
+      - key: BILLPLZ_COLLECTION_ID
+        sync: false
 
-  - type: web
+  - type: static
     name: autobath-frontend
     env: static
     plan: free
