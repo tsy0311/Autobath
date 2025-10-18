@@ -7,6 +7,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [qrCode, setQrCode] = useState('');
+  const [manualPaidAmount, setManualPaidAmount] = useState('');
   const [error, setError] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('pending');
 
@@ -56,21 +57,15 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
     setError('');
 
     try {
-      const response = await api.post('/api/payments/tng/create', {
+      // For manual QR flow: skip gateway create. Use placeholder QR from props or static.
+      const placeholderPayment = {
+        paymentId: `TNG_${Date.now()}`,
         amount: orderData.total,
-        orderId: orderData.id,
-        customerInfo: orderData.customerInfo
-      });
-
-      if (!response.data.success) {
-        throw new Error(response.data.error || 'Failed to create TNG payment');
-      }
-
-      setPaymentData(response.data.payment);
-      setQrCode(response.data.payment.qrCode);
-      
-      // Start polling for payment status
-      startPaymentPolling(response.data.payment.paymentId);
+        qrCode: orderData.qrCode || '',
+        expiresAt: Date.now() + 15 * 60 * 1000
+      };
+      setPaymentData(placeholderPayment);
+      setQrCode(placeholderPayment.qrCode);
     } catch (error) {
       console.error('TNG payment creation error:', error);
       setError(error.message);
@@ -173,10 +168,10 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
       </div>
 
       {/* QR Code - Mobile Optimized */}
-      {qrCode && paymentStatus === 'pending' && (
+      {paymentStatus === 'pending' && (
         <div className="text-center bg-white rounded-xl border-2 border-secondary/20 p-4 sm:p-6">
           <div className="w-full max-w-[280px] sm:max-w-xs mx-auto bg-white rounded-2xl flex items-center justify-center mb-4 p-4 shadow-lg">
-            {qrCode.startsWith('data:image') ? (
+            {qrCode ? (
               <div className="relative">
                 <img 
                   src={qrCode} 
@@ -200,6 +195,48 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
               RM {paymentData?.amount?.toFixed(2)}
             </p>
             <p className="text-xs text-gray-600">Amount to Pay</p>
+          </div>
+          {/* Manual amount verification input */}
+          <div className="mt-3">
+            <label className="block text-xs text-gray-600 mb-1">Enter amount you paid (RM)</label>
+            <input
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              value={manualPaidAmount}
+              onChange={(e) => setManualPaidAmount(e.target.value)}
+              className="w-full sm:max-w-xs mx-auto border-2 border-gray-300 rounded-lg p-2 text-center"
+              placeholder={paymentData?.amount?.toFixed(2)}
+            />
+            <button
+              onClick={async () => {
+                try {
+                  const resp = await api.post('/api/payments/tng/manual-verify', {
+                    expectedAmount: paymentData?.amount,
+                    paidAmount: Number(manualPaidAmount),
+                    orderId: orderData.id,
+                  });
+                  if (resp.data.success && resp.data.status === 'completed') {
+                    setPaymentStatus('completed');
+                    onSuccess({
+                      paymentId: paymentData.paymentId,
+                      method: 'tng',
+                      amount: paymentData.amount,
+                      status: 'completed',
+                    });
+                    toast.success('Payment verified successfully!');
+                  } else {
+                    toast.error('Amount mismatch. Please contact support.');
+                    setError('Amount paid is not correct. Please contact support.');
+                  }
+                } catch (err) {
+                  toast.error('Verification failed. Try again.');
+                }
+              }}
+              className="mt-2 inline-block px-6 py-2 bg-secondary hover:bg-secondary-dark text-white rounded-lg font-semibold"
+            >
+              Verify Payment
+            </button>
           </div>
           {paymentData?.billplzUrl && (
             <a 
