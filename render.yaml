@@ -11,7 +11,7 @@ services:
       - key: PORT
         value: 10000
       - key: FRONTEND_URL
-        value: https://autobath-website.onrender.com
+        value: https://autobath.co
       - key: EMAIL_HOST
         value: smtp.gmail.com
       - key: EMAIL_PORT
@@ -37,6 +37,6 @@ services:
     staticPublishPath: ./build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://autobath-api.onrender.com
+        value: https://api.autobath.co
       - key: REACT_APP_STRIPE_PUBLISHABLE_KEY
         sync: false
