@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FaCar, FaChair, FaClock, FaUsers, 
+  FaCar, FaChair, FaClock,
   FaCheck, FaTag, FaShieldAlt, FaMobile, FaGift,
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
@@ -16,7 +16,6 @@ const Home = () => {
     totalReviews: 0
   });
   const [servicesList, setServicesList] = useState([]);
-  const [packagesList, setPackagesList] = useState([]);
 
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
