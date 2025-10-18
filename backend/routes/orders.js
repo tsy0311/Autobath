@@ -7,7 +7,23 @@ const { sendEmail } = require('../services/emailService');
 // Create new order
 router.post('/', async (req, res) => {
   try {
-    const { customerName, customerEmail, customerPhone, items } = req.body;
+    // Normalize request body to support both frontend payload shapes
+    const body = req.body || {};
+    let { customerName, customerEmail, customerPhone, items } = body;
+
+    if ((!customerName || !customerEmail) && body.customerInfo) {
+      customerName = body.customerInfo.name;
+      customerEmail = body.customerInfo.email;
+      customerPhone = body.customerInfo.phone;
+    }
+
+    // Map items that may come as { id, quantity } to { productId, quantity }
+    if (Array.isArray(items)) {
+      items = items.map((it) => ({
+        productId: it.productId || it.product_id || it.id,
+        quantity: Number(it.quantity) || 1
+      }));
+    }
 
     // Validate required fields
     if (!customerName || !customerEmail || !items || !Array.isArray(items) || items.length === 0) {
