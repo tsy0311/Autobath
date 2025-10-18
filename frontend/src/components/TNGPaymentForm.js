@@ -10,58 +10,6 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [error, setError] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('pending');
 
-  const startPaymentPolling = useCallback((paymentId) => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await api.post('/api/payments/tng/verify', {
-          paymentId: paymentId
-        });
-
-        if (response.data.success) {
-          if (response.data.status === 'completed') {
-            setPaymentStatus('completed');
-            clearInterval(pollInterval);
-            // If backend returns amount (Billplz), verify it matches the order total
-            const verifiedAmount = typeof response.data.amount === 'number' ? response.data.amount : null;
-            if (verifiedAmount != null) {
-              const expected = Number(orderData.total).toFixed(2);
-              const actual = Number(verifiedAmount).toFixed(2);
-              if (expected !== actual) {
-                setError(`Amount mismatch. Expected RM ${expected}, got RM ${actual}.`);
-                setPaymentStatus('timeout');
-                onError('Amount mismatch');
-                return;
-              }
-            }
-
-            const successPayment = {
-              paymentId: paymentId,
-              method: 'tng',
-              amount: orderData.total,
-              currency: 'MYR',
-              status: 'completed',
-              transactionId: paymentId,
-              qrCode: qrCode
-            };
-
-            onSuccess(successPayment);
-            toast.success('TNG payment completed successfully!');
-          }
-        }
-      } catch (error) {
-        console.error('Payment verification error:', error);
-      }
-    }, 3000); // Poll every 3 seconds
-
-    // Stop polling after 15 minutes
-    setTimeout(() => {
-      clearInterval(pollInterval);
-      if (paymentStatus === 'pending') {
-        setError('Payment timeout. Please try again.');
-        setPaymentStatus('timeout');
-      }
-    }, 15 * 60 * 1000);
-  }, [orderData.total, qrCode, onSuccess, paymentStatus]);
 
   const createTNGPayment = useCallback(async () => {
     setLoading(true);
@@ -83,7 +31,56 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
       setPaymentData(p);
       setQrCode(p.qrCode || '');
       if (p.paymentId) {
-        startPaymentPolling(p.paymentId);
+        // Start polling inline to avoid circular dependency
+        const pollInterval = setInterval(async () => {
+          try {
+            const verifyResponse = await api.post('/api/payments/tng/verify', {
+              paymentId: p.paymentId
+            });
+
+            if (verifyResponse.data.success && verifyResponse.data.status === 'completed') {
+              setPaymentStatus('completed');
+              clearInterval(pollInterval);
+              
+              // Verify amount if provided by backend
+              const verifiedAmount = typeof verifyResponse.data.amount === 'number' ? verifyResponse.data.amount : null;
+              if (verifiedAmount != null) {
+                const expected = Number(orderData.total).toFixed(2);
+                const actual = Number(verifiedAmount).toFixed(2);
+                if (expected !== actual) {
+                  setError(`Amount mismatch. Expected RM ${expected}, got RM ${actual}.`);
+                  setPaymentStatus('timeout');
+                  onError('Amount mismatch');
+                  return;
+                }
+              }
+
+              const successPayment = {
+                paymentId: p.paymentId,
+                method: 'tng',
+                amount: orderData.total,
+                currency: 'MYR',
+                status: 'completed',
+                transactionId: p.paymentId,
+                qrCode: p.qrCode
+              };
+
+              onSuccess(successPayment);
+              toast.success('TNG payment completed successfully!');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+          }
+        }, 3000);
+
+        // Stop polling after 15 minutes
+        setTimeout(() => {
+          clearInterval(pollInterval);
+          if (paymentStatus === 'pending') {
+            setError('Payment timeout. Please try again.');
+            setPaymentStatus('timeout');
+          }
+        }, 15 * 60 * 1000);
       }
     } catch (error) {
       console.error('TNG payment creation error:', error);
@@ -92,7 +89,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
     } finally {
       setLoading(false);
     }
-  }, [orderData.total, orderData.id, orderData.customerInfo, onError, startPaymentPolling]);
+  }, [orderData.total, orderData.id, orderData.customerInfo, onError, onSuccess, paymentStatus]);
 
   useEffect(() => {
     createTNGPayment();
