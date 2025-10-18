@@ -7,8 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import ChangePasswordModal from '../components/ChangePasswordModal';
 import ProductManagement from '../components/ProductManagement';
 import BookingsManagement from '../components/BookingsManagement';
-import CustomersManagement from '../components/CustomersManagement';
-import ReviewsManagement from '../components/ReviewsManagement';
+// CustomersManagement removed
+// ReviewsManagement removed
 import OrdersManagement from '../components/OrdersManagement';
 
 const AdminDashboard = () => {
@@ -242,26 +242,7 @@ const AdminDashboard = () => {
             >
               <FaCalendarAlt className="text-sm sm:text-base" /> Bookings
             </button>
-            <button 
-              className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
-                activeTab === 'customers' 
-                  ? 'bg-gradient-to-r from-secondary to-secondary-dark text-white shadow-lg' 
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveTab('customers')}
-            >
-              <FaUsers className="text-sm sm:text-base" /> Customers
-            </button>
-            <button 
-              className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
-                activeTab === 'reviews' 
-                  ? 'bg-gradient-to-r from-secondary to-secondary-dark text-white shadow-lg' 
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveTab('reviews')}
-            >
-              <FaStar className="text-sm sm:text-base" /> Reviews
-            </button>
+            {/* Customers / Reviews tabs removed */}
             <button 
               className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                 activeTab === 'orders' 
@@ -285,15 +266,7 @@ const AdminDashboard = () => {
           <BookingsManagement />
         )}
 
-        {/* Customers Tab */}
-        {activeTab === 'customers' && (
-          <CustomersManagement />
-        )}
-
-        {/* Reviews Tab */}
-        {activeTab === 'reviews' && (
-          <ReviewsManagement />
-        )}
+        {/* Customers / Reviews content removed */}
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
@@ -329,17 +302,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300 border-l-4 border-purple-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm text-gray-600 font-semibold mb-1">Total Customers</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.totalCustomers}</p>
-                  </div>
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <FaUsers className="text-2xl sm:text-3xl text-purple-600" />
-                  </div>
-                </div>
-              </div>
+              {/* Total Customers card removed */}
 
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300 border-l-4 border-yellow-500">
                 <div className="flex items-center justify-between">
@@ -434,29 +397,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
-                  <FaStar className="text-sm sm:text-base text-yellow-600" /> Recent Reviews
-                </h3>
-                <div className="activity-list">
-                  {stats.recentReviews.map(review => (
-                    <div key={review.id} className="activity-item">
-                      <div className="activity-info">
-                        <div className="activity-title">{review.customer_name}</div>
-                        <div className="activity-details">{review.service_name || 'Service Review'}</div>
-                      </div>
-                      <div className="activity-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar 
-                            key={i} 
-                            className={i < review.rating ? 'star-filled' : 'star-empty'}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Recent Reviews panel removed */}
             </div>
           </div>
         )}

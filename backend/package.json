@@ -12,6 +12,7 @@
     "seed:test-data": "node database/add-test-data.js",
     "clear:test-data": "node database/clear-test-data.js",
     "clear:products": "node database/clear-products.js",
+    "clear:bookings": "node database/clear-bookings.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
