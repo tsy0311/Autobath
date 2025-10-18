@@ -7,7 +7,6 @@ import {
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
 import api from '../services/api';
-import Testimonials from '../components/Testimonials';
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -387,103 +386,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* CTA Section */}
-      <section className="py-12 sm:py-16 md:py-20 text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={require('../img/dashboard.jpg')} 
-            alt="Professional car detailing service"
-            loading="lazy"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/1200x400/2C5282/ffffff?text=AUTOBATH';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary opacity-80"></div>
-        </div>
-        <div className="container relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">{"Ready to Transform Your Vehicle?"}</h2>
-          <p className="text-xl md:text-2xl mb-10 opacity-90 leading-relaxed">
-            {"Book your appointment today and experience the AUTOBATH difference"}
-          </p>
-          
-          {/* Service Packages (Default) */}
-          <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{"Service Packages"}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <Link to="/booking?package=1&type=package" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <h4 className="text-xl font-bold mb-2">{"Basic Package"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Essential detailing for regular maintenance"}</p>
-                <div className="text-2xl font-bold">RM 40.50</div>
-              </Link>
-              <Link to="/booking?package=2&type=package" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300 relative">
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                  {"Most Popular"}
-                </div>
-                <h4 className="text-xl font-bold mb-2">{"Premium Package"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Comprehensive detailing with premium products"}</p>
-                <div className="text-2xl font-bold">RM 102.00</div>
-              </Link>
-              <Link to="/booking?package=3&type=package" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                <h4 className="text-xl font-bold mb-2">{"Ultra Package"}</h4>
-                <p className="text-sm opacity-80 mb-3">{"Complete transformation with ceramic coating"}</p>
-                <div className="text-2xl font-bold">RM 360.00</div>
-              </Link>
-            </div>
-          </div>
-
-          {/* Individual Services (Synced with Booking) */}
-          <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{"Individual Services"}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {(() => {
-                const engine = servicesList.find(s => s.name === 'Engine Bay Wash & Protect');
-                const interior5 = servicesList.find(s => s.name === 'Interior Detailing & Protect (5-seater)');
-                const interior7 = servicesList.find(s => s.name === 'Interior Detailing & Protect (7-seater)');
-                const spray = servicesList.find(s => s.name === 'S002 Spray Sealant');
-                const interiorPrice = (interior5?.base_price ?? interior7?.base_price ?? 0).toFixed(2);
-                return (
-                  <>
-                    {engine && (
-                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                        <h4 className="text-xl font-bold mb-2">{engine.name}</h4>
-                        <p className="text-sm opacity-80 mb-3">Engine bay cleaning and protection</p>
-                        <div className="text-2xl font-bold">RM {Number(engine.base_price).toFixed(2)}</div>
-                      </Link>
-                    )}
-                    {(interior5 || interior7) && (
-                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                        <h4 className="text-xl font-bold mb-2">Interior Detailing & Protect</h4>
-                        <p className="text-sm opacity-80 mb-3">5 or 7 seater options</p>
-                        <div className="text-2xl font-bold">From RM {interiorPrice}</div>
-                      </Link>
-                    )}
-                    {spray && (
-                      <Link to="/booking?type=individual" className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                        <h4 className="text-xl font-bold mb-2">{spray.name}</h4>
-                        <p className="text-sm opacity-80 mb-3">Quick spray sealant application</p>
-                        <div className="text-2xl font-bold">RM {Number(spray.base_price).toFixed(2)}</div>
-                      </Link>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-            <Link to="/booking" className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 flex items-center gap-2 w-full sm:w-auto justify-center max-w-xs">
-              <FaCalendarAlt /> {"Book Now"}
-            </Link>
-            <Link to="/contact" className="btn btn-secondary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 flex items-center gap-2 w-full sm:w-auto justify-center max-w-xs">
-              <FaUsers /> {"Contact Us"}
-            </Link>
-          </div>
-        </div>
-      </section>
+      
     </div>
   );
 };
