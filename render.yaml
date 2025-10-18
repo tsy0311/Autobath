@@ -2,7 +2,7 @@ services:
   - type: web
     name: autobath-backend
     env: node
-    plan: free
+    plan: starter
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
@@ -30,10 +30,10 @@ services:
       - key: BILLPLZ_COLLECTION_ID
         sync: false
 
-  - type: web
+  - type: static
     name: autobath-frontend
     env: static
-    plan: free
+    plan: starter
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
