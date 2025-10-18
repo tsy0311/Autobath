@@ -4,9 +4,11 @@ const { db } = require('../database/init');
 const { sendEmail } = require('../services/emailService');
 
 // Business hours and slot config
-const BUSINESS_DAYS = [1, 2, 3, 4, 5, 6]; // 1=Mon ... 6=Sat (0=Sun closed)
-const OPEN_HOUR = 9;   // 9:00
-const CLOSE_HOUR = 18; // 18:00
+// Open every day except Tuesday, from 10:00 to 02:00 (overnight)
+// getDay(): 0=Sun, 1=Mon, 2=Tue, ... 6=Sat
+const BUSINESS_DAYS = [0, 1, 3, 4, 5, 6]; // exclude Tuesday (2)
+const OPEN_HOUR = 10;   // 10:00
+const CLOSE_HOUR = 2;   // 02:00 (next day)
 const SLOT_INTERVAL = 30; // 30-minute intervals
 const BUFFER_TIME = 15; // 15-minute buffer between services for cleanup
 
@@ -16,16 +18,43 @@ function generateDailySlots(dateStr, duration = 60) {
   if (!BUSINESS_DAYS.includes(day)) return [];
   
   const slots = [];
-  // Generate slots in 30-minute intervals
-  for (let hour = OPEN_HOUR; hour < CLOSE_HOUR; hour++) {
+  // If close hour is after open hour (same-day window), use simple range
+  if (CLOSE_HOUR > OPEN_HOUR) {
+    for (let hour = OPEN_HOUR; hour < CLOSE_HOUR; hour++) {
+      for (let minute = 0; minute < 60; minute += SLOT_INTERVAL) {
+        const hh = String(hour).padStart(2, '0');
+        const mm = String(minute).padStart(2, '0');
+        const slotTime = `${hh}:${mm}`;
+        const slotEnd = addMinutesToTime(slotTime, duration);
+        if (timeToMinutes(slotEnd) <= CLOSE_HOUR * 60) {
+          slots.push(slotTime);
+        }
+      }
+    }
+    return slots;
+  }
+
+  // Overnight window (wraps past midnight): [00:00, CLOSE_HOUR) and [OPEN_HOUR, 24:00)
+  // Early morning part: 00:00 to CLOSE_HOUR
+  for (let hour = 0; hour < CLOSE_HOUR; hour++) {
     for (let minute = 0; minute < 60; minute += SLOT_INTERVAL) {
       const hh = String(hour).padStart(2, '0');
       const mm = String(minute).padStart(2, '0');
       const slotTime = `${hh}:${mm}`;
-      
-      // Check if this slot + duration fits within business hours
       const slotEnd = addMinutesToTime(slotTime, duration);
       if (timeToMinutes(slotEnd) <= CLOSE_HOUR * 60) {
+        slots.push(slotTime);
+      }
+    }
+  }
+  // Daytime-evening part: OPEN_HOUR to 24:00
+  for (let hour = OPEN_HOUR; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += SLOT_INTERVAL) {
+      const hh = String(hour).padStart(2, '0');
+      const mm = String(minute).padStart(2, '0');
+      const slotTime = `${hh}:${mm}`;
+      const slotEnd = addMinutesToTime(slotTime, duration);
+      if (timeToMinutes(slotEnd) <= 24 * 60) {
         slots.push(slotTime);
       }
     }
