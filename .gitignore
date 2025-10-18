@@ -147,3 +147,6 @@ Thumbs.db
 # Build artifacts
 *.log
 >>>>>>> 1223073187d767b4b1a55832c926651c4083ea03
+env.txt
+backend/env.txt
+frontend/env.txt
