@@ -7,7 +7,6 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
   const [qrCode, setQrCode] = useState('');
-  const [manualPaidAmount, setManualPaidAmount] = useState('');
   const [error, setError] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('pending');
 
@@ -22,8 +21,20 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
           if (response.data.status === 'completed') {
             setPaymentStatus('completed');
             clearInterval(pollInterval);
-            
-            const paymentData = {
+            // If backend returns amount (Billplz), verify it matches the order total
+            const verifiedAmount = typeof response.data.amount === 'number' ? response.data.amount : null;
+            if (verifiedAmount != null) {
+              const expected = Number(orderData.total).toFixed(2);
+              const actual = Number(verifiedAmount).toFixed(2);
+              if (expected !== actual) {
+                setError(`Amount mismatch. Expected RM ${expected}, got RM ${actual}.`);
+                setPaymentStatus('timeout');
+                onError('Amount mismatch');
+                return;
+              }
+            }
+
+            const successPayment = {
               paymentId: paymentId,
               method: 'tng',
               amount: orderData.total,
@@ -33,7 +44,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
               qrCode: qrCode
             };
 
-            onSuccess(paymentData);
+            onSuccess(successPayment);
             toast.success('TNG payment completed successfully!');
           }
         }
@@ -57,15 +68,23 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
     setError('');
 
     try {
-      // For manual QR flow: skip gateway create. Use placeholder QR from props or static.
-      const placeholderPayment = {
-        paymentId: `TNG_${Date.now()}`,
+      // Create TNG payment with exact amount from backend (Billplz or test mode)
+      const response = await api.post('/api/payments/tng/create', {
         amount: orderData.total,
-        qrCode: orderData.qrCode || '',
-        expiresAt: Date.now() + 15 * 60 * 1000
-      };
-      setPaymentData(placeholderPayment);
-      setQrCode(placeholderPayment.qrCode);
+        orderId: orderData.id,
+        customerInfo: orderData.customerInfo
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to create TNG payment');
+      }
+
+      const p = response.data.payment;
+      setPaymentData(p);
+      setQrCode(p.qrCode || '');
+      if (p.paymentId) {
+        startPaymentPolling(p.paymentId);
+      }
     } catch (error) {
       console.error('TNG payment creation error:', error);
       setError(error.message);
@@ -195,48 +214,6 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
               RM {paymentData?.amount?.toFixed(2)}
             </p>
             <p className="text-xs text-gray-600">Amount to Pay</p>
-          </div>
-          {/* Manual amount verification input */}
-          <div className="mt-3">
-            <label className="block text-xs text-gray-600 mb-1">Enter amount you paid (RM)</label>
-            <input
-              type="number"
-              step="0.01"
-              inputMode="decimal"
-              value={manualPaidAmount}
-              onChange={(e) => setManualPaidAmount(e.target.value)}
-              className="w-full sm:max-w-xs mx-auto border-2 border-gray-300 rounded-lg p-2 text-center"
-              placeholder={paymentData?.amount?.toFixed(2)}
-            />
-            <button
-              onClick={async () => {
-                try {
-                  const resp = await api.post('/api/payments/tng/manual-verify', {
-                    expectedAmount: paymentData?.amount,
-                    paidAmount: Number(manualPaidAmount),
-                    orderId: orderData.id,
-                  });
-                  if (resp.data.success && resp.data.status === 'completed') {
-                    setPaymentStatus('completed');
-                    onSuccess({
-                      paymentId: paymentData.paymentId,
-                      method: 'tng',
-                      amount: paymentData.amount,
-                      status: 'completed',
-                    });
-                    toast.success('Payment verified successfully!');
-                  } else {
-                    toast.error('Amount mismatch. Please contact support.');
-                    setError('Amount paid is not correct. Please contact support.');
-                  }
-                } catch (err) {
-                  toast.error('Verification failed. Try again.');
-                }
-              }}
-              className="mt-2 inline-block px-6 py-2 bg-secondary hover:bg-secondary-dark text-white rounded-lg font-semibold"
-            >
-              Verify Payment
-            </button>
           </div>
           {paymentData?.billplzUrl && (
             <a 
