@@ -276,24 +276,27 @@ const Booking = () => {
             <p className="text-xl text-white/90">Quick, friendly, and step-by-step—like a simple form.</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
               {steps.map((s, idx) => (
                 <div key={s.id} className="flex items-center flex-1">
                   <div className={`flex flex-col items-center ${
                     currentStep === s.id ? 'text-secondary' : 
                     currentStep > s.id ? 'text-green-600' : 'text-gray-400'
                   }`}>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-2 ${
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold mb-1 sm:mb-2 ${
                       currentStep === s.id ? 'bg-secondary text-white' : 
                       currentStep > s.id ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'
                     }`}>
                       {currentStep > s.id ? <FaCheck /> : s.id}
                     </div>
-                    <div className="text-sm font-medium text-center">{s.title}</div>
+                    <div className="text-xs sm:text-sm font-medium text-center hidden sm:block">{s.title}</div>
+                    <div className="text-xs font-medium text-center block sm:hidden">
+                      {s.title.split(' ')[0]}
+                    </div>
                   </div>
                   {idx < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-4 ${
+                    <div className={`flex-1 h-0.5 mx-2 sm:mx-4 ${
                       currentStep > s.id ? 'bg-green-600' : 'bg-gray-200'
                     }`} />
                   )}
@@ -554,9 +557,9 @@ const Booking = () => {
 
                 </div>
 
-                <div className="flex justify-end mt-8">
+                <div className="flex justify-center sm:justify-end mt-6 sm:mt-8">
                   <button 
-                    className="btn" 
+                    className="btn w-full sm:w-auto" 
                     disabled={!canProceedStep1} 
                     onClick={goNext}
                   >
@@ -662,17 +665,19 @@ const Booking = () => {
                       <p className="text-gray-500 text-center py-4">Loading slots...</p>
                     ) : date ? (
                       availableSlots.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                           {availableSlots.map((s) => (
                             <button
                               key={s}
                               type="button"
-                              className={`p-3 rounded-lg border-2 transition-all font-medium ${
+                              className={`p-3 sm:p-4 rounded-lg border-2 transition-all font-medium text-sm sm:text-base min-h-[48px] touch-manipulation ${
                                 slot === s 
                                   ? 'border-secondary bg-secondary text-white shadow-lg scale-105' 
-                                  : 'border-gray-200 hover:border-secondary hover:bg-secondary/5'
+                                  : 'border-gray-200 hover:border-secondary hover:bg-secondary/5 active:scale-95'
                               }`}
                               onClick={() => setSlot(s)}
+                              onTouchStart={() => {}} // Ensure touch events are handled
+                              style={{ touchAction: 'manipulation' }} // Optimize for touch
                             >
                               {s}
                             </button>
@@ -703,9 +708,9 @@ const Booking = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-8">
-                  <button className="btn btn-outline" onClick={goBack}>Back</button>
-                  <button className="btn" disabled={!canProceedStep2} onClick={goNext}>Next</button>
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 sm:mt-8">
+                  <button className="btn btn-outline order-2 sm:order-1" onClick={goBack}>Back</button>
+                  <button className="btn order-1 sm:order-2" disabled={!canProceedStep2} onClick={goNext}>Next</button>
                 </div>
               </div>
             )}
@@ -738,9 +743,9 @@ const Booking = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-8">
-                  <button className="btn btn-outline" onClick={goBack}>Back</button>
-                  <button className="btn" disabled={!canProceedStep3} onClick={goNext}>Next</button>
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 sm:mt-8">
+                  <button className="btn btn-outline order-2 sm:order-1" onClick={goBack}>Back</button>
+                  <button className="btn order-1 sm:order-2" disabled={!canProceedStep3} onClick={goNext}>Next</button>
                 </div>
               </div>
             )}
@@ -828,9 +833,9 @@ const Booking = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between mt-8">
-                  <button className="btn btn-outline" onClick={goBack}>Back</button>
-                  <button className="btn" onClick={handleSubmit} disabled={submitting}>
+                <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 sm:mt-8">
+                  <button className="btn btn-outline order-2 sm:order-1" onClick={goBack}>Back</button>
+                  <button className="btn order-1 sm:order-2" onClick={handleSubmit} disabled={submitting}>
                     {submitting ? 'Submitting...' : 'Confirm Booking'}
                   </button>
                 </div>
