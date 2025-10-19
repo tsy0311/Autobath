@@ -15,7 +15,7 @@ const Login = () => {
   // Redirect if already authenticated (only after auth check is complete)
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      navigate('/admin', { replace: true });
+      navigate('/admin/dev', { replace: true });
     }
   }, [isAuthenticated, authLoading, navigate]);
 
@@ -35,7 +35,7 @@ const Login = () => {
       if (result.success) {
         toast.success('Login successful! Redirecting...');
         setTimeout(() => {
-          navigate('/admin', { replace: true });
+          navigate('/admin/dev', { replace: true });
         }, 500);
       } else {
         toast.error(result.message || 'Login failed');

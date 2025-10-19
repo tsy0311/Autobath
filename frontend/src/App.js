@@ -49,7 +49,7 @@ function App() {
             
             {/* Protected Admin Routes (No Header/Footer for clean admin UI) */}
             <Route 
-              path="/admin" 
+              path="/admin/dev" 
               element={
                 <ProtectedRoute>
                   <AdminDashboard />
