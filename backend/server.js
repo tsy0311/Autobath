@@ -24,6 +24,7 @@ const customerRoutes = require('./routes/customers');
 const reviewRoutes = require('./routes/reviews');
 const productBundleRoutes = require('./routes/productBundles');
 const paymentRoutes = require('./routes/payments');
+const migrateRoutes = require('./routes/migrate');
 
 // Import database
 const { initDatabase } = require('./database/init');
@@ -114,6 +115,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/product-bundles', productBundleRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/migrate', migrateRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
