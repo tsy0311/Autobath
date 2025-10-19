@@ -33,7 +33,10 @@ const initDatabase = () => {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `);
+      `, (err) => {
+        if (err) console.error('Error creating products table:', err);
+        else console.log('✅ Products table ready');
+      });
 
       // Bookings table
       db.run(`
@@ -51,9 +54,14 @@ const initDatabase = () => {
           service_type TEXT,               -- package, individual
           package_id INTEGER,              -- reference to service_packages
           service_id INTEGER,              -- reference to services
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          duration_minutes INTEGER DEFAULT 60,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-      `);
+      `, (err) => {
+        if (err) console.error('Error creating bookings table:', err);
+        else console.log('✅ Bookings table ready');
+      });
 
       // Orders table
       db.run(`
