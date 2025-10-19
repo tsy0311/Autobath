@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const { db } = require('../database/init');
 
 // Database migration endpoint
@@ -157,6 +158,90 @@ router.post('/fix-database', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Database migration failed',
+      message: error.message
+    });
+  }
+});
+
+// Create admin user endpoint
+router.post('/create-admin', async (req, res) => {
+  try {
+    console.log('👤 Creating admin user...');
+    
+    // Create admin_users table first
+    await new Promise((resolve, reject) => {
+      db.run(`
+        CREATE TABLE IF NOT EXISTS admin_users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT UNIQUE NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          full_name TEXT,
+          is_active BOOLEAN DEFAULT 1,
+          last_login DATETIME,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `, (err) => {
+        if (err) {
+          console.error('Error creating admin_users table:', err);
+          reject(err);
+        } else {
+          console.log('✅ admin_users table ready');
+          resolve();
+        }
+      });
+    });
+
+    // Check if admin already exists
+    const existingAdmin = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM admin_users WHERE username = ?', ['admin'], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (existingAdmin) {
+      return res.json({
+        success: true,
+        message: 'Admin user already exists',
+        username: 'admin',
+        password: 'admin123'
+      });
+    }
+
+    // Create default admin user
+    const defaultPassword = 'admin123';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    await new Promise((resolve, reject) => {
+      db.run(`
+        INSERT INTO admin_users (username, email, password_hash, full_name)
+        VALUES (?, ?, ?, ?)
+      `, ['admin', 'admin@autobath.com', hashedPassword, 'Admin User'], (err) => {
+        if (err) {
+          console.error('Error creating admin user:', err);
+          reject(err);
+        } else {
+          console.log('✅ Admin user created successfully');
+          resolve();
+        }
+      });
+    });
+
+    res.json({
+      success: true,
+      message: 'Admin user created successfully',
+      username: 'admin',
+      password: 'admin123',
+      warning: 'Please change the default password after first login!'
+    });
+
+  } catch (error) {
+    console.error('❌ Failed to create admin user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create admin user',
       message: error.message
     });
   }

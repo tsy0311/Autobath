@@ -13,6 +13,7 @@
     "clear:test-data": "node database/clear-test-data.js",
     "clear:products": "node database/clear-products.js",
     "clear:bookings": "node database/clear-bookings.js",
+    "create:admin": "node database/add-admin-users.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
