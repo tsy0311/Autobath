@@ -201,6 +201,24 @@ const initDatabase = () => {
         )
       `);
 
+      // Admin users table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS admin_users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT UNIQUE NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          full_name TEXT,
+          is_active BOOLEAN DEFAULT 1,
+          last_login DATETIME,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `, (err) => {
+        if (err) console.error('Error creating admin_users table:', err);
+        else console.log('✅ Admin users table ready');
+      });
+
       // Product bundles table
       db.run(`
         CREATE TABLE IF NOT EXISTS product_bundles (
@@ -240,8 +258,53 @@ const insertSampleData = () => {
     insertSampleServices()
       .then(() => insertSampleServicePackages())
       .then(() => insertSampleProductBundles())
+      .then(() => createDefaultAdmin())
       .then(() => resolve())
       .catch(reject);
+  });
+};
+
+// Create default admin user
+const createDefaultAdmin = () => {
+  return new Promise((resolve, reject) => {
+    const bcrypt = require('bcryptjs');
+    
+    // Check if admin already exists
+    db.get('SELECT * FROM admin_users WHERE username = ?', ['admin'], async (err, row) => {
+      if (err) {
+        console.error('Error checking for admin user:', err);
+        return reject(err);
+      }
+
+      if (row) {
+        console.log('ℹ️  Admin user already exists');
+        return resolve();
+      }
+
+      // Create default admin user
+      try {
+        const defaultPassword = 'admin123';
+        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+        db.run(`
+          INSERT INTO admin_users (username, email, password_hash, full_name, is_active)
+          VALUES (?, ?, ?, ?, ?)
+        `, ['admin', 'admin@autobath.com', hashedPassword, 'Admin User', 1], (err) => {
+          if (err) {
+            console.error('Error creating default admin:', err);
+            return reject(err);
+          }
+          console.log('✅ Default admin user created successfully');
+          console.log('📧 Username: admin');
+          console.log('🔑 Password: admin123');
+          console.log('⚠️  IMPORTANT: Change the default password after first login!');
+          resolve();
+        });
+      } catch (error) {
+        console.error('Error hashing password:', error);
+        reject(error);
+      }
+    });
   });
 };
 
