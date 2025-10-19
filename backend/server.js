@@ -126,17 +126,50 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Dev-only endpoint to verify email transport configuration
-if (process.env.NODE_ENV !== 'production') {
-  app.get('/api/_email/verify', async (req, res) => {
-    try {
-      const result = await verifyEmailTransport();
-      res.json({ success: result.ok, ...result, user: process.env.EMAIL_USER || '' });
-    } catch (e) {
-      res.status(500).json({ success: false, error: e.message || String(e) });
-    }
-  });
-}
+// Email verification endpoint (available in all environments)
+app.get('/api/_email/verify', async (req, res) => {
+  try {
+    const result = await verifyEmailTransport();
+    res.json({ 
+      success: result.ok, 
+      ...result, 
+      user: process.env.EMAIL_USER || '',
+      hasCredentials: !!(process.env.EMAIL_USER && process.env.EMAIL_PASS)
+    });
+  } catch (e) {
+    res.status(500).json({ 
+      success: false, 
+      error: e.message || String(e),
+      hasCredentials: !!(process.env.EMAIL_USER && process.env.EMAIL_PASS)
+    });
+  }
+});
+
+// Email test endpoint
+app.post('/api/_email/test', async (req, res) => {
+  try {
+    const { sendEmail } = require('./services/emailService');
+    
+    const result = await sendEmail({
+      to: 'autobath36@gmail.com',
+      subject: 'Test Email from AUTOBATH Backend',
+      template: 'contact',
+      data: {
+        name: 'Test User',
+        email: 'test@example.com',
+        message: 'This is a test email to verify email functionality.'
+      }
+    });
+    
+    res.json({ success: true, messageId: result.messageId });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      hasCredentials: !!(process.env.EMAIL_USER && process.env.EMAIL_PASS)
+    });
+  }
+});
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
