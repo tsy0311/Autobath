@@ -38,6 +38,43 @@ const initDatabase = () => {
         else console.log('✅ Products table ready');
       });
 
+      // Product images table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS product_images (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          product_id INTEGER NOT NULL,
+          image_url TEXT NOT NULL,
+          alt_text TEXT,
+          sort_order INTEGER DEFAULT 0,
+          is_primary BOOLEAN DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+        )
+      `, (err) => {
+        if (err) console.error('Error creating product_images table:', err);
+        else console.log('✅ Product images table ready');
+      });
+
+      // Product color options table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS product_colors (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          product_id INTEGER NOT NULL,
+          color_name TEXT NOT NULL,
+          color_code TEXT,
+          color_image_url TEXT,
+          price_adjustment DECIMAL(10,2) DEFAULT 0,
+          stock INTEGER DEFAULT 0,
+          is_available BOOLEAN DEFAULT 1,
+          sort_order INTEGER DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+        )
+      `, (err) => {
+        if (err) console.error('Error creating product_colors table:', err);
+        else console.log('✅ Product colors table ready');
+      });
+
       // Bookings table
       db.run(`
         CREATE TABLE IF NOT EXISTS bookings (

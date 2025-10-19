@@ -11,6 +11,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/" element={<><Header /><Home /><Footer /><FloatingBookButton /></>} />
             <Route path="/home" element={<><Header /><Home /><Footer /><FloatingBookButton /></>} />
             <Route path="/products" element={<><Header /><Products /><Footer /><FloatingBookButton /></>} />
+            <Route path="/product/:id" element={<><Header /><ProductDetail /><Footer /><FloatingBookButton /></>} />
             <Route path="/contact" element={<><Header /><Contact /><Footer /><FloatingBookButton /></>} />
             <Route path="/booking" element={<><Header /><Booking /><Footer /><FloatingBookButton /></>} />
             <Route path="/cart" element={<><Header /><Cart /><Footer /></>} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette, FaUpload, FaSort } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -19,6 +19,11 @@ const ProductManagement = () => {
     image_url: ''
   });
   const [brands, setBrands] = useState([]);
+  const [productImages, setProductImages] = useState([]);
+  const [productColors, setProductColors] = useState([]);
+  const [newImage, setNewImage] = useState({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+  const [newColor, setNewColor] = useState({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+  const [activeTab, setActiveTab] = useState('basic');
 
   useEffect(() => {
     fetchProducts();
@@ -47,7 +52,7 @@ const ProductManagement = () => {
     }
   };
 
-  const handleOpenModal = (product = null) => {
+  const handleOpenModal = async (product = null) => {
     if (product) {
       setEditingProduct(product);
       setFormData({
@@ -58,6 +63,10 @@ const ProductManagement = () => {
         stock: product.stock,
         image_url: product.image_url || ''
       });
+      
+      // Load product images and colors
+      setProductImages(product.images || []);
+      setProductColors(product.colors || []);
     } else {
       setEditingProduct(null);
       setFormData({
@@ -68,7 +77,10 @@ const ProductManagement = () => {
         stock: '',
         image_url: ''
       });
+      setProductImages([]);
+      setProductColors([]);
     }
+    setActiveTab('basic');
     setIsModalOpen(true);
   };
 
@@ -83,6 +95,85 @@ const ProductManagement = () => {
       stock: '',
       image_url: ''
     });
+    setProductImages([]);
+    setProductColors([]);
+    setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+    setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+    setActiveTab('basic');
+  };
+
+  const handleAddImage = async () => {
+    if (!newImage.image_url.trim()) {
+      toast.error('Please enter an image URL');
+      return;
+    }
+
+    if (!editingProduct) {
+      toast.error('Please save the product first before adding images');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/api/products/${editingProduct.id}/images`, newImage);
+      if (response.data.success) {
+        toast.success('Image added successfully');
+        setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+        fetchProducts(); // Refresh to get updated data
+      }
+    } catch (error) {
+      console.error('Error adding image:', error);
+      toast.error('Failed to add image');
+    }
+  };
+
+  const handleDeleteImage = async (imageId) => {
+    try {
+      const response = await api.delete(`/api/products/images/${imageId}`);
+      if (response.data.success) {
+        toast.success('Image deleted successfully');
+        fetchProducts(); // Refresh to get updated data
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error('Failed to delete image');
+    }
+  };
+
+  const handleAddColor = async () => {
+    if (!newColor.color_name.trim()) {
+      toast.error('Please enter a color name');
+      return;
+    }
+
+    if (!editingProduct) {
+      toast.error('Please save the product first before adding colors');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/api/products/${editingProduct.id}/colors`, newColor);
+      if (response.data.success) {
+        toast.success('Color added successfully');
+        setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+        fetchProducts(); // Refresh to get updated data
+      }
+    } catch (error) {
+      console.error('Error adding color:', error);
+      toast.error('Failed to add color');
+    }
+  };
+
+  const handleDeleteColor = async (colorId) => {
+    try {
+      const response = await api.delete(`/api/products/colors/${colorId}`);
+      if (response.data.success) {
+        toast.success('Color deleted successfully');
+        fetchProducts(); // Refresh to get updated data
+      }
+    } catch (error) {
+      console.error('Error deleting color:', error);
+      toast.error('Failed to delete color');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -294,7 +385,32 @@ const ProductManagement = () => {
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div className="p-6">
+              {/* Tabs */}
+              <div className="flex border-b border-gray-200 mb-6">
+                {[
+                  { id: 'basic', label: 'Basic Info', icon: FaBox },
+                  { id: 'images', label: 'Images', icon: FaImage },
+                  { id: 'colors', label: 'Colors', icon: FaPalette }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 font-medium text-sm transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-b-2 border-secondary text-secondary'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <tab.icon />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Content */}
+              {activeTab === 'basic' && (
+                <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Product Name */}
                 <div>
@@ -427,6 +543,243 @@ const ProductManagement = () => {
                 </button>
               </div>
             </form>
+              )}
+
+              {/* Images Tab */}
+              {activeTab === 'images' && (
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-4">Product Images</h4>
+                    
+                    {/* Add New Image */}
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-medium text-gray-700 mb-3">Add New Image</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
+                          <input
+                            type="url"
+                            value={newImage.image_url}
+                            onChange={(e) => setNewImage({...newImage, image_url: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="https://example.com/image.jpg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Alt Text</label>
+                          <input
+                            type="text"
+                            value={newImage.alt_text}
+                            onChange={(e) => setNewImage({...newImage, alt_text: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="Product image description"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                          <input
+                            type="number"
+                            value={newImage.sort_order}
+                            onChange={(e) => setNewImage({...newImage, sort_order: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={newImage.is_primary}
+                              onChange={(e) => setNewImage({...newImage, is_primary: e.target.checked})}
+                              className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                            />
+                            <span className="text-sm text-gray-700">Primary Image</span>
+                          </label>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddImage}
+                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                      >
+                        <FaPlus className="inline mr-2" />
+                        Add Image
+                      </button>
+                    </div>
+
+                    {/* Existing Images */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {productImages.map((image, index) => (
+                        <div key={image.id} className="relative group">
+                          <img
+                            src={image.image_url}
+                            alt={image.alt_text || product.name}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleDeleteImage(image.id)}
+                              className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              <FaTrash className="text-xs" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 left-2 text-xs bg-black/70 text-white px-2 py-1 rounded">
+                            {image.is_primary ? 'Primary' : `#${image.sort_order}`}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Colors Tab */}
+              {activeTab === 'colors' && (
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-primary mb-4">Product Colors</h4>
+                    
+                    {/* Add New Color */}
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-medium text-gray-700 mb-3">Add New Color</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Name *</label>
+                          <input
+                            type="text"
+                            value={newColor.color_name}
+                            onChange={(e) => setNewColor({...newColor, color_name: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="e.g., Red, Blue, Black"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Code</label>
+                          <input
+                            type="text"
+                            value={newColor.color_code}
+                            onChange={(e) => setNewColor({...newColor, color_code: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="#FF0000"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Image URL</label>
+                          <input
+                            type="url"
+                            value={newColor.color_image_url}
+                            onChange={(e) => setNewColor({...newColor, color_image_url: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="https://example.com/color-image.jpg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment (RM)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={newColor.price_adjustment}
+                            onChange={(e) => setNewColor({...newColor, price_adjustment: parseFloat(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                          <input
+                            type="number"
+                            value={newColor.stock}
+                            onChange={(e) => setNewColor({...newColor, stock: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                          <input
+                            type="number"
+                            value={newColor.sort_order}
+                            onChange={(e) => setNewColor({...newColor, sort_order: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mt-3">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={newColor.is_available}
+                            onChange={(e) => setNewColor({...newColor, is_available: e.target.checked})}
+                            className="rounded border-gray-300 text-secondary focus:ring-secondary"
+                          />
+                          <span className="text-sm text-gray-700">Available</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleAddColor}
+                          className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                        >
+                          <FaPlus className="inline mr-2" />
+                          Add Color
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Existing Colors */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {productColors.map((color) => (
+                        <div key={color.id} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              {color.color_code && (
+                                <div
+                                  className="w-6 h-6 rounded-full border border-gray-300"
+                                  style={{ backgroundColor: color.color_code }}
+                                ></div>
+                              )}
+                              <span className="font-medium">{color.color_name}</span>
+                            </div>
+                            <button
+                              onClick={() => handleDeleteColor(color.id)}
+                              className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                            >
+                              <FaTrash className="text-sm" />
+                            </button>
+                          </div>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <div>Price: {color.price_adjustment > 0 ? '+' : ''}RM {color.price_adjustment}</div>
+                            <div>Stock: {color.stock}</div>
+                            <div>Status: {color.is_available ? 'Available' : 'Unavailable'}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Footer */}
+              <div className="flex gap-3 pt-6 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  {activeTab === 'basic' ? 'Cancel' : 'Close'}
+                </button>
+                {activeTab === 'basic' && (
+                  <button
+                    type="submit"
+                    form="product-form"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                  >
+                    {editingProduct ? 'Update Product' : 'Add Product'}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

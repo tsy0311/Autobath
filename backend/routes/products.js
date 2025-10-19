@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
     ORDER BY p.brand, p.name
   `;
 
-  db.all(query, [], (err, rows) => {
+  db.all(query, [], async (err, rows) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({
@@ -24,9 +24,40 @@ router.get('/', (req, res) => {
       });
     }
 
+    // Get images and colors for each product
+    const productsWithDetails = await Promise.all(rows.map(async (product) => {
+      const images = await new Promise((resolve) => {
+        db.all('SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order, id', [product.id], (err, images) => {
+          if (err) {
+            console.error('Error fetching product images:', err);
+            resolve([]);
+          } else {
+            resolve(images);
+          }
+        });
+      });
+
+      const colors = await new Promise((resolve) => {
+        db.all('SELECT * FROM product_colors WHERE product_id = ? AND is_available = 1 ORDER BY sort_order, id', [product.id], (err, colors) => {
+          if (err) {
+            console.error('Error fetching product colors:', err);
+            resolve([]);
+          } else {
+            resolve(colors);
+          }
+        });
+      });
+
+      return {
+        ...product,
+        images,
+        colors
+      };
+    }));
+
     res.json({
       success: true,
-      products: rows
+      products: productsWithDetails
     });
   });
 });
@@ -43,7 +74,7 @@ router.get('/:id', (req, res) => {
     WHERE p.id = ?
   `;
 
-  db.get(query, [id], (err, row) => {
+  db.get(query, [id], async (err, row) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({
@@ -59,9 +90,36 @@ router.get('/:id', (req, res) => {
       });
     }
 
+    // Get images and colors for the product
+    const images = await new Promise((resolve) => {
+      db.all('SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order, id', [id], (err, images) => {
+        if (err) {
+          console.error('Error fetching product images:', err);
+          resolve([]);
+        } else {
+          resolve(images);
+        }
+      });
+    });
+
+    const colors = await new Promise((resolve) => {
+      db.all('SELECT * FROM product_colors WHERE product_id = ? AND is_available = 1 ORDER BY sort_order, id', [id], (err, colors) => {
+        if (err) {
+          console.error('Error fetching product colors:', err);
+          resolve([]);
+        } else {
+          resolve(colors);
+        }
+      });
+    });
+
     res.json({
       success: true,
-      product: row
+      product: {
+        ...row,
+        images,
+        colors
+      }
     });
   });
 });
@@ -392,6 +450,196 @@ router.post('/seed', authenticateToken, requireAdmin, (req, res) => {
       }
     });
   });
+});
+
+// Add product image
+router.post('/:id/images', authenticateToken, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const { image_url, alt_text, sort_order, is_primary } = req.body;
+
+  if (!image_url) {
+    return res.status(400).json({
+      success: false,
+      message: 'Image URL is required'
+    });
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO product_images (product_id, image_url, alt_text, sort_order, is_primary)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  stmt.run(id, image_url, alt_text || null, sort_order || 0, is_primary || 0, function(err) {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to add product image'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Image added successfully',
+      imageId: this.lastID
+    });
+  });
+
+  stmt.finalize();
+});
+
+// Delete product image
+router.delete('/images/:imageId', authenticateToken, requireAdmin, (req, res) => {
+  const { imageId } = req.params;
+
+  const stmt = db.prepare('DELETE FROM product_images WHERE id = ?');
+
+  stmt.run(imageId, function(err) {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to delete image'
+      });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Image not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Image deleted successfully'
+    });
+  });
+
+  stmt.finalize();
+});
+
+// Add product color
+router.post('/:id/colors', authenticateToken, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const { color_name, color_code, color_image_url, price_adjustment, stock, is_available, sort_order } = req.body;
+
+  if (!color_name) {
+    return res.status(400).json({
+      success: false,
+      message: 'Color name is required'
+    });
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO product_colors (product_id, color_name, color_code, color_image_url, price_adjustment, stock, is_available, sort_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run(
+    id, 
+    color_name, 
+    color_code || null, 
+    color_image_url || null, 
+    price_adjustment || 0, 
+    stock || 0, 
+    is_available !== undefined ? is_available : 1, 
+    sort_order || 0, 
+    function(err) {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to add product color'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Color added successfully',
+        colorId: this.lastID
+      });
+    }
+  );
+
+  stmt.finalize();
+});
+
+// Update product color
+router.put('/colors/:colorId', authenticateToken, requireAdmin, (req, res) => {
+  const { colorId } = req.params;
+  const { color_name, color_code, color_image_url, price_adjustment, stock, is_available, sort_order } = req.body;
+
+  const stmt = db.prepare(`
+    UPDATE product_colors 
+    SET color_name = ?, color_code = ?, color_image_url = ?, price_adjustment = ?, stock = ?, is_available = ?, sort_order = ?
+    WHERE id = ?
+  `);
+
+  stmt.run(
+    color_name, 
+    color_code, 
+    color_image_url, 
+    price_adjustment, 
+    stock, 
+    is_available, 
+    sort_order, 
+    colorId, 
+    function(err) {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to update product color'
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Color not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Color updated successfully'
+      });
+    }
+  );
+
+  stmt.finalize();
+});
+
+// Delete product color
+router.delete('/colors/:colorId', authenticateToken, requireAdmin, (req, res) => {
+  const { colorId } = req.params;
+
+  const stmt = db.prepare('DELETE FROM product_colors WHERE id = ?');
+
+  stmt.run(colorId, function(err) {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to delete color'
+      });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Color not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Color deleted successfully'
+    });
+  });
+
+  stmt.finalize();
 });
 
 module.exports = router;

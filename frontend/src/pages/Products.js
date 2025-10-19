@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaPumpSoap, FaTags } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaShoppingCart, FaPumpSoap, FaTags, FaEye } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import api from '../services/api';
@@ -12,6 +13,7 @@ const Products = () => {
   const [brands, setBrands] = useState(['All']);
   const [searchQuery, setSearchQuery] = useState('');
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const ProductIcon = FaPumpSoap;
 
@@ -128,13 +130,29 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map(product => {
             return (
-              <div key={product.id} className="card">
-                <div className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20">
-                  <ProductIcon className="text-6xl text-secondary" />
+              <div key={product.id} className="card group hover:shadow-xl transition-all duration-300">
+                <div 
+                  className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20 cursor-pointer"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  {product.images && product.images.length > 0 ? (
+                    <img 
+                      src={product.images[0].image_url} 
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ProductIcon className="text-6xl text-secondary" />
+                  )}
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-primary mb-3">{product.name}</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">{product.description}</p>
+                  <h3 
+                    className="text-xl font-bold text-primary mb-3 cursor-pointer hover:text-secondary transition-colors"
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  >
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">{product.description}</p>
                   <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
                     <span className="inline-flex items-center gap-1 bg-secondary/10 text-secondary px-3 py-1 rounded-full">
                       <FaTags /> {product.brand || 'Unbranded'}
@@ -143,14 +161,23 @@ const Products = () => {
                   </div>
                   <div className="text-sm text-gray-500 mb-4">Sold: {product.sold ?? 0}</div>
                   <div className="text-2xl font-bold text-primary mb-4">RM {product.price.toFixed(2)}</div>
-                  <button 
-                    className="btn w-full flex items-center justify-center gap-2"
-                    onClick={() => handleAddToCart(product)}
-                    disabled={product.stock === 0}
-                  >
-                    <FaShoppingCart /> 
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      className="btn flex-1 flex items-center justify-center gap-2"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={product.stock === 0}
+                    >
+                      <FaShoppingCart /> 
+                      {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
+                    <button 
+                      className="px-4 py-2 border border-secondary text-secondary hover:bg-secondary hover:text-white rounded-lg transition-colors flex items-center justify-center"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                      title="View Details"
+                    >
+                      <FaEye />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
