@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUsers, FaCalendarAlt, FaShoppingCart, FaStar, FaDollarSign, FaChartLine, FaCog, FaSignOutAlt, FaHome, FaKey, FaBox } from 'react-icons/fa';
+import { FaUsers, FaCalendarAlt, FaShoppingCart, FaStar, FaDollarSign, FaChartLine, FaCog, FaSignOutAlt, FaHome, FaKey, FaBox, FaSeedling } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -99,6 +100,30 @@ const AdminDashboard = () => {
       console.error('Error fetching dashboard data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSeedProducts = async () => {
+    if (!window.confirm('This will add 35+ car wash products to your database. Continue?')) {
+      return;
+    }
+
+    try {
+      setIsSeeding(true);
+      const response = await api.post('/api/products/seed');
+      
+      if (response.data.success) {
+        toast.success(`Products seeded successfully! Added: ${response.data.added}, Updated: ${response.data.updated}`);
+        // Refresh the page to show updated stats
+        window.location.reload();
+      } else {
+        throw new Error(response.data.message || 'Seeding failed');
+      }
+    } catch (error) {
+      console.error('Error seeding products:', error);
+      toast.error('Failed to seed products. Please try again.');
+    } finally {
+      setIsSeeding(false);
     }
   };
 
@@ -398,6 +423,33 @@ const AdminDashboard = () => {
               </div>
 
               {/* Recent Reviews panel removed */}
+            </div>
+
+            {/* Seed Products Section */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-green-200">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <FaSeedling className="text-sm sm:text-base text-green-600" /> Product Database
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Add 35+ car wash products to your database with one click. This includes professional equipment from Lutian, An-Riddle, Benzhi, and other brands.
+              </p>
+              <button
+                onClick={handleSeedProducts}
+                disabled={isSeeding}
+                className="btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSeeding ? (
+                  <>
+                    <div className="spinner-small"></div>
+                    Seeding Products...
+                  </>
+                ) : (
+                  <>
+                    <FaSeedling />
+                    Seed Products Database
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
