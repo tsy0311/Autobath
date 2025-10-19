@@ -34,6 +34,7 @@ function App() {
           <Routes>
             {/* Public Routes with Header/Footer */}
             <Route path="/" element={<><Header /><Home /><Footer /><FloatingBookButton /></>} />
+            <Route path="/home" element={<><Header /><Home /><Footer /><FloatingBookButton /></>} />
             <Route path="/products" element={<><Header /><Products /><Footer /><FloatingBookButton /></>} />
             <Route path="/contact" element={<><Header /><Contact /><Footer /><FloatingBookButton /></>} />
             <Route path="/booking" element={<><Header /><Booking /><Footer /><FloatingBookButton /></>} />
