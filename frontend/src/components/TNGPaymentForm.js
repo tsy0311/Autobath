@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaMobile, FaQrcode, FaSpinner, FaCheckCircle, FaExclamationTriangle, FaCopy } from 'react-icons/fa';
+import { FaMobile, FaQrcode, FaSpinner, FaCheckCircle, FaExclamationTriangle, FaCopy, FaTruck, FaStore } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import qrCodeImage from '../img/qrcode.jpeg';
 
 const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [loading, setLoading] = useState(false);
@@ -9,11 +10,20 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [qrCode, setQrCode] = useState('');
   const [error, setError] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('pending');
+  const [deliveryOption, setDeliveryOption] = useState('collection'); // 'collection' or 'delivery'
+  const [address, setAddress] = useState('');
 
 
   const createTNGPayment = useCallback(async () => {
     setLoading(true);
     setError('');
+
+    // Validate delivery address if delivery is selected
+    if (deliveryOption === 'delivery' && !address.trim()) {
+      setError('Please enter your delivery address');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Create TNG payment with exact amount from backend (Billplz or test mode)
@@ -62,7 +72,9 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
                 currency: 'MYR',
                 status: 'completed',
                 transactionId: p.paymentId,
-                qrCode: p.qrCode
+                qrCode: p.qrCode,
+                deliveryOption: deliveryOption,
+                address: deliveryOption === 'delivery' ? address : null
               };
 
               onSuccess(successPayment);
@@ -89,7 +101,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
     } finally {
       setLoading(false);
     }
-  }, [orderData.total, orderData.id, orderData.customerInfo, onError, onSuccess, paymentStatus]);
+  }, [orderData.total, orderData.id, orderData.customerInfo, onError, onSuccess, paymentStatus, deliveryOption, address]);
 
   useEffect(() => {
     createTNGPayment();
@@ -183,28 +195,92 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
         </div>
       </div>
 
+      {/* Delivery/Collection Options */}
+      <div className="bg-white rounded-xl border-2 border-gray-200 p-4 sm:p-6">
+        <h4 className="font-bold text-primary mb-4 text-sm sm:text-base flex items-center gap-2">
+          <FaTruck className="text-secondary" />
+          Delivery Options
+        </h4>
+        
+        <div className="space-y-3">
+          {/* Collection Option */}
+          <label className="flex items-start gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-secondary/50 transition-colors">
+            <input
+              type="radio"
+              name="deliveryOption"
+              value="collection"
+              checked={deliveryOption === 'collection'}
+              onChange={(e) => setDeliveryOption(e.target.value)}
+              className="mt-1"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <FaStore className="text-secondary" />
+                <span className="font-semibold text-sm sm:text-base">Collection at Shop</span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600">
+                Come to our shop to collect your items
+              </p>
+            </div>
+          </label>
+
+          {/* Delivery Option */}
+          <label className="flex items-start gap-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-secondary/50 transition-colors">
+            <input
+              type="radio"
+              name="deliveryOption"
+              value="delivery"
+              checked={deliveryOption === 'delivery'}
+              onChange={(e) => setDeliveryOption(e.target.value)}
+              className="mt-1"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <FaTruck className="text-secondary" />
+                <span className="font-semibold text-sm sm:text-base">Home Delivery</span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600">
+                We'll deliver to your address
+              </p>
+            </div>
+          </label>
+        </div>
+
+        {/* Address Input for Delivery */}
+        {deliveryOption === 'delivery' && (
+          <div className="mt-4">
+            <label className="block text-sm font-semibold text-primary mb-2">
+              Delivery Address *
+            </label>
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter your full delivery address..."
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent resize-none"
+              rows="3"
+              required={deliveryOption === 'delivery'}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Please provide complete address including postal code
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* QR Code - Mobile Optimized */}
       {paymentStatus === 'pending' && (
         <div className="text-center bg-white rounded-xl border-2 border-secondary/20 p-4 sm:p-6">
           <div className="w-full max-w-[280px] sm:max-w-xs mx-auto bg-white rounded-2xl flex items-center justify-center mb-4 p-4 shadow-lg">
-            {qrCode ? (
-              <div className="relative">
-                <img 
-                  src={qrCode} 
-                  alt="Payment QR Code" 
-                  className="w-full h-auto rounded-lg"
-                />
-                <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                  Scan to Pay
-                </div>
+            <div className="relative">
+              <img 
+                src={qrCodeImage} 
+                alt="Touch 'n Go Payment QR Code" 
+                className="w-full h-auto rounded-lg"
+              />
+              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                Scan to Pay
               </div>
-            ) : (
-              <div className="text-center p-4">
-                <FaQrcode className="text-6xl sm:text-7xl text-secondary mx-auto mb-3 animate-pulse" />
-                <p className="text-sm sm:text-base font-bold text-gray-700">Scan to Pay</p>
-                <p className="text-xs text-gray-500 mt-1">Touch 'n Go eWallet</p>
-              </div>
-            )}
+            </div>
           </div>
           <div className="bg-secondary/5 rounded-lg p-3 mb-3">
             <p className="text-xl sm:text-2xl font-bold text-secondary mb-1">
@@ -278,6 +354,30 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
             <span className="font-semibold">Complete payment in TNG app</span>
           </li>
         </ol>
+        
+        {/* Delivery Information */}
+        <div className="mt-4 pt-3 border-t border-blue-200">
+          <div className="flex items-center gap-2 mb-2">
+            {deliveryOption === 'collection' ? (
+              <FaStore className="text-blue-600" />
+            ) : (
+              <FaTruck className="text-blue-600" />
+            )}
+            <span className="font-semibold text-blue-900 text-xs sm:text-sm">
+              {deliveryOption === 'collection' ? 'Collection at Shop' : 'Home Delivery'}
+            </span>
+          </div>
+          {deliveryOption === 'delivery' && address && (
+            <p className="text-xs text-blue-700 bg-blue-100 rounded p-2">
+              <strong>Delivery Address:</strong> {address}
+            </p>
+          )}
+          {deliveryOption === 'collection' && (
+            <p className="text-xs text-blue-700 bg-blue-100 rounded p-2">
+              <strong>Collection:</strong> Come to our shop to collect your items
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Auto-verify notice */}

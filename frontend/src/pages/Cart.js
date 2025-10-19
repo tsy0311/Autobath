@@ -43,6 +43,8 @@ const Cart = () => {
         total: getTotalPrice(),
         customerInfo: customerInfo,
         payment: paymentData,
+        deliveryOption: paymentData.deliveryOption || 'collection',
+        address: paymentData.address || null,
         status: 'pending'
       };
 
