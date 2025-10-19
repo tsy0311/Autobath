@@ -36,8 +36,8 @@ api.interceptors.response.use(
       // Unauthorized - clear token but DON'T auto-redirect if already on login page
       localStorage.removeItem('authToken');
       
-      // Only redirect if not already on login page
-      if (window.location.pathname !== '/login') {
+      // Only redirect if not already on login page AND not on the auth verification endpoint
+      if (window.location.pathname !== '/login' && !error.config?.url?.includes('/api/auth/verify')) {
         window.location.href = '/login';
       }
     }
