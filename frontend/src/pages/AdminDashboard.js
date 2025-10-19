@@ -133,7 +133,7 @@ const AdminDashboard = () => {
     try {
       await logout();
       toast.success('Logged out successfully');
-      navigate('/login');
+      navigate('/admin/login');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Error during logout');

@@ -46,7 +46,7 @@ function App() {
             <Route path="/quick-booking/:token" element={<><Header /><QuickBooking /><Footer /></>} />
             
             {/* Auth Routes (No Header/Footer) */}
-            <Route path="/login" element={<Login />} />
+            <Route path="/admin/login" element={<Login />} />
             
             {/* Protected Admin Routes (No Header/Footer for clean admin UI) */}
             <Route 
