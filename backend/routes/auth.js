@@ -190,5 +190,78 @@ router.post('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+// Initialize admin user endpoint (for production setup)
+router.post('/init-admin', async (req, res) => {
+  try {
+    const { username, password, email } = req.body;
+    
+    // Check if admin already exists
+    db.get('SELECT * FROM admin_users WHERE username = ?', [username || 'admin'], (err, existingAdmin) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Database error'
+        });
+      }
+
+      if (existingAdmin) {
+        return res.json({
+          success: true,
+          message: 'Admin user already exists',
+          admin: {
+            username: existingAdmin.username,
+            email: existingAdmin.email
+          }
+        });
+      }
+
+      // Create admin user
+      const adminUsername = username || 'admin';
+      const adminEmail = email || 'admin@autobath.com';
+      const adminPassword = password || 'admin123';
+      
+      bcrypt.hash(adminPassword, 10, (err, hashedPassword) => {
+        if (err) {
+          console.error('Password hashing error:', err);
+          return res.status(500).json({
+            success: false,
+            message: 'Error creating admin user'
+          });
+        }
+
+        db.run(`
+          INSERT INTO admin_users (username, email, password_hash, full_name, is_active)
+          VALUES (?, ?, ?, ?, ?)
+        `, [adminUsername, adminEmail, hashedPassword, 'Admin User', 1], function(err) {
+          if (err) {
+            console.error('Error creating admin user:', err);
+            return res.status(500).json({
+              success: false,
+              message: 'Error creating admin user'
+            });
+          }
+
+          res.json({
+            success: true,
+            message: 'Admin user created successfully',
+            admin: {
+              id: this.lastID,
+              username: adminUsername,
+              email: adminEmail
+            }
+          });
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Init admin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;
 
