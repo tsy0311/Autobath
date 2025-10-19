@@ -138,9 +138,16 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app build directory
   app.use(express.static(path.join(__dirname, '../frontend/build')));
   
-  app.get('*', (req, res) => {
+  // Handle React routing - return the main index.html file for any non-API routes
+  app.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    // For all other routes, serve the React app
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
 }
