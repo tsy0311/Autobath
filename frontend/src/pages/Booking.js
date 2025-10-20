@@ -35,22 +35,12 @@ const Booking = () => {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [touchedSlot, setTouchedSlot] = useState(null);
+  // Removed touchedSlot mobile workaround; rely on native click for better mobile compatibility
 
   // Hidden native date input to avoid showing YYYY-MM-DD UI
   const dateInputRef = useRef(null);
 
-  // Mobile touch handler for better touch responsiveness
-  const handleMobileTouch = (callback, slotValue) => (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Touch event detected for slot:', slotValue);
-    setTouchedSlot(slotValue);
-    setTimeout(() => {
-      setTouchedSlot(null);
-      callback();
-    }, 100);
-  };
+  // Simplified: rely on native click events for mobile to avoid suppressed interactions
   const openDatePicker = () => {
     if (dateInputRef.current) {
       // Modern browsers support showPicker on date inputs
@@ -686,13 +676,9 @@ const Booking = () => {
                               className={`p-3 sm:p-4 rounded-lg border-2 transition-all font-medium text-sm sm:text-base min-h-[48px] touch-manipulation ${
                                 slot === s 
                                   ? 'border-secondary bg-secondary text-white shadow-lg scale-105' 
-                                  : touchedSlot === s
-                                  ? 'border-secondary bg-secondary/20 scale-95'
                                   : 'border-gray-200 hover:border-secondary hover:bg-secondary/5 active:scale-95'
                               }`}
-                              onClick={handleMobileTouch(() => setSlot(s), s)}
-                              onTouchStart={handleMobileTouch(() => setSlot(s), s)}
-                              onTouchEnd={(e) => e.preventDefault()}
+                              onClick={() => setSlot(s)}
                               style={{ 
                                 touchAction: 'manipulation',
                                 WebkitTapHighlightColor: 'transparent',
