@@ -664,6 +664,23 @@ const Booking = () => {
                         </span>
                       )}
                     </label>
+                    {/* Mobile-friendly native select fallback */}
+                    {date && availableSlots.length > 0 && (
+                      <div className="sm:hidden mb-4">
+                        <select
+                          className="w-full px-3 py-3 border-2 rounded-lg"
+                          value={slot || ''}
+                          onChange={(e) => setSlot(e.target.value)}
+                        >
+                          <option value="" disabled>
+                            {slot ? 'Change time' : 'Choose a time'}
+                          </option>
+                          {availableSlots.map((s) => (
+                            <option key={`opt-${s}`} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                     {slotsLoading ? (
                       <p className="text-gray-500 text-center py-4">Loading slots...</p>
                     ) : date ? (
@@ -679,6 +696,8 @@ const Booking = () => {
                                   : 'border-gray-200 hover:border-secondary hover:bg-secondary/5 active:scale-95'
                               }`}
                               onClick={() => setSlot(s)}
+                              onPointerDown={() => setSlot(s)}
+                              onTouchStart={() => setSlot(s)}
                               style={{ 
                                 touchAction: 'manipulation',
                                 WebkitTapHighlightColor: 'transparent',
