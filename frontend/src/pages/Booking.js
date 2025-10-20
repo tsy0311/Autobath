@@ -37,19 +37,52 @@ const Booking = () => {
   const [loading, setLoading] = useState(true);
   // Removed touchedSlot mobile workaround; rely on native click for better mobile compatibility
 
-  // Hidden native date input to avoid showing YYYY-MM-DD UI
-  const dateInputRef = useRef(null);
+  // Internal calendar state (replaces native date picker for cross-device support)
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d;
+  });
 
   // Simplified: rely on native click events for mobile to avoid suppressed interactions
-  const openDatePicker = () => {
-    if (dateInputRef.current) {
-      // Modern browsers support showPicker on date inputs
-      if (typeof dateInputRef.current.showPicker === 'function') {
-        dateInputRef.current.showPicker();
-      } else {
-        dateInputRef.current.click();
-      }
+  const openDatePicker = () => setIsCalendarOpen((v) => !v);
+
+  const formatYYYYMMDD = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  const buildCalendarDays = (monthStart) => {
+    // monthStart is set to the 1st of the month
+    const start = new Date(monthStart);
+    const startWeekday = (start.getDay() + 6) % 7; // make Monday=0 for nicer grid
+    const daysInMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+    const days = [];
+    // Leading blanks
+    for (let i = 0; i < startWeekday; i++) days.push(null);
+    // Actual days
+    for (let d = 1; d <= daysInMonth; d++) {
+      days.push(new Date(start.getFullYear(), start.getMonth(), d));
     }
+    // Trailing to complete weeks
+    const tail = (7 - (days.length % 7)) % 7;
+    for (let i = 0; i < tail; i++) days.push(null);
+    return days;
+  };
+
+  const handleSelectCalendarDate = (d) => {
+    if (!d) return;
+    if (d < today) return; // disallow past dates
+    setDate(formatYYYYMMDD(d));
+    setIsCalendarOpen(false);
   };
 
   // Individual services to show (from backend), merge 5/7-seater into one selectable card
@@ -587,15 +620,6 @@ const Booking = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="form-group">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Select date</label>
-                      {/* Hidden native input; opened via button to avoid YYYY-MM-DD placeholder */}
-                      <input
-                        ref={dateInputRef}
-                        type="date"
-                        className="hidden"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                      />
                       <button
                         type="button"
                         onClick={openDatePicker}
@@ -604,11 +628,78 @@ const Booking = () => {
                             ? 'border-secondary text-secondary hover:bg-secondary/5'
                             : 'border-gray-300 text-gray-700 hover:border-secondary hover:bg-secondary/5'
                         }`}
+                        aria-haspopup="dialog"
+                        aria-expanded={isCalendarOpen}
                       >
                         {date
                           ? new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
                           : 'Choose date'}
                       </button>
+
+                      {isCalendarOpen && (
+                        <div className="mt-3 p-4 border-2 rounded-xl bg-white shadow-xl">
+                          <div className="flex items-center justify-between mb-3">
+                            <button
+                              type="button"
+                              className="px-3 py-1 rounded border hover:bg-gray-50"
+                              onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}
+                            >
+                              Prev
+                            </button>
+                            <div className="font-semibold text-primary">
+                              {calendarMonth.toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+                            </div>
+                            <button
+                              type="button"
+                              className="px-3 py-1 rounded border hover:bg-gray-50"
+                              onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
+                            >
+                              Next
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-7 gap-1 text-xs font-semibold text-gray-600 mb-2">
+                            {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d) => (
+                              <div key={d} className="text-center">{d}</div>
+                            ))}
+                          </div>
+
+                          <div className="grid grid-cols-7 gap-1">
+                            {buildCalendarDays(calendarMonth).map((d, idx) => {
+                              if (!d) return <div key={idx} className="h-10" />;
+                              const disabled = d < today;
+                              const selected = date && isSameDay(d, new Date(date));
+                              return (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  disabled={disabled}
+                                  onClick={() => handleSelectCalendarDate(d)}
+                                  className={`h-10 rounded-lg border text-sm transition-colors ${
+                                    selected
+                                      ? 'border-secondary bg-secondary text-white'
+                                      : disabled
+                                        ? 'border-gray-200 text-gray-300'
+                                        : 'border-gray-200 hover:border-secondary hover:bg-secondary/5'
+                                  }`}
+                                >
+                                  {d.getDate()}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <div className="flex justify-end mt-3">
+                            <button
+                              type="button"
+                              className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                              onClick={() => setIsCalendarOpen(false)}
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="form-group">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Selected Service</label>
