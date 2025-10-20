@@ -126,6 +126,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Root health check for platform probes (e.g., Render default /health)
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'AUTOBATH API is healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Email verification endpoint (available in all environments)
 app.get('/api/_email/verify', async (req, res) => {
   try {
