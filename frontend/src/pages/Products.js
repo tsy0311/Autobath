@@ -44,8 +44,7 @@ const Products = () => {
     }
   };
 
-  const handleAddToCart = (product, event) => {
-    event.stopPropagation(); // Prevent card click when button is clicked
+  const handleAddToCart = (product) => {
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
   };
@@ -163,7 +162,10 @@ const Products = () => {
                   <div className="flex gap-2">
                     <button 
                       className="btn flex-1 flex items-center justify-center gap-2"
-                      onClick={(e) => handleAddToCart(product, e)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
                       disabled={product.stock === 0}
                     >
                       <FaShoppingCart /> 

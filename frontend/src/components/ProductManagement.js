@@ -19,6 +19,10 @@ const ProductManagement = () => {
     stock: '',
     image_url: ''
   });
+  const [enableTypeSelection, setEnableTypeSelection] = useState(false);
+  const [typeSelectionTitle, setTypeSelectionTitle] = useState('');
+  const [typeSelectionOptions, setTypeSelectionOptions] = useState([]);
+  const [newTypeOption, setNewTypeOption] = useState({ name: '', price_adjustment: 0, stock: 0 });
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [productImages, setProductImages] = useState([]);
@@ -94,6 +98,10 @@ const ProductManagement = () => {
       setProductImages([]);
       setProductColors([]);
     }
+    setEnableTypeSelection(false);
+    setTypeSelectionTitle('');
+    setTypeSelectionOptions([]);
+    setNewTypeOption({ name: '', price_adjustment: 0, stock: 0 });
     setActiveTab('basic');
     setIsModalOpen(true);
   };
@@ -113,6 +121,10 @@ const ProductManagement = () => {
     setProductColors([]);
     setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
     setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+    setEnableTypeSelection(false);
+    setTypeSelectionTitle('');
+    setTypeSelectionOptions([]);
+    setNewTypeOption({ name: '', price_adjustment: 0, stock: 0 });
     setActiveTab('basic');
   };
 
@@ -122,34 +134,49 @@ const ProductManagement = () => {
       return;
     }
 
-    if (!editingProduct) {
-      toast.error('Please save the product first before adding images');
-      return;
-    }
-
-    try {
-      const response = await api.post(`/api/products/${editingProduct.id}/images`, newImage);
-      if (response.data.success) {
-        toast.success('Image added successfully');
-        setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
-        fetchProducts(); // Refresh to get updated data
+    if (editingProduct) {
+      // For existing products, add directly to database
+      try {
+        const response = await api.post(`/api/products/${editingProduct.id}/images`, newImage);
+        if (response.data.success) {
+          toast.success('Image added successfully');
+          setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+          fetchProducts(); // Refresh to get updated data
+        }
+      } catch (error) {
+        console.error('Error adding image:', error);
+        toast.error('Failed to add image');
       }
-    } catch (error) {
-      console.error('Error adding image:', error);
-      toast.error('Failed to add image');
+    } else {
+      // For new products, add to local state
+      const newImageWithId = {
+        ...newImage,
+        id: Date.now(), // Temporary ID for local state
+        product_id: null
+      };
+      setProductImages([...productImages, newImageWithId]);
+      setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+      toast.success('Image added to product (will be saved when product is created)');
     }
   };
 
   const handleDeleteImage = async (imageId) => {
-    try {
-      const response = await api.delete(`/api/products/images/${imageId}`);
-      if (response.data.success) {
-        toast.success('Image deleted successfully');
-        fetchProducts(); // Refresh to get updated data
+    if (editingProduct) {
+      // For existing products, delete from database
+      try {
+        const response = await api.delete(`/api/products/images/${imageId}`);
+        if (response.data.success) {
+          toast.success('Image deleted successfully');
+          fetchProducts(); // Refresh to get updated data
+        }
+      } catch (error) {
+        console.error('Error deleting image:', error);
+        toast.error('Failed to delete image');
       }
-    } catch (error) {
-      console.error('Error deleting image:', error);
-      toast.error('Failed to delete image');
+    } else {
+      // For new products, remove from local state
+      setProductImages(productImages.filter(img => img.id !== imageId));
+      toast.success('Image removed from product');
     }
   };
 
@@ -159,35 +186,73 @@ const ProductManagement = () => {
       return;
     }
 
-    if (!editingProduct) {
-      toast.error('Please save the product first before adding colors');
-      return;
-    }
-
-    try {
-      const response = await api.post(`/api/products/${editingProduct.id}/colors`, newColor);
-      if (response.data.success) {
-        toast.success('Color added successfully');
-        setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
-        fetchProducts(); // Refresh to get updated data
+    if (editingProduct) {
+      // For existing products, add directly to database
+      try {
+        const response = await api.post(`/api/products/${editingProduct.id}/colors`, newColor);
+        if (response.data.success) {
+          toast.success('Color added successfully');
+          setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+          fetchProducts(); // Refresh to get updated data
+        }
+      } catch (error) {
+        console.error('Error adding color:', error);
+        toast.error('Failed to add color');
       }
-    } catch (error) {
-      console.error('Error adding color:', error);
-      toast.error('Failed to add color');
+    } else {
+      // For new products, add to local state
+      const newColorWithId = {
+        ...newColor,
+        id: Date.now(), // Temporary ID for local state
+        product_id: null
+      };
+      setProductColors([...productColors, newColorWithId]);
+      setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+      toast.success('Color added to product (will be saved when product is created)');
     }
   };
 
   const handleDeleteColor = async (colorId) => {
-    try {
-      const response = await api.delete(`/api/products/colors/${colorId}`);
-      if (response.data.success) {
-        toast.success('Color deleted successfully');
-        fetchProducts(); // Refresh to get updated data
+    if (editingProduct) {
+      // For existing products, delete from database
+      try {
+        const response = await api.delete(`/api/products/colors/${colorId}`);
+        if (response.data.success) {
+          toast.success('Color deleted successfully');
+          fetchProducts(); // Refresh to get updated data
+        }
+      } catch (error) {
+        console.error('Error deleting color:', error);
+        toast.error('Failed to delete color');
       }
-    } catch (error) {
-      console.error('Error deleting color:', error);
-      toast.error('Failed to delete color');
+    } else {
+      // For new products, remove from local state
+      setProductColors(productColors.filter(color => color.id !== colorId));
+      toast.success('Color removed from product');
     }
+  };
+
+  const handleAddTypeOption = () => {
+    if (!newTypeOption.name.trim()) {
+      toast.error('Please enter a type option name');
+      return;
+    }
+
+    const newOptionWithId = {
+      ...newTypeOption,
+      id: Date.now(),
+      is_available: true,
+      sort_order: typeSelectionOptions.length + 1
+    };
+
+    setTypeSelectionOptions([...typeSelectionOptions, newOptionWithId]);
+    setNewTypeOption({ name: '', price_adjustment: 0, stock: 0 });
+    toast.success('Type option added');
+  };
+
+  const handleDeleteTypeOption = (optionId) => {
+    setTypeSelectionOptions(typeSelectionOptions.filter(option => option.id !== optionId));
+    toast.success('Type option removed');
   };
 
   const handleSubmit = async (e) => {
@@ -199,13 +264,62 @@ const ProductManagement = () => {
     }
 
     try {
+      let productId;
       if (editingProduct) {
         await api.put(`/api/products/${editingProduct.id}`, formData);
+        productId = editingProduct.id;
         toast.success('Product updated successfully!');
       } else {
-        await api.post('/api/products', formData);
+        const response = await api.post('/api/products', formData);
+        productId = response.data.productId;
         toast.success('Product added successfully!');
       }
+
+      // Add images if any were uploaded during creation
+      if (productImages.length > 0 && productId) {
+        for (const image of productImages) {
+          try {
+            await api.post(`/api/products/${productId}/images`, image);
+          } catch (error) {
+            console.error('Error adding image:', error);
+            toast.error(`Failed to add image: ${image.alt_text || 'Unknown'}`);
+          }
+        }
+      }
+
+      // Add colors if any were added during creation
+      if (productColors.length > 0 && productId) {
+        for (const color of productColors) {
+          try {
+            await api.post(`/api/products/${productId}/colors`, color);
+          } catch (error) {
+            console.error('Error adding color:', error);
+            toast.error(`Failed to add color: ${color.color_name}`);
+          }
+        }
+      }
+
+      // Add type selection options if enabled
+      if (enableTypeSelection && typeSelectionOptions.length > 0 && productId) {
+        for (const option of typeSelectionOptions) {
+          try {
+            const colorData = {
+              color_name: option.name,
+              color_code: null,
+              color_image_url: null,
+              price_adjustment: option.price_adjustment,
+              stock: option.stock,
+              is_available: option.is_available,
+              sort_order: option.sort_order
+            };
+            await api.post(`/api/products/${productId}/colors`, colorData);
+          } catch (error) {
+            console.error('Error adding type option:', error);
+            toast.error(`Failed to add type option: ${option.name}`);
+          }
+        }
+      }
+
       handleCloseModal();
       fetchProducts();
     } catch (error) {
@@ -557,6 +671,114 @@ const ProductManagement = () => {
                 </div>
                 {formData.image_url && (
                   <p className="text-xs text-gray-500 mt-1 break-all">{formData.image_url}</p>
+                )}
+              </div>
+
+              {/* Type Selection Section */}
+              <div className="border-t pt-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <input
+                    type="checkbox"
+                    id="enableTypeSelection"
+                    checked={enableTypeSelection}
+                    onChange={(e) => setEnableTypeSelection(e.target.checked)}
+                    className="w-4 h-4 text-secondary focus:ring-secondary border-gray-300 rounded"
+                  />
+                  <label htmlFor="enableTypeSelection" className="text-sm font-semibold text-gray-700">
+                    Enable Type Selection (e.g., Size, Color, Model)
+                  </label>
+                </div>
+
+                {enableTypeSelection && (
+                  <div className="space-y-4">
+                    {/* Type Selection Title */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Type Selection Title *
+                      </label>
+                      <input
+                        type="text"
+                        value={typeSelectionTitle}
+                        onChange={(e) => setTypeSelectionTitle(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                        placeholder="e.g., Size, Color, Model, Type"
+                        required={enableTypeSelection}
+                      />
+                    </div>
+
+                    {/* Add Type Option */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h5 className="font-medium text-gray-700 mb-3">Add Type Option</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Option Name *</label>
+                          <input
+                            type="text"
+                            value={newTypeOption.name}
+                            onChange={(e) => setNewTypeOption({...newTypeOption, name: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="e.g., Small, Red, Standard"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment (RM)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={newTypeOption.price_adjustment}
+                            onChange={(e) => setNewTypeOption({...newTypeOption, price_adjustment: parseFloat(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                          <input
+                            type="number"
+                            value={newTypeOption.stock}
+                            onChange={(e) => setNewTypeOption({...newTypeOption, stock: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddTypeOption}
+                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                      >
+                        <FaPlus className="inline mr-2" />
+                        Add Type Option
+                      </button>
+                    </div>
+
+                    {/* Existing Type Options */}
+                    {typeSelectionOptions.length > 0 && (
+                      <div>
+                        <h5 className="font-medium text-gray-700 mb-3">Type Options ({typeSelectionOptions.length})</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {typeSelectionOptions.map((option) => (
+                            <div key={option.id} className="border border-gray-200 rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium">{option.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTypeOption(option.id)}
+                                  className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                  <FaTrash className="text-sm" />
+                                </button>
+                              </div>
+                              <div className="text-sm text-gray-600 space-y-1">
+                                <div>Price: {option.price_adjustment > 0 ? '+' : ''}RM {option.price_adjustment}</div>
+                                <div>Stock: {option.stock}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
