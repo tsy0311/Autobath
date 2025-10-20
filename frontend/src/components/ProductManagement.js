@@ -919,7 +919,7 @@ const ProductManagement = () => {
                         <div key={image.id} className="relative group">
                           <img
                             src={image.image_url}
-                            alt={image.alt_text || product.name}
+                            alt={image.alt_text || formData.name || 'Product image'}
                             className="w-full h-32 object-cover rounded-lg"
                           />
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
