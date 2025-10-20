@@ -62,6 +62,61 @@ router.get('/', (req, res) => {
   });
 });
 
+// Get all categories
+router.get('/categories', (req, res) => {
+  const query = 'SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order, name';
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        error: 'Database error',
+        message: 'Failed to fetch categories'
+      });
+    }
+
+    res.json({
+      success: true,
+      categories: rows
+    });
+  });
+});
+
+// Add new category
+router.post('/categories', authenticateToken, requireAdmin, (req, res) => {
+  const { name, description, sort_order } = req.body;
+
+  if (!name) {
+    return res.status(400).json({
+      success: false,
+      message: 'Category name is required'
+    });
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO categories (name, description, sort_order, is_active)
+    VALUES (?, ?, ?, 1)
+  `);
+
+  stmt.run(name, description || null, sort_order || 0, function(err) {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to add category'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Category added successfully',
+      categoryId: this.lastID
+    });
+  });
+
+  stmt.finalize();
+});
+
 // Get product by ID
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -636,61 +691,6 @@ router.delete('/colors/:colorId', authenticateToken, requireAdmin, (req, res) =>
     res.json({
       success: true,
       message: 'Color deleted successfully'
-    });
-  });
-
-  stmt.finalize();
-});
-
-// Get all categories
-router.get('/categories', (req, res) => {
-  const query = 'SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order, name';
-
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({
-        error: 'Database error',
-        message: 'Failed to fetch categories'
-      });
-    }
-
-    res.json({
-      success: true,
-      categories: rows
-    });
-  });
-});
-
-// Add new category
-router.post('/categories', authenticateToken, requireAdmin, (req, res) => {
-  const { name, description, sort_order } = req.body;
-
-  if (!name) {
-    return res.status(400).json({
-      success: false,
-      message: 'Category name is required'
-    });
-  }
-
-  const stmt = db.prepare(`
-    INSERT INTO categories (name, description, sort_order, is_active)
-    VALUES (?, ?, ?, 1)
-  `);
-
-  stmt.run(name, description || null, sort_order || 0, function(err) {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to add category'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Category added successfully',
-      categoryId: this.lastID
     });
   });
 
