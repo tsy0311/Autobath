@@ -174,3 +174,21 @@ If you encounter issues:
 ---
 
 **Ready to launch your AUTOBATH website! 🚗✨**
+
+## Local Development (isolated from live)
+
+1. Backend
+   - `cd backend && PORT=3001 npm run dev`
+   - Optional: create a local-only env file `backend/.env` (do not commit):
+     - `FRONTEND_URL=http://localhost:3000`
+     - `EMAIL_USER=...`
+     - `EMAIL_PASS=...`
+
+2. Frontend
+   - `cd frontend && npm start`
+   - Optional: create a local-only env file `frontend/.env.local` (do not commit):
+     - `REACT_APP_API_URL=http://localhost:3001`
+
+3. Access
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:3001`

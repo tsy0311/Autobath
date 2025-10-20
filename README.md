@@ -1,3 +1,24 @@
+## Local run (frontend + backend)
+
+Backend
+
+```
+cd backend
+PORT=3001 npm run dev
+```
+
+Frontend
+
+```
+cd frontend
+npm start
+```
+
+Configuration
+
+- Frontend uses `REACT_APP_API_URL` if set, otherwise falls back to `http://localhost:3001`.
+- You can also rely on the CRA `proxy` (already configured) so relative `/api` calls go to the backend.
+
 # AUTOBATH Website
 
 A modern, full-stack website for AUTOBATH car detailing services built with React frontend and Node.js backend.
