@@ -293,8 +293,10 @@ const initDatabase = () => {
           reject(err);
         } else {
           console.log('Database tables initialized successfully');
-          // Skip inserting sample products going forward
-          insertSampleData()
+          // Ensure catalog data (products, service packages, individual services) is present
+          const { ensureCatalogSeeded } = require('./product');
+          ensureCatalogSeeded()
+            .then(() => insertSampleData())
             .then(() => resolve())
             .catch(reject);
         }
