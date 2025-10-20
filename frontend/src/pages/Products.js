@@ -44,7 +44,8 @@ const Products = () => {
     }
   };
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (product, event) => {
+    event.stopPropagation(); // Prevent card click when button is clicked
     addToCart(product);
     toast.success(`${product.name} added to cart!`);
   };
@@ -130,11 +131,12 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map(product => {
             return (
-              <div key={product.id} className="card group hover:shadow-xl transition-all duration-300">
-                <div 
-                  className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20 cursor-pointer"
-                  onClick={() => navigate(`/product/${product.id}`)}
-                >
+              <div 
+                key={product.id} 
+                className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
+                onClick={() => navigate(`/product/${product.id}`)}
+              >
+                <div className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20">
                   {product.images && product.images.length > 0 ? (
                     <img 
                       src={product.images[0].image_url} 
@@ -146,10 +148,7 @@ const Products = () => {
                   )}
                 </div>
                 <div className="p-6">
-                  <h3 
-                    className="text-xl font-bold text-primary mb-3 cursor-pointer hover:text-secondary transition-colors"
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  >
+                  <h3 className="text-xl font-bold text-primary mb-3 hover:text-secondary transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">{product.description}</p>
@@ -164,7 +163,7 @@ const Products = () => {
                   <div className="flex gap-2">
                     <button 
                       className="btn flex-1 flex items-center justify-center gap-2"
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => handleAddToCart(product, e)}
                       disabled={product.stock === 0}
                     >
                       <FaShoppingCart /> 
@@ -172,7 +171,10 @@ const Products = () => {
                     </button>
                     <button 
                       className="px-4 py-2 border border-secondary text-secondary hover:bg-secondary hover:text-white rounded-lg transition-colors flex items-center justify-center"
-                      onClick={() => navigate(`/product/${product.id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/product/${product.id}`);
+                      }}
                       title="View Details"
                     >
                       <FaEye />

@@ -15,10 +15,12 @@ const ProductManagement = () => {
     description: '',
     price: '',
     brand: '',
+    category: '',
     stock: '',
     image_url: ''
   });
   const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [productImages, setProductImages] = useState([]);
   const [productColors, setProductColors] = useState([]);
   const [newImage, setNewImage] = useState({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
@@ -28,6 +30,7 @@ const ProductManagement = () => {
   useEffect(() => {
     fetchProducts();
     fetchBrands();
+    fetchCategories();
   }, []);
 
   const fetchBrands = async () => {
@@ -36,6 +39,15 @@ const ProductManagement = () => {
       setBrands(res.data.brands || []);
     } catch (e) {
       console.error('Failed to load brands', e);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get('/api/products/categories');
+      setCategories(res.data.categories || []);
+    } catch (e) {
+      console.error('Failed to load categories', e);
     }
   };
 
@@ -60,6 +72,7 @@ const ProductManagement = () => {
         description: product.description || '',
         price: product.price,
         brand: product.brand || '',
+        category: product.category || '',
         stock: product.stock,
         image_url: product.image_url || ''
       });
@@ -74,6 +87,7 @@ const ProductManagement = () => {
         description: '',
         price: '',
         brand: brands[0] || '',
+        category: categories[0]?.name || '',
         stock: '',
         image_url: ''
       });
@@ -442,6 +456,26 @@ const ProductManagement = () => {
                   />
                 </div>
 
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Category *
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Price */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -554,6 +588,32 @@ const ProductManagement = () => {
                     {/* Add New Image */}
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                       <h5 className="font-medium text-gray-700 mb-3">Add New Image</h5>
+                      
+                      {/* Upload Method Selection */}
+                      <div className="mb-4">
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="uploadMethod"
+                              value="url"
+                              defaultChecked
+                              className="text-secondary focus:ring-secondary"
+                            />
+                            <span className="text-sm font-medium">Image URL</span>
+                          </label>
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="uploadMethod"
+                              value="file"
+                              className="text-secondary focus:ring-secondary"
+                            />
+                            <span className="text-sm font-medium">Upload File</span>
+                          </label>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
@@ -563,6 +623,30 @@ const ProductManagement = () => {
                             onChange={(e) => setNewImage({...newImage, image_url: e.target.value})}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
                             placeholder="https://example.com/image.jpg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Or Upload File</label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const data = new FormData();
+                              data.append('image', file);
+                              try {
+                                const res = await api.post('/api/upload', data, {
+                                  headers: { 'Content-Type': 'multipart/form-data' }
+                                });
+                                setNewImage({...newImage, image_url: res.data.url});
+                                toast.success('Image uploaded successfully');
+                              } catch (err) {
+                                console.error('Upload failed', err);
+                                toast.error('Image upload failed');
+                              }
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
                           />
                         </div>
                         <div>

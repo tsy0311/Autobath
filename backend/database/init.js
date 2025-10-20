@@ -75,6 +75,21 @@ const initDatabase = () => {
         else console.log('✅ Product colors table ready');
       });
 
+      // Categories table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS categories (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE,
+          description TEXT,
+          sort_order INTEGER DEFAULT 0,
+          is_active BOOLEAN DEFAULT 1,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `, (err) => {
+        if (err) console.error('Error creating categories table:', err);
+        else console.log('✅ Categories table ready');
+      });
+
       // Bookings table
       db.run(`
         CREATE TABLE IF NOT EXISTS bookings (
@@ -288,11 +303,47 @@ const initDatabase = () => {
   });
 };
 
+// Insert default categories
+const insertDefaultCategories = () => {
+  return new Promise((resolve, reject) => {
+    const categories = [
+      { name: 'Brushes & Tools', description: 'Cleaning brushes and detailing tools', sort_order: 1 },
+      { name: 'Pressure Washers', description: 'High pressure washing equipment', sort_order: 2 },
+      { name: 'Foam Cannons', description: 'Foam cannon and PA foam systems', sort_order: 3 },
+      { name: 'Vacuum Cleaners', description: 'Car vacuum and cleaning systems', sort_order: 4 },
+      { name: 'Accessories', description: 'Miscellaneous car detailing accessories', sort_order: 5 },
+      { name: 'Brushes', description: 'Specialized cleaning brushes', sort_order: 6 },
+      { name: 'Tools', description: 'Detailing tools and equipment', sort_order: 7 }
+    ];
+
+    const stmt = db.prepare(`
+      INSERT OR IGNORE INTO categories (name, description, sort_order, is_active)
+      VALUES (?, ?, ?, 1)
+    `);
+
+    let completed = 0;
+    categories.forEach(category => {
+      stmt.run(category.name, category.description, category.sort_order, (err) => {
+        if (err) {
+          console.error('Error inserting category:', err);
+        }
+        completed++;
+        if (completed === categories.length) {
+          stmt.finalize();
+          console.log('✅ Default categories inserted');
+          resolve();
+        }
+      });
+    });
+  });
+};
+
 // Insert sample data
 const insertSampleData = () => {
   return new Promise((resolve, reject) => {
     // Do not insert sample products anymore
-    insertSampleServices()
+    insertDefaultCategories()
+      .then(() => insertSampleServices())
       .then(() => insertSampleServicePackages())
       .then(() => insertSampleProductBundles())
       .then(() => createDefaultAdmin())
