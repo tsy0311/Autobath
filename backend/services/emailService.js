@@ -169,6 +169,7 @@ const templates = {
             ${data.items.map(item => `
               <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
                 <p style="margin: 0;"><strong>${item.name}</strong></p>
+                ${item.variant_name ? `<p style="margin: 2px 0 0 0; color: #C19A6B; font-size: 14px;">Variant: ${item.variant_name}${item.variant_price_adjustment !== 0 ? ` (${item.variant_price_adjustment > 0 ? '+' : ''}RM ${item.variant_price_adjustment})` : ''}</p>` : ''}
                 <p style="margin: 5px 0 0 0;">Quantity: ${item.quantity} × RM ${item.price}</p>
               </div>
             `).join('')}

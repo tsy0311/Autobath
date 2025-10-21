@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
   const query = `
     SELECT 
       id, name, description, base_price, duration_minutes, category, 
-      vehicle_types, requirements, image_url, is_active,
+      vehicle_types, bike_type, requirements, image_url, is_active,
       created_at, updated_at
     FROM services 
     WHERE is_active = 1
@@ -44,7 +44,7 @@ router.get('/:id', (req, res) => {
   const query = `
     SELECT 
       id, name, description, base_price, duration_minutes, category, 
-      vehicle_types, requirements, image_url, is_active,
+      vehicle_types, bike_type, requirements, image_url, is_active,
       created_at, updated_at
     FROM services 
     WHERE id = ? AND is_active = 1

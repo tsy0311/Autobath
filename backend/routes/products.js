@@ -331,8 +331,11 @@ router.get('/brands/list', (req, res) => {
 router.post('/', authenticateToken, requireAdmin, (req, res) => {
   const { name, description, price, image_url, category, brand, stock } = req.body;
 
+  console.log('📦 Creating new product:', { name, brand, price, stock, description });
+
   // Validate required fields
   if (!name || !brand) {
+    console.error('❌ Validation failed - missing name or brand:', { name, brand });
     return res.status(400).json({
       error: 'Missing required fields',
       message: 'Name and brand are required'
@@ -355,13 +358,14 @@ router.post('/', authenticateToken, requireAdmin, (req, res) => {
 
   stmt.run(name, description || null, normalizedPrice, image_url || null, category || null, brand, stock || 0, function(err) {
     if (err) {
-      console.error('Database error:', err);
+      console.error('❌ Database error creating product:', err);
       return res.status(500).json({
         error: 'Database error',
         message: 'Failed to create product'
       });
     }
 
+    console.log('✅ Product created successfully with ID:', this.lastID);
     res.status(201).json({
       success: true,
       message: 'Product created successfully',

@@ -6,12 +6,12 @@ const { db } = require('../database/init');
 router.get('/', (req, res) => {
   const query = `
     SELECT 
-      id, name, description, base_price, duration_minutes, services, 
+      id, name, description, base_price, duration_minutes, vehicle_type, services, 
       discount_percentage, image_url, is_popular, is_active,
       created_at, updated_at
     FROM service_packages 
     WHERE is_active = 1
-    ORDER BY is_popular DESC, name
+    ORDER BY is_popular DESC, vehicle_type, name
   `;
 
   db.all(query, [], (err, rows) => {

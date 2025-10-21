@@ -53,17 +53,41 @@ const PRODUCT_CATALOG = [
   { name: 'Windstorm Vacuum-30L', brand: 'Lutian', price: 'rm339' }
 ];
 
+// Service Packages by Vehicle Type
 const SERVICE_PACKAGES = [
-  { name: 'Basic Wash', base_price: 80.0, duration_minutes: 75, is_popular: 0 },
-  { name: 'Premium Wash', base_price: 138.0, duration_minutes: 180, is_popular: 1 },
-  { name: 'Ultra', base_price: 258.0, duration_minutes: 480, is_popular: 0 }
+  // Hatchback
+  { name: 'Basic Wash', base_price: 78.0, duration_minutes: 90, vehicle_type: 'hatchback', is_popular: 0 },
+  { name: 'Premium Wash', base_price: 120.0, duration_minutes: 105, vehicle_type: 'hatchback', is_popular: 1 },
+  { name: 'Ultra', base_price: 190.0, duration_minutes: 135, vehicle_type: 'hatchback', is_popular: 0 },
+  
+  // Sedan/SUV
+  { name: 'Basic Wash', base_price: 88.0, duration_minutes: 120, vehicle_type: 'sedan/suv', is_popular: 0 },
+  { name: 'Premium Wash', base_price: 150.0, duration_minutes: 135, vehicle_type: 'sedan/suv', is_popular: 1 },
+  { name: 'Ultra', base_price: 230.0, duration_minutes: 165, vehicle_type: 'sedan/suv', is_popular: 0 },
+  
+  // Truck/MPV
+  { name: 'Basic Wash', base_price: 108.0, duration_minutes: 150, vehicle_type: 'truck/mpv', is_popular: 0 },
+  { name: 'Premium Wash', base_price: 190.0, duration_minutes: 165, vehicle_type: 'truck/mpv', is_popular: 1 },
+  { name: 'Ultra', base_price: 260.0, duration_minutes: 195, vehicle_type: 'truck/mpv', is_popular: 0 }
 ];
 
+// Individual Services (Motorcycle and Add-ons)
 const INDIVIDUAL_SERVICES = [
-  { name: 'Engine Bay Wash & Protect', base_price: 88.0, duration_minutes: 60, category: 'Detailing' },
-  { name: 'Interior Detailing & Protect (5-seater)', base_price: 280.0, duration_minutes: 120, category: 'Interior' },
-  { name: 'Interior Detailing & Protect (7-seater)', base_price: 389.0, duration_minutes: 150, category: 'Interior' },
-  { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection' }
+  // Motorcycle - Normal Bike
+  { name: 'Basic Wash - Normal Bike', base_price: 25.0, duration_minutes: 40, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'normal' },
+  { name: 'Detailing + Wax - Normal Bike', base_price: 55.0, duration_minutes: 50, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'normal' },
+  { name: 'Polish - Normal Bike', base_price: 130.0, duration_minutes: 120, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'normal' },
+  
+  // Motorcycle - Sportbike
+  { name: 'Basic Wash - Sportbike', base_price: 25.0, duration_minutes: 70, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'sportbike' },
+  { name: 'Detailing + Wax - Sportbike', base_price: 55.0, duration_minutes: 120, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'sportbike' },
+  { name: 'Polish - Sportbike', base_price: 130.0, duration_minutes: 150, category: 'Motorcycle', vehicle_types: ['motorcycle'], bike_type: 'sportbike' },
+  
+  // Add-on Services
+  { name: 'Engine Bay Wash & Protect', base_price: 88.0, duration_minutes: 60, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
+  { name: 'Interior Detailing & Protect (5-seater)', base_price: 280.0, duration_minutes: 120, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
+  { name: 'Interior Detailing & Protect (7-seater)', base_price: 389.0, duration_minutes: 150, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
+  { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] }
 ];
 
 function upsertProducts(db) {
@@ -141,9 +165,9 @@ function upsertServicePackages(db) {
         if (row) {
           db.run(
             `UPDATE service_packages 
-             SET name = ?, base_price = ?, duration_minutes = ?, discount_percentage = 0, is_popular = ?, updated_at = CURRENT_TIMESTAMP
+             SET name = ?, base_price = ?, duration_minutes = ?, vehicle_type = ?, discount_percentage = 0, is_popular = ?, updated_at = CURRENT_TIMESTAMP
              WHERE id = ?`,
-            [pkg.name, pkg.base_price, pkg.duration_minutes, pkg.is_popular, row.id],
+            [pkg.name, pkg.base_price, pkg.duration_minutes, pkg.vehicle_type, pkg.is_popular, row.id],
             () => {
               pending -= 1;
               if (pending === 0) resolve();
@@ -151,9 +175,9 @@ function upsertServicePackages(db) {
           );
         } else {
           db.run(
-            `INSERT INTO service_packages (name, description, base_price, duration_minutes, services, discount_percentage, image_url, is_popular, is_active)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-            [pkg.name, null, pkg.base_price, pkg.duration_minutes, JSON.stringify([]), 0, null, pkg.is_popular],
+            `INSERT INTO service_packages (name, description, base_price, duration_minutes, vehicle_type, services, discount_percentage, image_url, is_popular, is_active)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+            [pkg.name, null, pkg.base_price, pkg.duration_minutes, pkg.vehicle_type, JSON.stringify([]), 0, null, pkg.is_popular],
             () => {
               pending -= 1;
               if (pending === 0) resolve();
@@ -180,9 +204,9 @@ function upsertIndividualServices(db) {
         if (row) {
           db.run(
             `UPDATE services 
-             SET description = COALESCE(description, ''), base_price = ?, duration_minutes = ?, category = ?, is_active = 1, updated_at = CURRENT_TIMESTAMP
+             SET description = COALESCE(description, ''), base_price = ?, duration_minutes = ?, category = ?, vehicle_types = ?, bike_type = ?, is_active = 1, updated_at = CURRENT_TIMESTAMP
              WHERE id = ?`,
-            [svc.base_price, svc.duration_minutes, svc.category, row.id],
+            [svc.base_price, svc.duration_minutes, svc.category, JSON.stringify(svc.vehicle_types || []), svc.bike_type || null, row.id],
             () => {
               pending -= 1;
               if (pending === 0) resolve();
@@ -190,15 +214,45 @@ function upsertIndividualServices(db) {
           );
         } else {
           db.run(
-            `INSERT INTO services (name, description, base_price, duration_minutes, category, vehicle_types, requirements, image_url, is_active)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-            [svc.name, null, svc.base_price, svc.duration_minutes, svc.category, JSON.stringify(['sedan','suv','truck']), JSON.stringify([]), null],
+            `INSERT INTO services (name, description, base_price, duration_minutes, category, vehicle_types, bike_type, requirements, image_url, is_active)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+            [svc.name, null, svc.base_price, svc.duration_minutes, svc.category, JSON.stringify(svc.vehicle_types || []), svc.bike_type || null, JSON.stringify([]), null],
             () => {
               pending -= 1;
               if (pending === 0) resolve();
             }
           );
         }
+      });
+    });
+  });
+}
+
+function addSpraySealantToPackages(db) {
+  return new Promise((resolve) => {
+    // Find S002 Spray Sealant service ID
+    db.get(`SELECT id FROM services WHERE name = 'S002 Spray Sealant'`, (err, sealantService) => {
+      if (err || !sealantService) {
+        console.log('S002 Spray Sealant service not found, skipping package updates');
+        resolve();
+        return;
+      }
+
+      // Update Premium and Ultra packages to include S002 Spray Sealant
+      const updateStmt = db.prepare(`
+        UPDATE service_packages 
+        SET services = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE (name LIKE '%Premium%' OR name LIKE '%Ultra%') AND is_active = 1
+      `);
+      
+      updateStmt.run(JSON.stringify([sealantService.id]), (err) => {
+        if (err) {
+          console.error('Error updating packages with spray sealant:', err);
+        } else {
+          console.log('✅ Added S002 Spray Sealant to Premium and Ultra packages');
+        }
+        updateStmt.finalize();
+        resolve();
       });
     });
   });
@@ -213,6 +267,7 @@ function ensureCatalogSeeded() {
         await upsertProducts(db);
         await upsertServicePackages(db);
         await upsertIndividualServices(db);
+        await addSpraySealantToPackages(db);
         db.run('COMMIT', () => {
           db.close();
           resolve();

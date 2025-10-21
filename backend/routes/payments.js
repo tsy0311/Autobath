@@ -174,41 +174,10 @@ router.post('/tng/verify', async (req, res) => {
 });
 
 /**
- * Manual TNG verification (no gateway): compares paid vs expected amount
- * @route POST /api/payments/tng/manual-verify
- * @body { expectedAmount: number, paidAmount: number, orderId?: string }
+ * REMOVED: Insecure manual verification endpoint
+ * Payment verification should only be done by admin after checking TNG account
+ * See admin order management for secure manual verification
  */
-router.post('/tng/manual-verify', async (req, res) => {
-  try {
-    const { expectedAmount, paidAmount, orderId } = req.body || {};
-
-    const exp = Number(expectedAmount);
-    const paid = Number(paidAmount);
-
-    if (!Number.isFinite(exp) || !Number.isFinite(paid)) {
-      return res.status(400).json({ success: false, error: 'Invalid amount' });
-    }
-
-    // Compare to 2 decimal places
-    const expCents = Math.round(exp * 100);
-    const paidCents = Math.round(paid * 100);
-
-    if (expCents !== paidCents) {
-      return res.json({
-        success: false,
-        status: 'mismatch',
-        message: 'Amount paid does not match the order total',
-        diff: (paidCents - expCents) / 100,
-        orderId: orderId || null
-      });
-    }
-
-    return res.json({ success: true, status: 'completed', orderId: orderId || null });
-  } catch (error) {
-    console.error('Error in manual TNG verify:', error);
-    res.status(500).json({ success: false, error: 'Failed to verify payment' });
-  }
-});
 
 /**
  * @route POST /api/payments/bank-transfer/create

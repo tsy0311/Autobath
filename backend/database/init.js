@@ -124,6 +124,14 @@ const initDatabase = () => {
           customer_phone TEXT,
           total_amount DECIMAL(10,2) NOT NULL,
           status TEXT DEFAULT 'pending',
+          payment_method TEXT DEFAULT 'tng',
+          payment_reference TEXT,
+          payment_proof_url TEXT,
+          payment_verified BOOLEAN DEFAULT 0,
+          payment_verified_by TEXT,
+          payment_verified_at DATETIME,
+          delivery_option TEXT DEFAULT 'collection',
+          delivery_address TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -137,8 +145,12 @@ const initDatabase = () => {
           product_id INTEGER NOT NULL,
           quantity INTEGER NOT NULL,
           price DECIMAL(10,2) NOT NULL,
+          variant_id INTEGER,
+          variant_name TEXT,
+          variant_price_adjustment DECIMAL(10,2) DEFAULT 0,
           FOREIGN KEY (order_id) REFERENCES orders (id),
-          FOREIGN KEY (product_id) REFERENCES products (id)
+          FOREIGN KEY (product_id) REFERENCES products (id),
+          FOREIGN KEY (variant_id) REFERENCES product_colors (id)
         )
       `);
 
@@ -166,7 +178,8 @@ const initDatabase = () => {
           base_price DECIMAL(10,2) NOT NULL,
           duration_minutes INTEGER NOT NULL,
           category TEXT NOT NULL,
-          vehicle_types TEXT, -- JSON array: ["sedan", "suv", "truck"]
+          vehicle_types TEXT, -- JSON array: ["motorcycle", "hatchback", "sedan/suv", "truck/mpv"]
+          bike_type TEXT, -- 'normal' or 'sportbike' for motorcycle services
           requirements TEXT, -- JSON array of requirements
           image_url TEXT,
           is_active BOOLEAN DEFAULT 1,
@@ -183,6 +196,7 @@ const initDatabase = () => {
           description TEXT,
           base_price DECIMAL(10,2) NOT NULL,
           duration_minutes INTEGER NOT NULL,
+          vehicle_type TEXT, -- 'hatchback', 'sedan/suv', 'truck/mpv'
           services TEXT, -- JSON array of service IDs
           discount_percentage DECIMAL(5,2) DEFAULT 0,
           image_url TEXT,
