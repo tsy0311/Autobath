@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaMobile } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import api from '../services/api';
+// import api from '../services/api'; // Removed unused import
 import PaymentModal from '../components/PaymentModal';
 
 const Cart = () => {
@@ -17,11 +17,11 @@ const Cart = () => {
   });
   const navigate = useNavigate();
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (cartItemId, newQuantity) => {
     if (newQuantity < 1) {
-      removeFromCart(productId);
+      removeFromCart(cartItemId);
     } else {
-      updateQuantity(productId, newQuantity);
+      updateQuantity(cartItemId, newQuantity);
     }
   };
 
@@ -37,30 +37,14 @@ const Cart = () => {
     try {
       setLoading(true);
       
-      // Create order with payment information
-      const orderData = {
-        items: items,
-        total: getTotalPrice(),
-        customerInfo: customerInfo,
-        payment: paymentData,
-        deliveryOption: paymentData.deliveryOption || 'collection',
-        address: paymentData.address || null,
-        status: 'pending'
-      };
-
-      const response = await api.post('/api/orders', orderData);
-      
-      if (response.data.success) {
-        toast.success('Order placed successfully!');
-        clearCart();
-        setCustomerInfo({ name: '', email: '', phone: '' });
-        navigate('/');
-      } else {
-        throw new Error(response.data.error || 'Failed to create order');
-      }
+      // Order is already created in the payment form, just handle success
+      toast.success('Order placed successfully!');
+      clearCart();
+      setCustomerInfo({ name: '', email: '', phone: '' });
+      navigate('/');
     } catch (error) {
-      console.error('Order creation error:', error);
-      toast.error('Failed to create order. Please try again.');
+      console.error('Order success handling error:', error);
+      toast.error('Failed to process order success. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -114,7 +98,7 @@ const Cart = () => {
           <div className="lg:col-span-2">
             <div className="space-y-3 sm:space-y-4">
               {items.map(item => (
-                <div key={item.id} className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-6">
+                <div key={item.cartItemId} className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-6">
                   {/* Mobile Layout */}
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-secondary/10 to-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -123,16 +107,28 @@ const Cart = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm sm:text-base md:text-lg font-bold text-primary mb-1 truncate">{item.name}</h3>
                       <p className="text-xs sm:text-sm text-gray-500 mb-1">{item.category}</p>
-                      <p className="text-xs sm:text-sm text-gray-600">RM {item.price.toFixed(2)} each</p>
+                      {item.selectedVariant && (
+                        <p className="text-xs sm:text-sm text-secondary font-medium mb-1">
+                          Variant: {item.selectedVariant.color_name}
+                          {item.selectedVariant.price_adjustment !== 0 && (
+                            <span className="text-gray-500 ml-1">
+                              ({item.selectedVariant.price_adjustment > 0 ? '+' : ''}RM {item.selectedVariant.price_adjustment.toFixed(2)})
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        RM {(item.finalPrice || item.price).toFixed(2)} each
+                      </p>
                       {/* Subtotal on mobile */}
                       <p className="text-base sm:text-lg font-bold text-secondary mt-2 md:hidden">
-                        RM {(item.price * item.quantity).toFixed(2)}
+                        RM {((item.finalPrice || item.price) * item.quantity).toFixed(2)}
                       </p>
                     </div>
                     {/* Delete button - top right on mobile */}
                     <button 
                       className="w-8 h-8 sm:w-9 sm:h-9 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors touch-manipulation flex-shrink-0 md:hidden"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.cartItemId)}
                     >
                       <FaTrash className="text-xs sm:text-sm" />
                     </button>
@@ -143,7 +139,7 @@ const Cart = () => {
                     <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1.5 sm:p-2">
                       <button 
                         className="w-8 h-8 sm:w-9 sm:h-9 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center transition-colors touch-manipulation"
-                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        onClick={() => handleQuantityChange(item.cartItemId, item.quantity - 1)}
                       >
                         <FaMinus className="text-xs sm:text-sm" />
                       </button>
@@ -152,7 +148,7 @@ const Cart = () => {
                       </span>
                       <button 
                         className="w-8 h-8 sm:w-9 sm:h-9 bg-secondary hover:bg-secondary-dark text-white rounded-lg flex items-center justify-center transition-colors touch-manipulation"
-                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        onClick={() => handleQuantityChange(item.cartItemId, item.quantity + 1)}
                       >
                         <FaPlus className="text-xs sm:text-sm" />
                       </button>
@@ -160,11 +156,11 @@ const Cart = () => {
                     {/* Subtotal on desktop */}
                     <div className="hidden md:flex items-center gap-4">
                       <div className="text-lg font-bold text-primary min-w-[100px] text-right">
-                        RM {(item.price * item.quantity).toFixed(2)}
+                        RM {((item.finalPrice || item.price) * item.quantity).toFixed(2)}
                       </div>
                       <button 
                         className="w-9 h-9 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-colors touch-manipulation"
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.cartItemId)}
                       >
                         <FaTrash className="text-sm" />
                       </button>

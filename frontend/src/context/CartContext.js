@@ -6,12 +6,15 @@ const CartContext = createContext();
 const cartReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_TO_CART':
-      const existingItem = state.items.find(item => item.id === action.payload.id);
+      const { product, selectedVariant } = action.payload;
+      const cartItemId = selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id;
+      const existingItem = state.items.find(item => item.cartItemId === cartItemId);
+      
       if (existingItem) {
         return {
           ...state,
           items: state.items.map(item =>
-            item.id === action.payload.id
+            item.cartItemId === cartItemId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
@@ -19,20 +22,29 @@ const cartReducer = (state, action) => {
       }
       return {
         ...state,
-        items: [...state.items, { ...action.payload, quantity: 1 }]
+        items: [...state.items, { 
+          ...product, 
+          cartItemId,
+          selectedVariant,
+          quantity: 1,
+          // Calculate final price with variant adjustment
+          finalPrice: selectedVariant ? 
+            product.price + (selectedVariant.price_adjustment || 0) : 
+            product.price
+        }]
       };
 
     case 'REMOVE_FROM_CART':
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload)
+        items: state.items.filter(item => item.cartItemId !== action.payload)
       };
 
     case 'UPDATE_QUANTITY':
       return {
         ...state,
         items: state.items.map(item =>
-          item.id === action.payload.id
+          item.cartItemId === action.payload.cartItemId
             ? { ...item, quantity: Math.max(1, action.payload.quantity) }
             : item
         )
@@ -82,16 +94,16 @@ export const CartProvider = ({ children }) => {
   }, [state.items]);
 
   // Cart actions
-  const addToCart = (product) => {
-    dispatch({ type: 'ADD_TO_CART', payload: product });
+  const addToCart = (product, selectedVariant = null) => {
+    dispatch({ type: 'ADD_TO_CART', payload: { product, selectedVariant } });
   };
 
-  const removeFromCart = (productId) => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+  const removeFromCart = (cartItemId) => {
+    dispatch({ type: 'REMOVE_FROM_CART', payload: cartItemId });
   };
 
-  const updateQuantity = (productId, quantity) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } });
+  const updateQuantity = (cartItemId, quantity) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { cartItemId, quantity } });
   };
 
   const clearCart = () => {
@@ -104,7 +116,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const getTotalPrice = () => {
-    return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return state.items.reduce((total, item) => total + ((item.finalPrice || item.price) * item.quantity), 0);
   };
 
   const value = {

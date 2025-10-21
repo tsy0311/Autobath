@@ -4,6 +4,7 @@ import { FaShoppingCart, FaPumpSoap, FaTags, FaEye } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import VariantSelectionModal from '../components/VariantSelectionModal';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,8 @@ const Products = () => {
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [brands, setBrands] = useState(['All']);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showVariantModal, setShowVariantModal] = useState(false);
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -44,9 +47,20 @@ const Products = () => {
     }
   };
 
-  const handleAddToCart = (product) => {
-    addToCart(product);
-    toast.success(`${product.name} added to cart!`);
+  const handleAddToCart = (product, selectedVariant = null) => {
+    addToCart(product, selectedVariant);
+    const variantText = selectedVariant ? ` (${selectedVariant.color_name})` : '';
+    toast.success(`${product.name}${variantText} added to cart!`);
+  };
+
+  const handleAddToCartClick = (product) => {
+    // Check if product has variants
+    if (product.colors && product.colors.length > 0) {
+      setSelectedProduct(product);
+      setShowVariantModal(true);
+    } else {
+      handleAddToCart(product);
+    }
   };
 
   const filteredProducts = products
@@ -135,7 +149,7 @@ const Products = () => {
                 className="card group hover:shadow-xl transition-all duration-300 cursor-pointer"
                 onClick={() => navigate(`/product/${product.id}`)}
               >
-                <div className="flex items-center justify-center h-32 bg-gradient-to-br from-secondary/10 to-secondary/20">
+                <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-secondary/10 to-secondary/20 overflow-hidden">
                   {product.images && product.images.length > 0 ? (
                     <img 
                       src={product.images[0].image_url} 
@@ -164,7 +178,7 @@ const Products = () => {
                       className="btn flex-1 flex items-center justify-center gap-2"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddToCart(product);
+                        handleAddToCartClick(product);
                       }}
                       disabled={product.stock === 0}
                     >
@@ -194,6 +208,17 @@ const Products = () => {
           </div>
         )}
       </div>
+
+      {/* Variant Selection Modal */}
+      <VariantSelectionModal
+        isOpen={showVariantModal}
+        onClose={() => {
+          setShowVariantModal(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+        onAddToCart={handleAddToCart}
+      />
     </div>
   );
 };

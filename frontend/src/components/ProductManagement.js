@@ -15,7 +15,6 @@ const ProductManagement = () => {
     description: '',
     price: '',
     brand: '',
-    category: '',
     stock: '',
     image_url: ''
   });
@@ -28,6 +27,7 @@ const ProductManagement = () => {
   const [productImages, setProductImages] = useState([]);
   const [productColors, setProductColors] = useState([]);
   const [newImage, setNewImage] = useState({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+  const [imagePreview, setImagePreview] = useState(null);
   const [newColor, setNewColor] = useState({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
   const [activeTab, setActiveTab] = useState('basic');
 
@@ -70,20 +70,52 @@ const ProductManagement = () => {
 
   const handleOpenModal = async (product = null) => {
     if (product) {
-      setEditingProduct(product);
-      setFormData({
-        name: product.name,
-        description: product.description || '',
-        price: product.price,
-        brand: product.brand || '',
-        category: product.category || '',
-        stock: product.stock,
-        image_url: product.image_url || ''
-      });
-      
-      // Load product images and colors
-      setProductImages(product.images || []);
-      setProductColors(product.colors || []);
+      try {
+        // Always fetch full, fresh product details including images/colors
+        const res = await api.get(`/api/products/${product.id}`);
+        if (res.data?.success && res.data.product) {
+          const full = res.data.product;
+          setEditingProduct(full);
+          setFormData({
+            name: full.name,
+            description: full.description || '',
+            price: full.price,
+            brand: full.brand || '',
+            stock: full.stock,
+            image_url: full.image_url || ''
+          });
+
+          setProductImages(full.images || []);
+          setProductColors(full.colors || []);
+        } else {
+          // Fallback to provided product object
+          setEditingProduct(product);
+          setFormData({
+            name: product.name,
+            description: product.description || '',
+            price: product.price,
+            brand: product.brand || '',
+            stock: product.stock,
+            image_url: product.image_url || ''
+          });
+          setProductImages(product.images || []);
+          setProductColors(product.colors || []);
+        }
+      } catch (e) {
+        console.error('Failed to fetch product details', e);
+        // Fallback to provided product object
+        setEditingProduct(product);
+        setFormData({
+          name: product.name,
+          description: product.description || '',
+          price: product.price,
+          brand: product.brand || '',
+          stock: product.stock,
+          image_url: product.image_url || ''
+        });
+        setProductImages(product.images || []);
+        setProductColors(product.colors || []);
+      }
     } else {
       setEditingProduct(null);
       setFormData({
@@ -91,7 +123,6 @@ const ProductManagement = () => {
         description: '',
         price: '',
         brand: brands[0] || '',
-        category: categories[0]?.name || '',
         stock: '',
         image_url: ''
       });
@@ -120,6 +151,7 @@ const ProductManagement = () => {
     setProductImages([]);
     setProductColors([]);
     setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+    setImagePreview(null);
     setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
     setEnableTypeSelection(false);
     setTypeSelectionTitle('');
@@ -130,7 +162,7 @@ const ProductManagement = () => {
 
   const handleAddImage = async () => {
     if (!newImage.image_url.trim()) {
-      toast.error('Please enter an image URL');
+      toast.error('Please upload an image first');
       return;
     }
 
@@ -140,8 +172,16 @@ const ProductManagement = () => {
         const response = await api.post(`/api/products/${editingProduct.id}/images`, newImage);
         if (response.data.success) {
           toast.success('Image added successfully');
+          // Reload the product to get updated images
+          const productResponse = await api.get(`/api/products/${editingProduct.id}`);
+          if (productResponse.data.success) {
+            setProductImages(productResponse.data.product.images || []);
+            // Also update the editing product to reflect changes
+            setEditingProduct(productResponse.data.product);
+          }
+          // Refresh the products list to show updated product
+          fetchProducts();
           setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
-          fetchProducts(); // Refresh to get updated data
         }
       } catch (error) {
         console.error('Error adding image:', error);
@@ -167,7 +207,11 @@ const ProductManagement = () => {
         const response = await api.delete(`/api/products/images/${imageId}`);
         if (response.data.success) {
           toast.success('Image deleted successfully');
-          fetchProducts(); // Refresh to get updated data
+          // Reload the product to get updated images
+          const productResponse = await api.get(`/api/products/${editingProduct.id}`);
+          if (productResponse.data.success) {
+            setProductImages(productResponse.data.product.images || []);
+          }
         }
       } catch (error) {
         console.error('Error deleting image:', error);
@@ -266,7 +310,7 @@ const ProductManagement = () => {
     try {
       let productId;
       if (editingProduct) {
-        await api.put(`/api/products/${editingProduct.id}`, formData);
+        const response = await api.put(`/api/products/${editingProduct.id}`, formData);
         productId = editingProduct.id;
         toast.success('Product updated successfully!');
       } else {
@@ -276,7 +320,7 @@ const ProductManagement = () => {
       }
 
       // Add images if any were uploaded during creation
-      if (productImages.length > 0 && productId) {
+      if (productImages.length > 0 && productId && !editingProduct) {
         for (const image of productImages) {
           try {
             await api.post(`/api/products/${productId}/images`, image);
@@ -288,7 +332,7 @@ const ProductManagement = () => {
       }
 
       // Add colors if any were added during creation
-      if (productColors.length > 0 && productId) {
+      if (productColors.length > 0 && productId && !editingProduct) {
         for (const color of productColors) {
           try {
             await api.post(`/api/products/${productId}/colors`, color);
@@ -300,14 +344,14 @@ const ProductManagement = () => {
       }
 
       // Add type selection options if enabled
-      if (enableTypeSelection && typeSelectionOptions.length > 0 && productId) {
+      if (typeSelectionOptions.length > 0 && productId && !editingProduct) {
         for (const option of typeSelectionOptions) {
           try {
             const colorData = {
               color_name: option.name,
               color_code: null,
               color_image_url: null,
-              price_adjustment: option.price_adjustment,
+              price_adjustment: option.price_adjustment || 0,
               stock: option.stock,
               is_available: option.is_available,
               sort_order: option.sort_order
@@ -320,11 +364,13 @@ const ProductManagement = () => {
         }
       }
 
+      // Refresh the products list
+      await fetchProducts();
       handleCloseModal();
-      fetchProducts();
     } catch (error) {
       console.error('Error saving product:', error);
-      toast.error(error.response?.data?.message || 'Failed to save product');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to save product';
+      toast.error(errorMessage);
     }
   };
 
@@ -428,8 +474,18 @@ const ProductManagement = () => {
           {filteredProducts.map(product => (
             <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               {/* Product Image */}
-              <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                {product.image_url ? (
+              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[0].image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentElement.innerHTML = '<div class="text-6xl text-gray-400"><i class="fas fa-image"></i></div>';
+                    }}
+                  />
+                ) : product.image_url ? (
                   <img
                     src={product.image_url}
                     alt={product.name}
@@ -519,7 +575,7 @@ const ProductManagement = () => {
                 {[
                   { id: 'basic', label: 'Basic Info', icon: FaBox },
                   { id: 'images', label: 'Images', icon: FaImage },
-                  { id: 'colors', label: 'Colors', icon: FaPalette }
+                  { id: 'variants', label: 'Variants', icon: FaPalette }
                 ].map(tab => (
                   <button
                     key={tab.id}
@@ -570,26 +626,6 @@ const ProductManagement = () => {
                   />
                 </div>
 
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map(category => (
-                      <option key={category.id} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 {/* Price */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -638,166 +674,42 @@ const ProductManagement = () => {
                 />
               </div>
 
-              {/* Image */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Image
-                </label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const data = new FormData();
-                      data.append('image', file);
-                      try {
-                        const res = await api.post('/api/upload', data, {
-                          headers: { 'Content-Type': 'multipart/form-data' }
-                        });
-                        setFormData({ ...formData, image_url: res.data.url });
-                        toast.success('Image uploaded');
-                      } catch (err) {
-                        console.error('Upload failed', err);
-                        toast.error('Image upload failed');
-                      }
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                  {formData.image_url && (
-                    <img src={formData.image_url} alt="preview" className="w-16 h-16 object-cover rounded" />
-                  )}
+
+              {/* Buttons - Only show for Basic Info tab */}
+              {editingProduct && (
+                <div className="flex gap-3 pt-4 mt-6 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                  >
+                    Update Product
+                  </button>
                 </div>
-                {formData.image_url && (
-                  <p className="text-xs text-gray-500 mt-1 break-all">{formData.image_url}</p>
-                )}
-              </div>
-
-              {/* Type Selection Section */}
-              <div className="border-t pt-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <input
-                    type="checkbox"
-                    id="enableTypeSelection"
-                    checked={enableTypeSelection}
-                    onChange={(e) => setEnableTypeSelection(e.target.checked)}
-                    className="w-4 h-4 text-secondary focus:ring-secondary border-gray-300 rounded"
-                  />
-                  <label htmlFor="enableTypeSelection" className="text-sm font-semibold text-gray-700">
-                    Enable Type Selection (e.g., Size, Color, Model)
-                  </label>
+              )}
+              {!editingProduct && (
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                  >
+                    Add Product
+                  </button>
                 </div>
-
-                {enableTypeSelection && (
-                  <div className="space-y-4">
-                    {/* Type Selection Title */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Type Selection Title *
-                      </label>
-                      <input
-                        type="text"
-                        value={typeSelectionTitle}
-                        onChange={(e) => setTypeSelectionTitle(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                        placeholder="e.g., Size, Color, Model, Type"
-                        required={enableTypeSelection}
-                      />
-                    </div>
-
-                    {/* Add Type Option */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h5 className="font-medium text-gray-700 mb-3">Add Type Option</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Option Name *</label>
-                          <input
-                            type="text"
-                            value={newTypeOption.name}
-                            onChange={(e) => setNewTypeOption({...newTypeOption, name: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="e.g., Small, Red, Standard"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment (RM)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={newTypeOption.price_adjustment}
-                            onChange={(e) => setNewTypeOption({...newTypeOption, price_adjustment: parseFloat(e.target.value) || 0})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="0.00"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-                          <input
-                            type="number"
-                            value={newTypeOption.stock}
-                            onChange={(e) => setNewTypeOption({...newTypeOption, stock: parseInt(e.target.value) || 0})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleAddTypeOption}
-                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
-                      >
-                        <FaPlus className="inline mr-2" />
-                        Add Type Option
-                      </button>
-                    </div>
-
-                    {/* Existing Type Options */}
-                    {typeSelectionOptions.length > 0 && (
-                      <div>
-                        <h5 className="font-medium text-gray-700 mb-3">Type Options ({typeSelectionOptions.length})</h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {typeSelectionOptions.map((option) => (
-                            <div key={option.id} className="border border-gray-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium">{option.name}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteTypeOption(option.id)}
-                                  className="p-1 text-red-500 hover:text-red-700 transition-colors"
-                                >
-                                  <FaTrash className="text-sm" />
-                                </button>
-                              </div>
-                              <div className="text-sm text-gray-600 space-y-1">
-                                <div>Price: {option.price_adjustment > 0 ? '+' : ''}RM {option.price_adjustment}</div>
-                                <div>Stock: {option.stock}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
-                >
-                  {editingProduct ? 'Update Product' : 'Add Product'}
-                </button>
-              </div>
+              )}
             </form>
               )}
 
@@ -809,68 +721,62 @@ const ProductManagement = () => {
                     
                     {/* Add New Image */}
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-medium text-gray-700 mb-3">Add New Image</h5>
-                      
-                      {/* Upload Method Selection */}
-                      <div className="mb-4">
-                        <div className="flex gap-4">
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name="uploadMethod"
-                              value="url"
-                              defaultChecked
-                              className="text-secondary focus:ring-secondary"
-                            />
-                            <span className="text-sm font-medium">Image URL</span>
-                          </label>
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name="uploadMethod"
-                              value="file"
-                              className="text-secondary focus:ring-secondary"
-                            />
-                            <span className="text-sm font-medium">Upload File</span>
-                          </label>
-                        </div>
-                      </div>
+                      <h5 className="font-medium text-gray-700 mb-3">Upload Image</h5>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {!imagePreview ? (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
-                          <input
-                            type="url"
-                            value={newImage.image_url}
-                            onChange={(e) => setNewImage({...newImage, image_url: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="https://example.com/image.jpg"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Or Upload File</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Select Image File</label>
                           <input
                             type="file"
                             accept="image/*"
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
+                              
+                              // Show preview immediately
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setImagePreview(reader.result);
+                              };
+                              reader.readAsDataURL(file);
+                              
+                              // Upload to server
                               const data = new FormData();
                               data.append('image', file);
                               try {
                                 const res = await api.post('/api/upload', data, {
                                   headers: { 'Content-Type': 'multipart/form-data' }
                                 });
-                                setNewImage({...newImage, image_url: res.data.url});
-                                toast.success('Image uploaded successfully');
+                                console.log('Upload response:', res.data);
+                                const imageUrl = res.data.url || res.data.path;
+                                console.log('Image URL:', imageUrl);
+                                setNewImage({...newImage, image_url: imageUrl});
+                                toast.success('Image ready for confirmation');
                               } catch (err) {
                                 console.error('Upload failed', err);
                                 toast.error('Image upload failed');
+                                setImagePreview(null);
                               }
                             }}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
                           />
                         </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {/* Image Preview */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Preview & Confirm (Square 1:1 Format)</label>
+                            <div className="relative w-64 aspect-square mx-auto">
+                              <img 
+                                src={imagePreview} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover border-2 border-gray-300 rounded-lg"
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 text-center">Image will be displayed in 1:1 square format. Review before adding.</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Alt Text</label>
                           <input
@@ -903,25 +809,51 @@ const ProductManagement = () => {
                           </label>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleAddImage}
-                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
-                      >
-                        <FaPlus className="inline mr-2" />
-                        Add Image
-                      </button>
+                      <div className="flex gap-3 mt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImagePreview(null);
+                            setNewImage({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
+                          }}
+                          className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleAddImage();
+                            setImagePreview(null);
+                          }}
+                          className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                        >
+                          <FaPlus className="inline mr-2" />
+                          Confirm & Add Image
+                        </button>
+                      </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Existing Images */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {productImages.map((image, index) => (
+                      {productImages.map((image, index) => {
+                        console.log('Rendering image:', image.image_url);
+                        return (
                         <div key={image.id} className="relative group">
-                          <img
-                            src={image.image_url}
-                            alt={image.alt_text || formData.name || 'Product image'}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
+                          <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                            <img
+                              src={image.image_url}
+                              alt={image.alt_text || formData.name || 'Product image'}
+                              className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Image failed to load:', image.image_url);
+                              // Hide broken image without rendering any placeholder
+                              e.currentTarget.style.display = 'none';
+                            }}
+                            />
+                          </div>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => handleDeleteImage(image.id)}
@@ -934,157 +866,145 @@ const ProductManagement = () => {
                             {image.is_primary ? 'Primary' : `#${image.sort_order}`}
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
+                  </div>
+
+                  {/* Action Buttons for Images Tab */}
+                  <div className="flex gap-3 pt-6 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        const formElement = document.querySelector('form');
+                        if (formElement) {
+                          formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                        }
+                      }}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                    >
+                      {editingProduct ? 'Update Product' : 'Add Product'}
+                    </button>
                   </div>
                 </div>
               )}
 
-              {/* Colors Tab */}
-              {activeTab === 'colors' && (
+              {/* Variants Tab */}
+              {activeTab === 'variants' && (
                 <div className="space-y-6">
                   <div>
-                    <h4 className="text-lg font-semibold text-primary mb-4">Product Colors</h4>
+                    <h4 className="text-lg font-semibold text-primary mb-2">Product Variants</h4>
+                    <p className="text-sm text-gray-600 mb-4">Define product options like Size (Small/Large) or Color (Red/Green)</p>
                     
-                    {/* Add New Color */}
+                    {/* Variant Type */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Variant Type (e.g., Size, Color, Model)
+                      </label>
+                      <input
+                        type="text"
+                        value={typeSelectionTitle}
+                        onChange={(e) => setTypeSelectionTitle(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                        placeholder="e.g., Size, Color, Model"
+                      />
+                    </div>
+
+                    {/* Add New Variant */}
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-medium text-gray-700 mb-3">Add New Color</h5>
+                      <h5 className="font-medium text-gray-700 mb-3">Add Variant Option</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Name *</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Option Name *</label>
                           <input
                             type="text"
-                            value={newColor.color_name}
-                            onChange={(e) => setNewColor({...newColor, color_name: e.target.value})}
+                            value={newTypeOption.name}
+                            onChange={(e) => setNewTypeOption({...newTypeOption, name: e.target.value})}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="e.g., Red, Blue, Black"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Code</label>
-                          <input
-                            type="text"
-                            value={newColor.color_code}
-                            onChange={(e) => setNewColor({...newColor, color_code: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="#FF0000"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Color Image URL</label>
-                          <input
-                            type="url"
-                            value={newColor.color_image_url}
-                            onChange={(e) => setNewColor({...newColor, color_image_url: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="https://example.com/color-image.jpg"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment (RM)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={newColor.price_adjustment}
-                            onChange={(e) => setNewColor({...newColor, price_adjustment: parseFloat(e.target.value) || 0})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="0.00"
+                            placeholder="e.g., Small, Red, Standard"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
                           <input
                             type="number"
-                            value={newColor.stock}
-                            onChange={(e) => setNewColor({...newColor, stock: parseInt(e.target.value) || 0})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="0"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                          <input
-                            type="number"
-                            value={newColor.sort_order}
-                            onChange={(e) => setNewColor({...newColor, sort_order: parseInt(e.target.value) || 0})}
+                            value={newTypeOption.stock}
+                            onChange={(e) => setNewTypeOption({...newTypeOption, stock: parseInt(e.target.value) || 0})}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
                             placeholder="0"
                           />
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 mt-3">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={newColor.is_available}
-                            onChange={(e) => setNewColor({...newColor, is_available: e.target.checked})}
-                            className="rounded border-gray-300 text-secondary focus:ring-secondary"
-                          />
-                          <span className="text-sm text-gray-700">Available</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={handleAddColor}
-                          className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
-                        >
-                          <FaPlus className="inline mr-2" />
-                          Add Color
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddTypeOption}
+                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                      >
+                        <FaPlus className="inline mr-2" />
+                        Add Option
+                      </button>
                     </div>
 
-                    {/* Existing Colors */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {productColors.map((color) => (
-                        <div key={color.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              {color.color_code && (
-                                <div
-                                  className="w-6 h-6 rounded-full border border-gray-300"
-                                  style={{ backgroundColor: color.color_code }}
-                                ></div>
-                              )}
-                              <span className="font-medium">{color.color_name}</span>
+                    {/* Existing Variants */}
+                    {typeSelectionOptions.length > 0 && (
+                      <div>
+                        <h5 className="font-medium text-gray-700 mb-3">Variant Options ({typeSelectionOptions.length})</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {typeSelectionOptions.map((option) => (
+                            <div key={option.id} className="border border-gray-200 rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium">{option.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTypeOption(option.id)}
+                                  className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                  <FaTrash className="text-sm" />
+                                </button>
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                <div>Stock: {option.stock}</div>
+                              </div>
                             </div>
-                            <button
-                              onClick={() => handleDeleteColor(color.id)}
-                              className="p-1 text-red-500 hover:text-red-700 transition-colors"
-                            >
-                              <FaTrash className="text-sm" />
-                            </button>
-                          </div>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <div>Price: {color.price_adjustment > 0 ? '+' : ''}RM {color.price_adjustment}</div>
-                            <div>Stock: {color.stock}</div>
-                            <div>Status: {color.is_available ? 'Available' : 'Unavailable'}</div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons for Variants Tab */}
+                  <div className="flex gap-3 pt-6 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        const formElement = document.querySelector('form');
+                        if (formElement) {
+                          formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                        }
+                      }}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                    >
+                      {editingProduct ? 'Update Product' : 'Add Product'}
+                    </button>
                   </div>
                 </div>
               )}
-
-              {/* Modal Footer */}
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                >
-                  {activeTab === 'basic' ? 'Cancel' : 'Close'}
-                </button>
-                {activeTab === 'basic' && (
-                  <button
-                    type="submit"
-                    form="product-form"
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-secondary to-secondary-dark text-white rounded-lg font-semibold hover:shadow-lg transition-all"
-                  >
-                    {editingProduct ? 'Update Product' : 'Add Product'}
-                  </button>
-                )}
-              </div>
             </div>
           </div>
         </div>
