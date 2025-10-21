@@ -115,33 +115,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Trust Badges Section */}
-      <section className="py-12 bg-white border-y border-gray-200">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="p-6 rounded-xl hover:bg-gray-50 transition-all">
-              <div className="text-4xl mb-3">🏆</div>
-              <h4 className="font-bold text-primary mb-1">{"Happy Customers"}</h4>
-              <p className="text-sm text-gray-600">{"Satisfied customers"}</p>
-            </div>
-            <div className="p-6 rounded-xl hover:bg-gray-50 transition-all">
-              <div className="text-4xl mb-3">⭐</div>
-              <h4 className="font-bold text-primary mb-1">{"5-Star Rated"}</h4>
-              <p className="text-sm text-gray-600">{"Rated service"}</p>
-            </div>
-            <div className="p-6 rounded-xl hover:bg-gray-50 transition-all">
-              <div className="text-4xl mb-3">✅</div>
-              <h4 className="font-bold text-primary mb-1">{"Certified"}</h4>
-              <p className="text-sm text-gray-600">{"Professional team"}</p>
-            </div>
-            <div className="p-6 rounded-xl hover:bg-gray-50 transition-all">
-              <div className="text-4xl mb-3">🌿</div>
-              <h4 className="font-bold text-primary mb-1">{"Eco-Friendly"}</h4>
-              <p className="text-sm text-gray-600">{"Eco-friendly products"}</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
@@ -219,7 +192,19 @@ const Home = () => {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Essential detailing for regular maintenance"}</p>
+                <p className="text-gray-600 mb-4 leading-relaxed">{"Essential detailing for regular maintenance"}</p>
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
+                </div>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Pre-wash</li>
+                    <li>• Wash</li>
+                    <li>• Vacuum</li>
+                    <li>• Protect wax</li>
+                  </ul>
+                </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 1h 15m
@@ -244,7 +229,22 @@ const Home = () => {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Comprehensive detailing with premium products"}</p>
+                <p className="text-gray-600 mb-4 leading-relaxed">{"Comprehensive detailing with premium products"}</p>
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
+                </div>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Pre-wash</li>
+                    <li>• Wash</li>
+                    <li>• Vacuum</li>
+                    <li>• S002 spray sealant included</li>
+                    <li>• Deep cleaning rim</li>
+                    <li>• Interior cleaning</li>
+                    <li>• Tyre protection wax</li>
+                  </ul>
+                </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 3h 0m
@@ -266,7 +266,23 @@ const Home = () => {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Complete transformation with ceramic coating"}</p>
+                <p className="text-gray-600 mb-4 leading-relaxed">{"Complete transformation with ceramic coating"}</p>
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
+                </div>
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Pre-wash</li>
+                    <li>• Wash</li>
+                    <li>• Vacuum</li>
+                    <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
+                    <li>• Coating</li>
+                    <li>• S002 spray sealant</li>
+                    <li>• Tyre protection wax</li>
+                    <li>• Deep cleaning rim</li>
+                  </ul>
+                </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600 font-semibold">
                     <FaClock /> 8h 0m
@@ -353,31 +369,84 @@ const Home = () => {
         <div className="container">
           <div className="section-title">
             <h2>{"Instagram Feeds"}</h2>
-            <p>{"Follow our latest work on Instagram"}</p>
+            <p>{"Follow our latest work on Instagram @autobath_my"}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1,2,3].map((i) => (
-              <a
-                key={i}
-                href="https://www.instagram.com/autobath_my/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
-              >
-                <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                  <img
-                    src={require('../img/placeholder.jpg')}
-                    alt="Instagram preview"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
-                </div>
-              </a>
-            ))}
+            {/* Instagram Post 1 */}
+            <a
+              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
+            >
+              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  alt="AUTOBATH car detailing work"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = require('../img/placeholder.jpg');
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                <div className="absolute top-3 right-3 text-white text-2xl">📸</div>
+              </div>
+            </a>
+
+            {/* Instagram Post 2 */}
+            <a
+              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
+            >
+              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1563720228757-4b4a4a4a4a4a?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  alt="AUTOBATH premium detailing"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = require('../img/placeholder.jpg');
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                <div className="absolute top-3 right-3 text-white text-2xl">✨</div>
+              </div>
+            </a>
+
+            {/* Instagram Post 3 */}
+            <a
+              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
+            >
+              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  alt="AUTOBATH ceramic coating"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = require('../img/placeholder.jpg');
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                <div className="absolute top-3 right-3 text-white text-2xl">🚗</div>
+              </div>
+            </a>
+          </div>
+          <div className="text-center mt-8">
+            <a
+              href="https://www.instagram.com/autobath_my/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary font-semibold hover:text-secondary transition-colors"
+            >
+              Follow us on Instagram @autobath_my
+            </a>
           </div>
         </div>
       </section>

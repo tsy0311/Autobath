@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaUser, FaEnvelope, FaPhone, FaDollarSign, FaFilter, FaSearch, FaEye } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaEnvelope, FaDollarSign, FaSearch, FaEye } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 

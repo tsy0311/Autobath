@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUsers, FaCalendarAlt, FaShoppingCart, FaStar, FaDollarSign, FaChartLine, FaCog, FaSignOutAlt, FaHome, FaKey, FaBox, FaSeedling, FaReceipt } from 'react-icons/fa';
+import { FaCalendarAlt, FaShoppingCart, FaStar, FaDollarSign, FaChartLine, FaSignOutAlt, FaHome, FaKey, FaBox, FaSeedling, FaReceipt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,6 @@ import ProductManagement from '../components/ProductManagement';
 import BookingsManagement from '../components/BookingsManagement';
 // CustomersManagement removed
 // ReviewsManagement removed
-import OrdersManagement from '../components/OrdersManagement';
 import OrderManagement from '../components/OrderManagement';
 
 const AdminDashboard = () => {

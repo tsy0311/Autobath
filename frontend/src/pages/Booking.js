@@ -85,27 +85,7 @@ const Booking = () => {
     setIsCalendarOpen(false);
   };
 
-  // Individual services to show (from backend), merge 5/7-seater into one selectable card
-  const interior5 = useMemo(() => (services || []).find(s => s.name === 'Interior Detailing & Protect (5-seater)'), [services]);
-  const interior7 = useMemo(() => (services || []).find(s => s.name === 'Interior Detailing & Protect (7-seater)'), [services]);
-  const engineBay = useMemo(() => (services || []).find(s => s.name === 'Engine Bay Wash & Protect'), [services]);
-  const spraySealant = useMemo(() => (services || []).find(s => s.name === 'S002 Spray Sealant'), [services]);
 
-  const [interiorSeatOption, setInteriorSeatOption] = useState('5'); // '5' or '7'
-
-  const individualServices = useMemo(() => {
-    const list = [];
-    if (engineBay) list.push(engineBay);
-    if (interior5 || interior7) {
-      list.push({
-        merged: true,
-        name: 'Interior Detailing & Protect',
-        variants: [interior5, interior7].filter(Boolean)
-      });
-    }
-    if (spraySealant) list.push(spraySealant);
-    return list;
-  }, [engineBay, interior5, interior7, spraySealant]);
 
 
   // Load services and packages on component mount
@@ -478,7 +458,50 @@ const Booking = () => {
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
-                                    <p className="text-gray-600">{packageData.description}</p>
+                                    <p className="text-gray-600 mb-3">{packageData.description}</p>
+                                    <div className="mb-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+                                      <p className="text-xs text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
+                                    </div>
+                                    {packageData.name === 'Basic Package' && (
+                                      <div className="mb-3">
+                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
+                                        <ul className="text-xs text-gray-600 space-y-1">
+                                          <li>• Pre-wash</li>
+                                          <li>• Wash</li>
+                                          <li>• Vacuum</li>
+                                          <li>• Protect wax</li>
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {packageData.name === 'Premium Package' && (
+                                      <div className="mb-3">
+                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
+                                        <ul className="text-xs text-gray-600 space-y-1">
+                                          <li>• Pre-wash</li>
+                                          <li>• Wash</li>
+                                          <li>• Vacuum</li>
+                                          <li>• S002 spray sealant included</li>
+                                          <li>• Deep cleaning rim</li>
+                                          <li>• Interior cleaning</li>
+                                          <li>• Tyre protection wax</li>
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {packageData.name === 'Ultra Package' && (
+                                      <div className="mb-3">
+                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
+                                        <ul className="text-xs text-gray-600 space-y-1">
+                                          <li>• Pre-wash</li>
+                                          <li>• Wash</li>
+                                          <li>• Vacuum</li>
+                                          <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
+                                          <li>• Coating</li>
+                                          <li>• S002 spray sealant</li>
+                                          <li>• Tyre protection wax</li>
+                                          <li>• Deep cleaning rim</li>
+                                        </ul>
+                                      </div>
+                                    )}
                                   </div>
                                   <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
                                     selectedPackage?.id === packageData.id 

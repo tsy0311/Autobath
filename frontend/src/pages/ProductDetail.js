@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaShoppingCart, FaHeart, FaShare, FaStar, FaPlus, FaMinus, FaImages, FaPalette, FaTruck, FaStore, FaCheck } from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingCart, FaHeart, FaShare, FaStar, FaPlus, FaMinus, FaPalette, FaTruck, FaStore, FaCheck } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -16,11 +16,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/api/products/${id}`);
@@ -38,7 +34,11 @@ const ProductDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   const handleAddToCart = () => {
     if (!product) return;

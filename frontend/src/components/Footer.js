@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope,FaInstagram,FaWhatsapp } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEnvelope,FaInstagram,FaWhatsapp } from 'react-icons/fa';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

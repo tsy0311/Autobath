@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette, FaUpload, FaSort } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -18,12 +18,12 @@ const ProductManagement = () => {
     stock: '',
     image_url: ''
   });
-  const [enableTypeSelection, setEnableTypeSelection] = useState(false);
   const [typeSelectionTitle, setTypeSelectionTitle] = useState('');
   const [typeSelectionOptions, setTypeSelectionOptions] = useState([]);
   const [newTypeOption, setNewTypeOption] = useState({ name: '', price_adjustment: 0, stock: 0 });
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [enableTypeSelection, setEnableTypeSelection] = useState(false);
   const [productImages, setProductImages] = useState([]);
   const [productColors, setProductColors] = useState([]);
   const [newImage, setNewImage] = useState({ image_url: '', alt_text: '', sort_order: 0, is_primary: false });
@@ -224,57 +224,7 @@ const ProductManagement = () => {
     }
   };
 
-  const handleAddColor = async () => {
-    if (!newColor.color_name.trim()) {
-      toast.error('Please enter a color name');
-      return;
-    }
 
-    if (editingProduct) {
-      // For existing products, add directly to database
-      try {
-        const response = await api.post(`/api/products/${editingProduct.id}/colors`, newColor);
-        if (response.data.success) {
-          toast.success('Color added successfully');
-          setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
-          fetchProducts(); // Refresh to get updated data
-        }
-      } catch (error) {
-        console.error('Error adding color:', error);
-        toast.error('Failed to add color');
-      }
-    } else {
-      // For new products, add to local state
-      const newColorWithId = {
-        ...newColor,
-        id: Date.now(), // Temporary ID for local state
-        product_id: null
-      };
-      setProductColors([...productColors, newColorWithId]);
-      setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
-      toast.success('Color added to product (will be saved when product is created)');
-    }
-  };
-
-  const handleDeleteColor = async (colorId) => {
-    if (editingProduct) {
-      // For existing products, delete from database
-      try {
-        const response = await api.delete(`/api/products/colors/${colorId}`);
-        if (response.data.success) {
-          toast.success('Color deleted successfully');
-          fetchProducts(); // Refresh to get updated data
-        }
-      } catch (error) {
-        console.error('Error deleting color:', error);
-        toast.error('Failed to delete color');
-      }
-    } else {
-      // For new products, remove from local state
-      setProductColors(productColors.filter(color => color.id !== colorId));
-      toast.success('Color removed from product');
-    }
-  };
 
   const handleAddTypeOption = () => {
     if (!newTypeOption.name.trim()) {
@@ -310,7 +260,7 @@ const ProductManagement = () => {
     try {
       let productId;
       if (editingProduct) {
-        const response = await api.put(`/api/products/${editingProduct.id}`, formData);
+        await api.put(`/api/products/${editingProduct.id}`, formData);
         productId = editingProduct.id;
         toast.success('Product updated successfully!');
       } else {

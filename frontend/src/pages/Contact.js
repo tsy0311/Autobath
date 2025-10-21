@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaFacebook, FaInstagram, FaTwitter, FaYoutube, FaWhatsapp } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEnvelope, FaClock, FaInstagram, FaWhatsapp } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -109,6 +109,7 @@ const Contact = () => {
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="Instagram"
+                className="font-bold"
               >
                 <FaInstagram />
               </a>

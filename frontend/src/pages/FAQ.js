@@ -11,7 +11,7 @@ const FAQ = () => {
       questions: [
         {
           q: 'How long does each service take?',
-          a: 'Service duration varies: Basic Package (75 min), Premium Package (3 hours), Ultra Package (8 hours). Individual services range from 90 minutes to 6 hours depending on the service.'
+          a: 'Service duration varies: Basic Package (1h 15m), Premium Package (3 hours), Ultra Package (8 hours). Polishing takes 5-6 hours, Polish + coating takes 6-7 hours. Individual services range from 90 minutes to 6 hours depending on the service.'
         },
         {
           q: 'Can I reschedule my appointment?',
@@ -40,7 +40,7 @@ const FAQ = () => {
         },
         {
           q: 'What\'s the difference between packages?',
-          a: 'Basic: Essential cleaning. Premium: Complete detailing with wax. Ultra: Full treatment including paint correction and ceramic coating. See our package comparison table for details.'
+          a: 'Basic: Pre-wash, wash, vacuum, protect wax. Premium: Pre-wash, wash, vacuum, S002 spray sealant included, deep cleaning rim, interior cleaning and tyre protection wax. Ultra: Pre-wash, wash, vacuum, interior deep cleaning (excluded seat deep cleaning), coating, S002 spray sealant, tyre protection wax, deep cleaning rim. All services use Koch Chemie products directly from Germany.'
         },
         {
           q: 'Do you offer warranty or guarantee?',
@@ -74,7 +74,7 @@ const FAQ = () => {
       questions: [
         {
           q: 'Are your products safe for all vehicles?',
-          a: 'Yes! We use professional-grade, pH-neutral products that are safe for all paint types, finishes, and vehicle materials.'
+          a: 'Yes! We use professional-grade Koch Chemie products directly from Germany that are pH-neutral and safe for all paint types, finishes, and vehicle materials.'
         },
         {
           q: 'Can I buy products without booking a service?',
@@ -83,6 +83,10 @@ const FAQ = () => {
         {
           q: 'Do you offer product bundles?',
           a: 'Yes! Check our product bundles for savings. Popular bundles include Cleaning Starter Kit, Interior Care Bundle, and Professional Protection Kit.'
+        },
+        {
+          q: 'What products do you use?',
+          a: 'We exclusively use Koch Chemie products directly imported from Germany. These are professional-grade automotive detailing products known for their quality and effectiveness in the automotive industry.'
         }
       ]
     },
