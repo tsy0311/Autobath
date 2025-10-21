@@ -24,9 +24,9 @@ const Booking = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [vehicleType, setVehicleType] = useState('sedan');
+  const [vehicleType, setVehicleType] = useState('hatchback');
   const [serviceType, setServiceType] = useState('package'); // package or individual
-  const [motorcycleCategory, setMotorcycleCategory] = useState('normal'); // normal | sport
+  const [motorcycleCategory, setMotorcycleCategory] = useState('normal'); // normal | sportbike
 
   // Customer details
   const [name, setName] = useState('');
@@ -161,14 +161,8 @@ const Booking = () => {
       }
     } else if (serviceId && type === 'individual') {
       setServiceType('individual');
-      // Map URL service IDs to our static service types
-      const serviceMap = {
-        'exterior': { type: 'exterior', name: 'Exterior Detailing', description: 'Complete exterior wash, wax, and paint correction', base_price: 85.00, duration_minutes: 120 },
-        'interior': { type: 'interior', name: 'Interior Detailing', description: 'Deep interior cleaning and leather treatment', base_price: 75.00, duration_minutes: 90 },
-        'paint': { type: 'paint', name: 'Paint Protection', description: 'Ceramic coating and paint protection film', base_price: 299.00, duration_minutes: 360 }
-      };
-      
-      const serviceData = serviceMap[serviceId];
+      // Find service by ID from API data
+      const serviceData = services.find(s => s.id === parseInt(serviceId));
       if (serviceData) {
         setSelectedService(serviceData);
         setSelectedPackage(null);
@@ -354,10 +348,8 @@ const Booking = () => {
                     >
                       <option value="motorcycle">Motorcycle</option>
                       <option value="hatchback">Hatchback</option>
-                      <option value="sedan">Sedan</option>
-                      <option value="suv">SUV</option>
-                      <option value="mpv">MPV</option>
-                      <option value="truck">Truck</option>
+                      <option value="sedan/suv">Sedan/SUV</option>
+                      <option value="truck/mpv">Truck/MPV</option>
                     </select>
                   </div>
 
@@ -375,49 +367,55 @@ const Booking = () => {
                           </button>
                           <button
                             type="button"
-                            className={`px-4 py-2 rounded-lg font-medium ${motorcycleCategory === 'sport' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
-                            onClick={() => { setMotorcycleCategory('sport'); setSelectedService(null); }}
+                            className={`px-4 py-2 rounded-lg font-medium ${motorcycleCategory === 'sportbike' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
+                            onClick={() => { setMotorcycleCategory('sportbike'); setSelectedService(null); }}
                           >
-                            Sport Bike
+                            Sportbike
                           </button>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {[
-                          { key: 'moto-basic', name: 'Basic Wash', priceNormal: 25, priceSport: 35, duration: 45 },
-                          { key: 'moto-detail', name: 'Detailing + Wax', priceNormal: 55, priceSport: 75, duration: 90 },
-                          { key: 'moto-polish', name: 'Polishing Service', priceNormal: 130, priceSport: 230, duration: 120 },
-                        ].map((svc) => {
-                          const price = motorcycleCategory === 'sport' ? svc.priceSport : svc.priceNormal;
-                          const selected = selectedService && selectedService.metaKey === svc.key;
-                          return (
+                        {services
+                          .filter(svc => svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory)
+                          .map((svc) => (
                             <div
-                              key={svc.key}
-                              className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${selected ? 'border-secondary bg-secondary/5 shadow-lg' : 'border-gray-200 hover:border-secondary hover:shadow-md'}`}
-                              onClick={() => setSelectedService({
-                                metaKey: svc.key,
-                                name: `Motorcycle ${svc.name} - ${motorcycleCategory === 'sport' ? 'Sport Bike' : 'Normal Bike'}`,
-                                base_price: price,
-                                duration_minutes: svc.duration
-                              })}
+                              key={svc.id}
+                              className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
+                                selectedService?.id === svc.id
+                                  ? 'border-secondary bg-secondary/5 shadow-lg'
+                                  : 'border-gray-200 hover:border-secondary hover:shadow-md'
+                              }`}
+                              onClick={() => setSelectedService(svc)}
                             >
                               <div className="flex flex-col justify-between h-full">
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">{svc.name}</h4>
+                                    {svc.description && (
+                                      <p className="text-gray-600">{svc.description}</p>
+                                    )}
+                                  </div>
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
+                                    selectedService?.id === svc.id
+                                      ? 'bg-secondary text-white'
+                                      : 'border-2 border-gray-300'
+                                  }`}>
+                                    {selectedService?.id === svc.id && <FaCheck className="text-sm" />}
                                   </div>
                                 </div>
                                 <div className="space-y-2 text-sm mt-auto">
                                   <div className="flex justify-between items-center">
-                                    <span className="font-semibold text-secondary text-lg">RM {price.toFixed(2)}</span>
-                                    <span className="text-gray-600">{Math.floor(svc.duration/60)}h {svc.duration%60}m</span>
+                                    <span className="font-semibold text-secondary text-lg">RM {svc.base_price.toFixed(2)}</span>
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                      <FaClock className="text-xs" />
+                                      <span>{Math.floor(svc.duration_minutes / 60)}h {svc.duration_minutes % 60}m</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          );
-                        })}
+                          ))}
                       </div>
                     </>
                   ) : (
@@ -459,7 +457,9 @@ const Booking = () => {
                       {/* Service Packages */}
                       {serviceType === 'package' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {packages.map(packageData => (
+                          {packages
+                            .filter(pkg => pkg.vehicle_type === vehicleType)
+                            .map(packageData => (
                             <div 
                               key={packageData.id}
                               className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
@@ -506,81 +506,59 @@ const Booking = () => {
                       {/* Individual Services (dynamic from backend) */}
                       {serviceType === 'individual' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {individualServices.length === 0 ? (
+                          {services
+                            .filter(svc => {
+                              if (vehicleType === 'motorcycle') {
+                                return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
+                              } else {
+                                return svc.vehicle_types && svc.vehicle_types.includes(vehicleType);
+                              }
+                            })
+                            .length === 0 ? (
                             <div className="col-span-full text-center text-gray-600">
-                              No individual services found. Please refresh.
+                              No individual services available for {vehicleType === 'motorcycle' ? `${motorcycleCategory} motorcycle` : vehicleType}
                             </div>
                           ) : (
-                            individualServices.map((svc) => (
+                            services
+                              .filter(svc => {
+                                if (vehicleType === 'motorcycle') {
+                                  return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
+                                } else {
+                                  return svc.vehicle_types && svc.vehicle_types.includes(vehicleType);
+                                }
+                              })
+                              .map((svc) => (
                               <div
-                                key={svc.merged ? 'interior-merged' : svc.id}
+                                key={svc.id}
                                 className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                                  (svc.merged ? selectedService?.name === 'Interior Detailing & Protect' : selectedService?.id === svc.id)
+                                  selectedService?.id === svc.id
                                     ? 'border-secondary bg-secondary/5 shadow-lg'
                                     : 'border-gray-200 hover:border-secondary hover:shadow-md'
                                 }`}
-                                onClick={() => {
-                                  if (svc.merged) {
-                                    // choose current variant by seat option
-                                    const chosen = interiorSeatOption === '7'
-                                      ? (interior7 || interior5)
-                                      : (interior5 || interior7);
-                                    if (chosen) setSelectedService(chosen);
-                                  } else {
-                                    setSelectedService(svc);
-                                  }
-                                }}
+                                onClick={() => setSelectedService(svc)}
                               >
                                 <div className="flex flex-col justify-between h-full">
                                   <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
-                                      <h4 className="text-lg font-semibold text-primary mb-2">{svc.merged ? 'Interior Detailing & Protect' : svc.name}</h4>
-                                      {!svc.merged && svc.description && (
+                                      <h4 className="text-lg font-semibold text-primary mb-2">{svc.name}</h4>
+                                      {svc.description && (
                                         <p className="text-gray-600">{svc.description}</p>
                                       )}
                                     </div>
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
-                                      (svc.merged ? (selectedService && selectedService.name?.startsWith('Interior Detailing')) : (selectedService?.id === svc.id)) ? 'bg-secondary text-white' : 'border-2 border-gray-300'
+                                      selectedService?.id === svc.id ? 'bg-secondary text-white' : 'border-2 border-gray-300'
                                     }`}>
                                       {selectedService?.id === svc.id && <FaCheck className="text-sm" />}
                                     </div>
                                   </div>
                                   <div className="space-y-2 text-sm mt-auto">
-                                    {svc.merged ? (
-                                      (selectedService && selectedService.name?.startsWith('Interior Detailing')) ? (
-                                        <>
-                                          <div className="mb-2">
-                                            <label className="block text-xs font-semibold text-gray-700 mb-1">Seat Option</label>
-                                            <select
-                                              value={interiorSeatOption}
-                                              onChange={(e) => {
-                                                setInteriorSeatOption(e.target.value);
-                                                const chosen = e.target.value === '7' ? (interior7 || interior5) : (interior5 || interior7);
-                                                if (chosen) setSelectedService(chosen);
-                                              }}
-                                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                            >
-                                              <option value="5">5-seater (RM {(interior5?.base_price ?? interior7?.base_price ?? 0).toFixed(2)})</option>
-                                              <option value="7">7-seater (RM {(interior7?.base_price ?? interior5?.base_price ?? 0).toFixed(2)})</option>
-                                            </select>
-                                          </div>
-                                          <div className="flex items-center gap-1 text-gray-500">
-                                            <FaClock /> {formatDuration((interiorSeatOption === '7' ? interior7?.duration_minutes : interior5?.duration_minutes) || 60)}
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <div className="text-gray-600 text-sm">Tap to choose 5 or 7 seater</div>
-                                      )
-                                    ) : (
-                                      <>
-                                        <div className="flex items-center gap-1 text-gray-500">
-                                          <FaClock /> {formatDuration(svc.duration_minutes || 60)}
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                          <span className="font-semibold text-secondary text-lg">From RM {(svc.base_price ?? 0).toFixed(2)}</span>
-                                        </div>
-                                      </>
-                                    )}
+                                    <div className="flex justify-between items-center">
+                                      <span className="font-semibold text-secondary text-lg">RM {svc.base_price.toFixed(2)}</span>
+                                      <div className="flex items-center gap-1 text-gray-500">
+                                        <FaClock className="text-xs" />
+                                        <span>{Math.floor(svc.duration_minutes / 60)}h {svc.duration_minutes % 60}m</span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
