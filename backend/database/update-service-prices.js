@@ -58,7 +58,6 @@ db.serialize(() => {
     { name: 'Engine Bay Wash & Protect', base_price: 88.0, duration_minutes: 60, category: 'Detailing' },
     { name: 'Interior Detailing & Protect (5-seater)', base_price: 280.0, duration_minutes: 120, category: 'Interior' },
     { name: 'Interior Detailing & Protect (7-seater)', base_price: 389.0, duration_minutes: 150, category: 'Interior' },
-    { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection' }
   ];
 
   services.forEach((svc) => {

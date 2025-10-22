@@ -62,7 +62,6 @@ function allAsync(sql, params = []) {
       { name: customers[2].name, email: customers[2].email, phone: customers[2].phone, service: 'Engine Bay Wash & Protect', date: d1, time: '11:00', duration: 60, status: 'pending' },
       { name: customers[3].name, email: customers[3].email, phone: customers[3].phone, service: 'Interior Detailing & Protect (5-seater)', date: d1, time: '15:00', duration: 120, status: 'confirmed' },
       { name: customers[4].name, email: customers[4].email, phone: customers[4].phone, service: 'Ultra', date: d2, time: '09:00', duration: 240, status: 'pending' },
-      { name: customers[0].name, email: customers[0].email, phone: customers[0].phone, service: 'S002 Spray Sealant', date: d2, time: '14:00', duration: 30, status: 'pending' },
     ];
 
     for (const b of bookings) {

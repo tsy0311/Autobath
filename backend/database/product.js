@@ -87,7 +87,6 @@ const INDIVIDUAL_SERVICES = [
   { name: 'Engine Bay Wash & Protect', base_price: 88.0, duration_minutes: 60, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
   { name: 'Interior Detailing & Protect (5-seater)', base_price: 280.0, duration_minutes: 120, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
   { name: 'Interior Detailing & Protect (7-seater)', base_price: 389.0, duration_minutes: 150, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
-  { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
   
   // Coating Services
   { name: 'GYEON Coating - Hatchback', base_price: 1400.0, duration_minutes: 240, category: 'Coating', vehicle_types: ['hatchback'] },
@@ -238,35 +237,6 @@ function upsertIndividualServices(db) {
   });
 }
 
-function addSpraySealantToPackages(db) {
-  return new Promise((resolve) => {
-    // Find S002 Spray Sealant service ID
-    db.get(`SELECT id FROM services WHERE name = 'S002 Spray Sealant'`, (err, sealantService) => {
-      if (err || !sealantService) {
-        console.log('S002 Spray Sealant service not found, skipping package updates');
-        resolve();
-        return;
-      }
-
-      // Update Premium and Ultra packages to include S002 Spray Sealant
-      const updateStmt = db.prepare(`
-        UPDATE service_packages 
-        SET services = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE (name LIKE '%Premium%' OR name LIKE '%Ultra%') AND is_active = 1
-      `);
-      
-      updateStmt.run(JSON.stringify([sealantService.id]), (err) => {
-        if (err) {
-          console.error('Error updating packages with spray sealant:', err);
-        } else {
-          console.log('✅ Added S002 Spray Sealant to Premium and Ultra packages');
-        }
-        updateStmt.finalize();
-        resolve();
-      });
-    });
-  });
-}
 
 function ensureCatalogSeeded() {
   return new Promise((resolve) => {
@@ -277,7 +247,6 @@ function ensureCatalogSeeded() {
         await upsertProducts(db);
         await upsertServicePackages(db);
         await upsertIndividualServices(db);
-        await addSpraySealantToPackages(db);
         db.run('COMMIT', () => {
           db.close();
           resolve();
