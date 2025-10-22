@@ -1,20 +1,13 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FaCar, FaChair, FaClock,
   FaCheck, FaTag, FaShieldAlt, FaMobile, FaGift,
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
-import api from '../services/api';
 
 const Home = () => {
-  const [stats, setStats] = useState({
-    totalServices: 0,
-    totalPackages: 0,
-    averageRating: 0,
-    totalReviews: 0
-  });
   
 
   useEffect(() => {
@@ -35,35 +28,6 @@ const Home = () => {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    fetchHomeData();
-  }, []);
-
-  const fetchHomeData = async () => {
-    try {
-      // Fetch data in parallel
-      const [servicesRes, packagesRes] = await Promise.all([
-        api.get('/api/services'),
-        api.get('/api/service-packages')
-      ]);
-
-      const services = servicesRes.data.services || [];
-      const packages = packagesRes.data.packages || [];
-
-      // Calculate statistics
-      setStats({
-        totalServices: services.length,
-        totalPackages: packages.length,
-        averageRating: 4.8,
-        totalReviews: 150
-      });
-
-
-    } catch (error) {
-      console.error('Error fetching home data:', error);
-      // Don't show error to user, just use default values
-    }
-  };
 
 
   return (
@@ -96,24 +60,6 @@ const Home = () => {
             <Link to="/booking" className="btn btn-primary flex items-center gap-2">
               <FaCalendarAlt /> Book Now
             </Link>
-          </div>
-        </div>
-        <div className="relative z-10 flex flex-wrap gap-3 sm:gap-6 md:gap-8 justify-center max-w-2xl mx-auto px-4">
-          <div className="text-center bg-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl backdrop-blur-sm border border-white/20">
-            <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalServices}+</div>
-            <div className="text-xs sm:text-sm text-white/80 uppercase tracking-wider">Services</div>
-          </div>
-          <div className="text-center bg-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl backdrop-blur-sm border border-white/20">
-            <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalPackages}</div>
-            <div className="text-xs sm:text-sm text-white/80 uppercase tracking-wider">Packages</div>
-          </div>
-          <div className="text-center bg-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl backdrop-blur-sm border border-white/20">
-            <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.averageRating.toFixed(1)}</div>
-            <div className="text-xs sm:text-sm text-white/80 uppercase tracking-wider">Rating</div>
-          </div>
-          <div className="text-center bg-white/10 px-4 sm:px-6 py-3 sm:py-4 rounded-xl backdrop-blur-sm border border-white/20">
-            <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalReviews}+</div>
-            <div className="text-xs sm:text-sm text-white/80 uppercase tracking-wider">Reviews</div>
           </div>
         </div>
       </section>
@@ -191,7 +137,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Basic Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 78.00</span>
+                  <span className="text-4xl font-bold">RM88.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -199,7 +145,6 @@ const Home = () => {
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Pre-wash</li>
                     <li>• Wash</li>
                     <li>• Vacuum</li>
                     <li>• Protect wax</li>
@@ -225,7 +170,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Premium Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 120.00</span>
+                  <span className="text-4xl font-bold">RM 150.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -236,10 +181,9 @@ const Home = () => {
                     <li>• Pre-wash</li>
                     <li>• Wash</li>
                     <li>• Vacuum</li>
-                    <li>• Premium protection included</li>
+                    <li>• Premium protection</li>
                     <li>• Deep cleaning rim</li>
-                    <li>• Interior cleaning</li>
-                    <li>• Tyre protection wax</li>
+                    <li>• Tyre protection</li>
                   </ul>
                 </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
@@ -259,7 +203,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Ultra Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 190.00</span>
+                  <span className="text-4xl font-bold">RM 230.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -270,11 +214,11 @@ const Home = () => {
                     <li>• Pre-wash</li>
                     <li>• Wash</li>
                     <li>• Vacuum</li>
-                    <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
-                    <li>• Coating</li>
-                    <li>• Premium protection</li>
-                    <li>• Tyre protection wax</li>
+                    <li>• S002 Spray selant protection</li>
+                    <li>• Interior deep cleaning</li>
                     <li>• Deep cleaning rim</li>
+                    <li>• Tyre protection</li>
+                    <li>• Treat you like VVIP</li>
                   </ul>
                 </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
