@@ -459,9 +459,6 @@ const Booking = () => {
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
                                     <p className="text-gray-600 mb-3">{packageData.description}</p>
-                                    <div className="mb-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
-                                      <p className="text-xs text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
-                                    </div>
                                     {packageData.name === 'Basic Package' && (
                                       <div className="mb-3">
                                         <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>

@@ -196,9 +196,6 @@ const Home = () => {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4 leading-relaxed">{"Essential detailing for regular maintenance"}</p>
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
-                </div>
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
@@ -233,9 +230,6 @@ const Home = () => {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4 leading-relaxed">{"Comprehensive detailing with premium products"}</p>
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
-                </div>
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
@@ -270,9 +264,6 @@ const Home = () => {
               </div>
               <div className="p-6">
                 <p className="text-gray-600 mb-4 leading-relaxed">{"Complete transformation with ceramic coating"}</p>
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                  <p className="text-sm text-blue-800 font-medium">All services use Koch Chemie products directly from Germany</p>
-                </div>
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
