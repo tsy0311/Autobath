@@ -143,7 +143,7 @@ const finalProducts = [
     category: 'Tools'
   },
   { 
-    name: 'MJJC V3', 
+    name: 'MJJC V3 泡沫炮', 
     brand: 'Benzhi', 
     price: 239, 
     stock: 5, 
@@ -189,7 +189,7 @@ const finalProducts = [
   
   // Lutian Brand Products (15 products)
   { 
-    name: 'F4', 
+    name: 'F4 高压清洗机', 
     brand: 'Lutian', 
     price: 339, 
     stock: 5, 
@@ -197,7 +197,7 @@ const finalProducts = [
     category: 'Equipment'
   },
   { 
-    name: 'P4', 
+    name: 'P4 高压清洗机', 
     brand: 'Lutian', 
     price: 399, 
     stock: 5, 
@@ -205,7 +205,7 @@ const finalProducts = [
     category: 'Equipment'
   },
   { 
-    name: 'P6PRO', 
+    name: 'P6PRO 高压清洗机', 
     brand: 'Lutian', 
     price: 669, 
     stock: 5, 
@@ -213,7 +213,7 @@ const finalProducts = [
     category: 'Equipment'
   },
   { 
-    name: 'P6PRO bundle', 
+    name: 'P6PRO bundle 高压清洗机套装', 
     brand: 'Lutian', 
     price: 849, 
     stock: 3, 
