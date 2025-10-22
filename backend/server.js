@@ -31,7 +31,7 @@ const { initDatabase } = require('./database/init');
 const { verifyEmailTransport } = require('./services/emailService');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5001;
 
 // Trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);

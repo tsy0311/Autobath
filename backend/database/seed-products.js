@@ -234,7 +234,7 @@ const products = [
   
   // Lutian Brand Products (22 products)
   { 
-    name: 'F4 高压清洗机', 
+    name: 'High Pressure Washer F4 高压清洗机', 
     brand: 'Lutian', 
     price: 'rm339', 
     stock: 5, 
@@ -242,7 +242,7 @@ const products = [
     category: 'Equipment'
   },
   { 
-    name: 'P4 高压清洗机', 
+    name: 'High Pressure Washer P4 高压清洗机', 
     brand: 'Lutian', 
     price: 'rm399', 
     stock: 5, 
@@ -250,7 +250,7 @@ const products = [
     category: 'Equipment'
   },
   { 
-    name: 'P6PRO 高压清洗机', 
+    name: 'High Pressure Washer P6 PRO 高压清洗机', 
     brand: 'Lutian', 
     price: 'rm669', 
     stock: 5, 
@@ -258,7 +258,7 @@ const products = [
     category: 'Equipment'
   },
   { 
-    name: 'P6PRO bundle 高压清洗机套装', 
+    name: 'High Pressure Washer P6 PRO + Trolley (Bundle) 高压清洗机套装', 
     brand: 'Lutian', 
     price: 'rm849', 
     stock: 3, 
