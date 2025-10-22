@@ -218,7 +218,7 @@ const Home = () => {
                     <li>• Interior deep cleaning</li>
                     <li>• Deep cleaning rim</li>
                     <li>• Tyre protection</li>
-                    <li>• Treat you like VVIP</li>
+                    <li>• Treat you   like VVIP</li>
                   </ul>
                 </div>
                 <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">

@@ -492,3 +492,4 @@ function finishImport() {
     db.close();
   });
 }
+
