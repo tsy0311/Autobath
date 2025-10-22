@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette, FaUpload } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import BulkImportModal from './BulkImportModal';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -30,6 +31,7 @@ const ProductManagement = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [newColor, setNewColor] = useState({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
   const [activeTab, setActiveTab] = useState('basic');
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -363,12 +365,20 @@ const ProductManagement = () => {
           <h2 className="text-3xl font-bold text-primary mb-2">Product Management</h2>
           <p className="text-gray-600">Manage your product catalog - visible to customers</p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-        >
-          <FaPlus /> Add New Product
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleOpenModal()}
+            className="btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+          >
+            <FaPlus /> Add New Product
+          </button>
+          <button
+            onClick={() => setIsBulkImportOpen(true)}
+            className="btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+          >
+            <FaUpload /> Bulk Import
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -959,6 +969,16 @@ const ProductManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Bulk Import Modal */}
+      <BulkImportModal
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={() => {
+          fetchProducts();
+          toast.success('Products imported successfully!');
+        }}
+      />
     </div>
   );
 };

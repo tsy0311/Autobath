@@ -765,4 +765,71 @@ router.delete('/colors/:colorId', authenticateToken, requireAdmin, (req, res) =>
   stmt.finalize();
 });
 
+// Bulk import products
+router.post('/bulk-import', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { type } = req.body;
+    
+    if (type === 'chinese-names') {
+      // Run the bulk import script
+      const { spawn } = require('child_process');
+      const path = require('path');
+      
+      const scriptPath = path.join(__dirname, '../database/bulk-import-products.js');
+      
+      const child = spawn('node', [scriptPath], {
+        cwd: path.join(__dirname, '..'),
+        stdio: 'pipe'
+      });
+      
+      let output = '';
+      let errorOutput = '';
+      
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      child.on('close', (code) => {
+        if (code === 0) {
+          // Count the number of products processed
+          const successCount = (output.match(/✅/g) || []).length;
+          const insertCount = (output.match(/➕/g) || []).length;
+          const totalCount = successCount + insertCount;
+          
+          res.json({
+            success: true,
+            message: 'Bulk import completed successfully',
+            count: totalCount,
+            output: output
+          });
+        } else {
+          console.error('Bulk import script error:', errorOutput);
+          res.status(500).json({
+            success: false,
+            message: 'Bulk import failed',
+            error: errorOutput
+          });
+        }
+      });
+      
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid import type'
+      });
+    }
+  } catch (error) {
+    console.error('Bulk import error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Bulk import failed',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
