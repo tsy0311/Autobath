@@ -342,11 +342,21 @@ const ProductManagement = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = searchTerm === '' || 
+                         product.name.toLowerCase().includes(searchLower) ||
+                         product.description?.toLowerCase().includes(searchLower) ||
+                         product.brand?.toLowerCase().includes(searchLower) ||
+                         product.category?.toLowerCase().includes(searchLower);
     const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
     return matchesSearch && matchesBrand;
   });
+
+  // Debug logging
+  console.log('Search term:', searchTerm);
+  console.log('Selected brand:', selectedBrand);
+  console.log('Total products:', products.length);
+  console.log('Filtered products:', filteredProducts.length);
 
   if (loading) {
     return (
@@ -389,26 +399,59 @@ const ProductManagement = () => {
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search products by name, description, brand, or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <FaTimes />
+              </button>
+            )}
           </div>
 
           {/* Brand Filter */}
-          <select
-            value={selectedBrand}
-            onChange={(e) => setSelectedBrand(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-          >
-            <option value="all">All Brands</option>
-            {brands.map(b => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+            >
+              <option value="all">All Brands</option>
+              {brands.map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            {(searchTerm || selectedBrand !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedBrand('all');
+                }}
+                className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors"
+                title="Clear all filters"
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Search Results Info */}
+      {(searchTerm || selectedBrand !== 'all') && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <p className="text-blue-800">
+            Showing {filteredProducts.length} of {products.length} products
+            {searchTerm && ` matching "${searchTerm}"`}
+            {selectedBrand !== 'all' && ` from ${selectedBrand}`}
+          </p>
+        </div>
+      )}
 
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
