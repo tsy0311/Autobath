@@ -15,10 +15,6 @@
     "clear:bookings": "node database/clear-bookings.js",
     "create:admin": "node database/add-admin-users.js",
     "seed:variants": "node database/seed-variants.js",
-    "bulk:import": "node database/bulk-import-products.js",
-    "clean:import": "node database/clean-bulk-import.js",
-    "final:cleanup": "node database/final-cleanup-45-products.js",
-    "complete:cleanup": "node database/complete-cleanup.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
