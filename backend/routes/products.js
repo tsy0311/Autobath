@@ -771,47 +771,80 @@ router.post('/bulk-import', authenticateToken, requireAdmin, async (req, res) =>
     const { type } = req.body;
     
     if (type === 'chinese-names') {
-      // Run the final cleanup script for exactly 45 products
+      // Run complete cleanup first, then final cleanup for exactly 45 products
       const { spawn } = require('child_process');
       const path = require('path');
       
-      const scriptPath = path.join(__dirname, '../database/final-cleanup-45-products.js');
+      // First run complete cleanup
+      const cleanupScript = path.join(__dirname, '../database/complete-cleanup.js');
+      const finalScript = path.join(__dirname, '../database/final-cleanup-45-products.js');
       
-      const child = spawn('node', [scriptPath], {
+      // Run complete cleanup first
+      const cleanupChild = spawn('node', [cleanupScript], {
         cwd: path.join(__dirname, '..'),
         stdio: 'pipe'
       });
       
-      let output = '';
-      let errorOutput = '';
+      let cleanupOutput = '';
+      let cleanupError = '';
       
-      child.stdout.on('data', (data) => {
-        output += data.toString();
+      cleanupChild.stdout.on('data', (data) => {
+        cleanupOutput += data.toString();
       });
       
-      child.stderr.on('data', (data) => {
-        errorOutput += data.toString();
+      cleanupChild.stderr.on('data', (data) => {
+        cleanupError += data.toString();
       });
       
-      child.on('close', (code) => {
-        if (code === 0) {
-          // Count the number of products processed
-          const successCount = (output.match(/✅/g) || []).length;
-          const insertCount = (output.match(/➕/g) || []).length;
-          const totalCount = successCount + insertCount;
+      cleanupChild.on('close', (cleanupCode) => {
+        if (cleanupCode === 0) {
+          console.log('Complete cleanup finished, now running final import...');
           
-          res.json({
-            success: true,
-            message: 'Bulk import completed successfully',
-            count: totalCount,
-            output: output
+          // Now run final cleanup
+          const finalChild = spawn('node', [finalScript], {
+            cwd: path.join(__dirname, '..'),
+            stdio: 'pipe'
+          });
+          
+          let finalOutput = '';
+          let finalError = '';
+          
+          finalChild.stdout.on('data', (data) => {
+            finalOutput += data.toString();
+          });
+          
+          finalChild.stderr.on('data', (data) => {
+            finalError += data.toString();
+          });
+          
+          finalChild.on('close', (finalCode) => {
+            if (finalCode === 0) {
+              // Count the number of products processed
+              const successCount = (finalOutput.match(/✅/g) || []).length;
+              const insertCount = (finalOutput.match(/➕/g) || []).length;
+              const totalCount = successCount + insertCount;
+              
+              res.json({
+                success: true,
+                message: 'Bulk import completed successfully - exactly 45 products with variants',
+                count: totalCount,
+                output: cleanupOutput + '\n\n' + finalOutput
+              });
+            } else {
+              console.error('Final import script error:', finalError);
+              res.status(500).json({
+                success: false,
+                message: 'Final import failed',
+                error: finalError
+              });
+            }
           });
         } else {
-          console.error('Bulk import script error:', errorOutput);
+          console.error('Complete cleanup script error:', cleanupError);
           res.status(500).json({
             success: false,
-            message: 'Bulk import failed',
-            error: errorOutput
+            message: 'Complete cleanup failed',
+            error: cleanupError
           });
         }
       });
