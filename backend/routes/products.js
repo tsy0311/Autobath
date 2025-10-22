@@ -771,11 +771,11 @@ router.post('/bulk-import', authenticateToken, requireAdmin, async (req, res) =>
     const { type } = req.body;
     
     if (type === 'chinese-names') {
-      // Run the bulk import script
+      // Run the clean bulk import script
       const { spawn } = require('child_process');
       const path = require('path');
       
-      const scriptPath = path.join(__dirname, '../database/bulk-import-products.js');
+      const scriptPath = path.join(__dirname, '../database/clean-bulk-import.js');
       
       const child = spawn('node', [scriptPath], {
         cwd: path.join(__dirname, '..'),

@@ -16,6 +16,7 @@
     "create:admin": "node database/add-admin-users.js",
     "seed:variants": "node database/seed-variants.js",
     "bulk:import": "node database/bulk-import-products.js",
+    "clean:import": "node database/clean-bulk-import.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
