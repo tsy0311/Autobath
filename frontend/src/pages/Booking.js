@@ -509,11 +509,11 @@ const Booking = () => {
                                   </div>
                                 </div>
                                 <div className="space-y-2 text-sm mt-auto">
-                                  <div className="flex items-center gap-1 text-gray-500">
-                                    <FaClock /> {formatDuration(packageData.duration_minutes)}
-                                  </div>
                                   <div className="flex justify-between items-center">
                                     <span className="font-semibold text-secondary text-lg">RM {packageData.finalPrice?.toFixed(2) || '0.00'}</span>
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                      <FaClock /> {formatDuration(packageData.duration_minutes)}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
