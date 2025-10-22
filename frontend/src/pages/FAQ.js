@@ -40,7 +40,7 @@ const FAQ = () => {
         },
         {
           q: 'What\'s the difference between packages?',
-          a: 'Basic: Pre-wash, wash, vacuum, protect wax. Premium: Pre-wash, wash, vacuum, S002 spray sealant included, deep cleaning rim, interior cleaning and tyre protection wax. Ultra: Pre-wash, wash, vacuum, interior deep cleaning (excluded seat deep cleaning), coating, S002 spray sealant, tyre protection wax, deep cleaning rim. All services use Koch Chemie products directly from Germany.'
+          a: 'Basic: Pre-wash, wash, vacuum, protect wax. Premium: Pre-wash, wash, vacuum, premium protection included, deep cleaning rim, interior cleaning and tyre protection wax. Ultra: Pre-wash, wash, vacuum, interior deep cleaning (excluded seat deep cleaning), coating, premium protection, tyre protection wax, deep cleaning rim. All services use Koch Chemie products directly from Germany.'
         },
         {
           q: 'Do you offer warranty or guarantee?',

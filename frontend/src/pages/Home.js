@@ -86,8 +86,11 @@ const Home = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
             Professional Car Detailing Services
           </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-10 text-gray-100 leading-relaxed px-2">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-4 sm:mb-6 text-gray-100 leading-relaxed px-2">
             Transform your vehicle with our premium detailing packages and individual services
+          </p>
+          <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-6 sm:mb-10 px-2">
+            All services use Koch Chemie products directly from Germany
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12">
             <Link to="/booking" className="btn btn-primary flex items-center gap-2">
@@ -188,7 +191,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Basic Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 80.00</span>
+                  <span className="text-4xl font-bold">RM 78.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -225,7 +228,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Premium Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 138.00</span>
+                  <span className="text-4xl font-bold">RM 120.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -239,7 +242,7 @@ const Home = () => {
                     <li>• Pre-wash</li>
                     <li>• Wash</li>
                     <li>• Vacuum</li>
-                    <li>• S002 spray sealant included</li>
+                    <li>• Premium protection included</li>
                     <li>• Deep cleaning rim</li>
                     <li>• Interior cleaning</li>
                     <li>• Tyre protection wax</li>
@@ -262,7 +265,7 @@ const Home = () => {
               <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
                 <h3 className="text-2xl font-bold mb-4">{"Ultra Package"}</h3>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 258.00</span>
+                  <span className="text-4xl font-bold">RM 190.00</span>
                 </div>
               </div>
               <div className="p-6">
@@ -278,7 +281,7 @@ const Home = () => {
                     <li>• Vacuum</li>
                     <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
                     <li>• Coating</li>
-                    <li>• S002 spray sealant</li>
+                    <li>• Premium protection</li>
                     <li>• Tyre protection wax</li>
                     <li>• Deep cleaning rim</li>
                   </ul>

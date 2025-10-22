@@ -480,7 +480,7 @@ const Booking = () => {
                                           <li>• Pre-wash</li>
                                           <li>• Wash</li>
                                           <li>• Vacuum</li>
-                                          <li>• S002 spray sealant included</li>
+                                          <li>• Premium protection included</li>
                                           <li>• Deep cleaning rim</li>
                                           <li>• Interior cleaning</li>
                                           <li>• Tyre protection wax</li>
@@ -496,7 +496,7 @@ const Booking = () => {
                                           <li>• Vacuum</li>
                                           <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
                                           <li>• Coating</li>
-                                          <li>• S002 spray sealant</li>
+                                          <li>• Premium protection</li>
                                           <li>• Tyre protection wax</li>
                                           <li>• Deep cleaning rim</li>
                                         </ul>
@@ -517,7 +517,6 @@ const Booking = () => {
                                   </div>
                                   <div className="flex justify-between items-center">
                                     <span className="font-semibold text-secondary text-lg">RM {packageData.finalPrice?.toFixed(2) || '0.00'}</span>
-                                    <span className="text-green-600 font-medium">Save RM {packageData.savings?.toFixed(2) || '0.00'}</span>
                                   </div>
                                 </div>
                               </div>
