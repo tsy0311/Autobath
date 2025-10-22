@@ -14,7 +14,7 @@
     "clear:products": "node database/clear-products.js",
     "clear:bookings": "node database/clear-bookings.js",
     "create:admin": "node database/add-admin-users.js",
-    "update:live-db": "node update-live-database.js",
+    "seed:variants": "node database/seed-variants.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
