@@ -87,7 +87,17 @@ const INDIVIDUAL_SERVICES = [
   { name: 'Engine Bay Wash & Protect', base_price: 88.0, duration_minutes: 60, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
   { name: 'Interior Detailing & Protect (5-seater)', base_price: 280.0, duration_minutes: 120, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
   { name: 'Interior Detailing & Protect (7-seater)', base_price: 389.0, duration_minutes: 150, category: 'Add-on', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
-  { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] }
+  { name: 'S002 Spray Sealant', base_price: 29.0, duration_minutes: 15, category: 'Protection', vehicle_types: ['hatchback', 'sedan/suv', 'truck/mpv'] },
+  
+  // Coating Services
+  { name: 'GYEON Coating - Hatchback', base_price: 1400.0, duration_minutes: 240, category: 'Coating', vehicle_types: ['hatchback'] },
+  { name: 'GYEON Coating - Sedan/SUV', base_price: 1600.0, duration_minutes: 300, category: 'Coating', vehicle_types: ['sedan/suv'] },
+  { name: 'GYEON Coating - MPV/Truck', base_price: 1800.0, duration_minutes: 360, category: 'Coating', vehicle_types: ['truck/mpv'] },
+  
+  // Polish Services
+  { name: 'Polish - Hatchback', base_price: 400.0, duration_minutes: 180, category: 'Polish', vehicle_types: ['hatchback'] },
+  { name: 'Polish - Sedan/SUV', base_price: 600.0, duration_minutes: 240, category: 'Polish', vehicle_types: ['sedan/suv'] },
+  { name: 'Polish - MPV/Truck', base_price: 800.0, duration_minutes: 300, category: 'Polish', vehicle_types: ['truck/mpv'] }
 ];
 
 function upsertProducts(db) {
