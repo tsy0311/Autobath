@@ -727,8 +727,8 @@ router.get('/', (req, res) => {
   // Always return hardcoded products with external URLs
   // This ensures consistent behavior across all environments
   // Force deployment update - v4.0.0 - MAJOR UPDATE
-  console.log('🔄 Returning hardcoded products with external image URLs...');
-  console.log('🚀 DEPLOYMENT FORCE UPDATE - v4.0.0');
+  console.log('🔄 Returning hardcoded products with SVG placeholders...');
+  console.log('🚀 DEPLOYMENT FORCE UPDATE - v5.2.0 - SVG PLACEHOLDERS');
   
   // Add a timestamp to force cache invalidation
   const response = {
