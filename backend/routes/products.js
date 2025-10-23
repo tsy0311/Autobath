@@ -1476,6 +1476,88 @@ router.delete('/:id/colors/:colorId', authenticateToken, requireAdmin, (req, res
   });
 });
 
+// Admin endpoint to update image URLs (for live deployment)
+router.post('/admin/update-images', (req, res) => {
+  console.log('🔄 Admin requested image URL update...');
+  
+  const db = getDatabase();
+  
+  // Mapping of old URLs to new external URLs
+  const imageMapping = {
+    '/uploads/metalsprayer1.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/glovewasherBlackWhite.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/handcarrybox.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/clip.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/brushset5pc1.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/simplepapot.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/onesided40x40(1).jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/twosided40x40.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/microfiber30x40(1).jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/curvebrush.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/straightbrush.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/spatula.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/squeezebottle.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/rimbrush.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/smallbrush.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/beautyclay.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/cupmeasurement.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/mjjcfoamcannon.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/mjjcv3.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/largeunicorn.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/pighairbrush.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/tearOffTowel.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/panther-f4.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/panther-p4-1.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/panther-p6.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/trolleybundle.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/carwashbrush1.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/detachablebrush1.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/easyPA.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/foamerf15.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/snowprofoamcannon.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/collapsablebox.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/blizzardPApot.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/ws10.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/ws20.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/ws30.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop',
+    '/uploads/brushset3pcs.jpg': 'https://images.unsplash.com/photo-1506905925346-3b390af30677?w=400&h=300&fit=crop'
+  };
+
+  let updateCount = 0;
+  let completed = 0;
+  const total = Object.keys(imageMapping).length;
+
+  Object.entries(imageMapping).forEach(([oldUrl, newUrl]) => {
+    // Update products table
+    db.run('UPDATE products SET image_url = ? WHERE image_url = ?', [newUrl, oldUrl], function(err) {
+      if (err) {
+        console.error(`Error updating products for ${oldUrl}:`, err);
+      } else if (this.changes > 0) {
+        console.log(`✅ Updated products: ${oldUrl} -> ${newUrl} (${this.changes} records)`);
+        updateCount += this.changes;
+      }
+      completed++;
+      if (completed === total) {
+        console.log(`🎉 Update complete! Updated ${updateCount} product records.`);
+        res.json({
+          success: true,
+          message: `Updated ${updateCount} product records with external image URLs`,
+          updateCount
+        });
+      }
+    });
+    
+    // Update product_images table
+    db.run('UPDATE product_images SET image_url = ? WHERE image_url = ?', [newUrl, oldUrl], function(err) {
+      if (err) {
+        console.error(`Error updating product_images for ${oldUrl}:`, err);
+      } else if (this.changes > 0) {
+        console.log(`✅ Updated product_images: ${oldUrl} -> ${newUrl} (${this.changes} records)`);
+      }
+    });
+  });
+});
+
 // Note: All routes now work with hardcoded products
 // To edit products, modify the hardcodedProducts array above
 
