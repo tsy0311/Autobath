@@ -739,10 +739,16 @@ router.get('/', (req, res) => {
       });
     }
     
-        // If no products in database, use hardcoded products and seed them
-        // Force deployment update - ensure external image URLs are used
-        if (!products || products.length === 0) {
-          console.log('📦 No products in database, using hardcoded products and seeding database...');
+        // Check if products have old /uploads/ URLs and need updating
+        const hasOldUrls = products && products.some(p => p.image_url && p.image_url.startsWith('/uploads/'));
+        
+        // If no products in database OR products have old URLs, use hardcoded products and seed them
+        if (!products || products.length === 0 || hasOldUrls) {
+          if (hasOldUrls) {
+            console.log('🔄 Products have old /uploads/ URLs, updating with external URLs...');
+          } else {
+            console.log('📦 No products in database, using hardcoded products and seeding database...');
+          }
       
       // Seed hardcoded products into database
       seedHardcodedProducts(db)
