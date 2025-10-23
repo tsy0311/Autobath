@@ -188,31 +188,32 @@ const Home = () => {
                     <div className="mb-6">
                       <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        {pkg.name === 'Basic' ? (
+                        {pkg.name.includes('Basic Wash') ? (
                           <>
-                            <li>• Wash</li>
-                            <li>• Vacuum</li>
-                            <li>• Protect wax</li>
+                            <li>• Exterior wash</li>
+                            <li>• Wheel cleaning</li>
+                            <li>• Interior vacuum</li>
+                            <li>• Basic protection</li>
                           </>
-                        ) : pkg.name === 'Premium' ? (
+                        ) : pkg.name.includes('Premium Wash') ? (
                           <>
-                            <li>• Pre-wash</li>
-                            <li>• Wash</li>
-                            <li>• Vacuum</li>
-                            <li>• Premium protection</li>
-                            <li>• Deep cleaning rim</li>
-                            <li>• Tyre protection</li>
+                            <li>• Pre-wash treatment</li>
+                            <li>• Premium exterior wash</li>
+                            <li>• Interior deep clean</li>
+                            <li>• Premium wax protection</li>
+                            <li>• Tire shine</li>
+                            <li>• Wheel detailing</li>
                           </>
-                        ) : pkg.name === 'Ultra' ? (
+                        ) : pkg.name.includes('Ultra') ? (
                           <>
-                            <li>• Pre-wash</li>
-                            <li>• Wash</li>
-                            <li>• Vacuum</li>
-                            <li>• S002 Spray selant protection</li>
+                            <li>• Complete pre-wash</li>
+                            <li>• Premium exterior wash</li>
                             <li>• Interior deep cleaning</li>
-                            <li>• Deep cleaning rim</li>
-                            <li>• Tyre protection</li>
-                            <li>• Treat you like VVIP</li>
+                            <li>• Ceramic coating application</li>
+                            <li>• Paint protection</li>
+                            <li>• Premium tire treatment</li>
+                            <li>• Wheel ceramic coating</li>
+                            <li>• VIP treatment</li>
                           </>
                         ) : pkg.includedServices && pkg.includedServices.length > 0 ? (
                           pkg.includedServices.map((service, serviceIndex) => (

@@ -459,43 +459,42 @@ const Booking = () => {
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
                                     <p className="text-gray-600 mb-3">{packageData.description}</p>
-                                    {packageData.name === 'Basic Package' && (
+                                    {packageData.name.includes('Basic Wash') && (
                                       <div className="mb-3">
                                         <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
                                         <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Pre-wash</li>
-                                          <li>• Wash</li>
-                                          <li>• Vacuum</li>
-                                          <li>• Protect wax</li>
+                                          <li>• Exterior wash</li>
+                                          <li>• Wheel cleaning</li>
+                                          <li>• Interior vacuum</li>
+                                          <li>• Basic protection</li>
                                         </ul>
                                       </div>
                                     )}
-                                    {packageData.name === 'Premium Package' && (
+                                    {packageData.name.includes('Premium Wash') && (
                                       <div className="mb-3">
                                         <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
                                         <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Pre-wash</li>
-                                          <li>• Wash</li>
-                                          <li>• Vacuum</li>
-                                          <li>• Premium protection included</li>
-                                          <li>• Deep cleaning rim</li>
-                                          <li>• Interior cleaning</li>
-                                          <li>• Tyre protection wax</li>
+                                          <li>• Pre-wash treatment</li>
+                                          <li>• Premium exterior wash</li>
+                                          <li>• Interior deep clean</li>
+                                          <li>• Premium wax protection</li>
+                                          <li>• Tire shine</li>
+                                          <li>• Wheel detailing</li>
                                         </ul>
                                       </div>
                                     )}
-                                    {packageData.name === 'Ultra Package' && (
+                                    {packageData.name.includes('Ultra') && (
                                       <div className="mb-3">
                                         <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
                                         <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Pre-wash</li>
-                                          <li>• Wash</li>
-                                          <li>• Vacuum</li>
-                                          <li>• Interior deep cleaning (excluded seat deep cleaning)</li>
-                                          <li>• Coating</li>
-                                          <li>• Premium protection</li>
-                                          <li>• Tyre protection wax</li>
-                                          <li>• Deep cleaning rim</li>
+                                          <li>• Complete pre-wash</li>
+                                          <li>• Premium exterior wash</li>
+                                          <li>• Interior deep cleaning</li>
+                                          <li>• Ceramic coating application</li>
+                                          <li>• Paint protection</li>
+                                          <li>• Premium tire treatment</li>
+                                          <li>• Wheel ceramic coating</li>
+                                          <li>• VIP treatment</li>
                                         </ul>
                                       </div>
                                     )}
