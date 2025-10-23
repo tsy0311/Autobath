@@ -43,6 +43,103 @@ function parsePrice(p) {
   return Number.isNaN(num) ? 0 : Math.round(num * 100) / 100;
 }
 
+// Function to seed hardcoded products into database
+function seedHardcodedProducts(db) {
+  return new Promise((resolve, reject) => {
+    console.log('🌱 Seeding hardcoded products into database...');
+    
+    // First, clear existing products to avoid duplicates
+    db.run('DELETE FROM products', (err) => {
+      if (err) {
+        console.error('Error clearing products:', err);
+        return reject(err);
+      }
+      
+      // Insert hardcoded products
+      const insertProductQuery = `
+        INSERT INTO products (id, name, description, price, brand, stock, category, image_url, sold, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+      `;
+      
+      const insertImageQuery = `
+        INSERT INTO product_images (product_id, image_url, alt_text, sort_order, is_primary, created_at)
+        VALUES (?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      const insertColorQuery = `
+        INSERT INTO product_colors (product_id, color_name, color_code, color_image_url, price_adjustment, stock, is_available, sort_order, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      `;
+      
+      let completed = 0;
+      const total = hardcodedProducts.length;
+      
+      hardcodedProducts.forEach(product => {
+        // Insert product
+        db.run(insertProductQuery, [
+          product.id,
+          product.name,
+          product.description || null,
+          product.price,
+          product.brand,
+          product.stock || 0,
+          product.category || null,
+          product.image_url || null,
+          product.sold || 0
+        ], function(err) {
+          if (err) {
+            console.error(`Error inserting product ${product.id}:`, err);
+            completed++;
+            if (completed === total) {
+              resolve(); // Continue even if some products fail
+            }
+            return;
+          }
+          
+          // Insert images if they exist
+          if (product.images && product.images.length > 0) {
+            product.images.forEach(image => {
+              db.run(insertImageQuery, [
+                product.id,
+                image.image_url,
+                image.alt_text || null,
+                image.sort_order || 0,
+                image.is_primary || 0
+              ], (err) => {
+                if (err) console.error(`Error inserting image for product ${product.id}:`, err);
+              });
+            });
+          }
+          
+          // Insert colors if they exist
+          if (product.colors && product.colors.length > 0) {
+            product.colors.forEach(color => {
+              db.run(insertColorQuery, [
+                product.id,
+                color.color_name,
+                color.color_code || null,
+                color.color_image_url || null,
+                color.price_adjustment || 0,
+                color.stock || 0,
+                color.is_available !== undefined ? color.is_available : 1,
+                color.sort_order || 0
+              ], (err) => {
+                if (err) console.error(`Error inserting color for product ${product.id}:`, err);
+              });
+            });
+          }
+          
+          completed++;
+          if (completed === total) {
+            console.log(`✅ Seeded ${total} products into database`);
+            resolve();
+          }
+        });
+      });
+    });
+  });
+}
+
 // Hardcoded products data - edit this directly to modify products
 const hardcodedProducts = [
   // An-Riddle Brand Products (10 products)
@@ -54,14 +151,14 @@ const hardcodedProducts = [
     stock: 10, 
     description: 'Professional metal sprayer for car detailing',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/metalsprayer1.jpg',
+    image_url: '/uploads/metalsprayer1.jpg',
     sold: 0,
     colors: [],
     images: [
       {
         id: 1,
         product_id: 1,
-        image_url: 'http://localhost:5001/uploads/metalsprayer1.jpg',
+        image_url: '/uploads/metalsprayer1.jpg',
         alt_text: null,
         sort_order: 0,
         is_primary: 1,
@@ -89,7 +186,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'High-quality washing gloves',
     category: 'Accessories',
-    image_url: 'http://localhost:5001/uploads/glovewasherBlackWhite.jpg',
+    image_url: '/uploads/glovewasherBlackWhite.jpg',
     sold: 0,
     colors: []
   },
@@ -101,7 +198,7 @@ const hardcodedProducts = [
     stock: 20, 
     description: 'Portable tool storage box',
     category: 'Accessories',
-    image_url: 'http://localhost:5001/uploads/handcarrybox.jpg',
+    image_url: '/uploads/handcarrybox.jpg',
     sold: 0,
     colors: []
   },
@@ -113,7 +210,7 @@ const hardcodedProducts = [
     stock: 6, 
     description: 'Multi-purpose clip for car mats',
     category: 'Accessories',
-    image_url: 'http://localhost:5001/uploads/clip.jpg',
+    image_url: '/uploads/clip.jpg',
     sold: 0,
     colors: []
   },
@@ -125,7 +222,7 @@ const hardcodedProducts = [
     stock: 52, 
     description: '5-piece detail brush set',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/brushset5pc1.jpg',
+    image_url: '/uploads/brushset5pc1.jpg',
     sold: 0,
     colors: []
   },
@@ -137,7 +234,7 @@ const hardcodedProducts = [
     stock: 10, 
     description: 'PA foam separator for car washing',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/simplepapot.jpg',
+    image_url: '/uploads/simplepapot.jpg',
     sold: 0,
     colors: []
   },
@@ -149,7 +246,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'High-quality one-sided microfiber towel for car detailing',
     category: 'Towels',
-    image_url: 'http://localhost:5001/uploads/onesided40x40(1).jpg',
+    image_url: '/uploads/onesided40x40(1).jpg',
     sold: 0,
     colors: [
       { id: 1, product_id: 8, color_name: '40x40', color_code: null, color_image_url: null, price_adjustment: 0, stock: 50, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -164,7 +261,7 @@ const hardcodedProducts = [
     stock: 80, 
     description: 'Premium two-sided microfiber towel for superior cleaning',
     category: 'Towels',
-    image_url: 'http://localhost:5001/uploads/twosided40x40.jpg',
+    image_url: '/uploads/twosided40x40.jpg',
     sold: 0,
     colors: [
       { id: 3, product_id: 9, color_name: '40x40', color_code: null, color_image_url: null, price_adjustment: 0, stock: 80, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -179,7 +276,7 @@ const hardcodedProducts = [
     stock: 30, 
     description: 'Soft microfiber towel for gentle cleaning and drying',
     category: 'Towels',
-    image_url: 'http://localhost:5001/uploads/microfiber30x40(1).jpg',
+    image_url: '/uploads/microfiber30x40(1).jpg',
     sold: 0,
     colors: [
       { id: 5, product_id: 10, color_name: '30x40', color_code: null, color_image_url: null, price_adjustment: 0, stock: 30, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -196,7 +293,7 @@ const hardcodedProducts = [
     stock: 40, 
     description: 'Curved brush for hard-to-reach areas',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/curvebrush.jpg',
+    image_url: '/uploads/curvebrush.jpg',
     sold: 0,
     colors: []
   },
@@ -208,7 +305,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'Straight brush for general cleaning',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/straightbrush.jpg',
+    image_url: '/uploads/straightbrush.jpg',
     sold: 0,
     colors: []
   },
@@ -220,7 +317,7 @@ const hardcodedProducts = [
     stock: 30, 
     description: 'Professional butter knife for wax removal',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/spatula.jpg',
+    image_url: '/uploads/spatula.jpg',
     sold: 0,
     colors: []
   },
@@ -232,7 +329,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'Measuring squeeze bottle for precise application',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/squeezebottle.jpg',
+    image_url: '/uploads/squeezebottle.jpg',
     sold: 0,
     colors: []
   },
@@ -246,7 +343,7 @@ const hardcodedProducts = [
     stock: 70, 
     description: 'Specialized brush for wheel rims',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/rimbrush.jpg',
+    image_url: '/uploads/rimbrush.jpg',
     sold: 0,
     colors: []
   },
@@ -258,7 +355,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'Brush designed for tire cleaning',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/smallbrush.jpg',
+    image_url: '/uploads/smallbrush.jpg',
     sold: 0,
     colors: []
   },
@@ -270,7 +367,7 @@ const hardcodedProducts = [
     stock: 30, 
     description: 'Professional beauty clay for paint decontamination',
     category: 'Detailing',
-    image_url: 'http://localhost:5001/uploads/beautyclay.jpg',
+    image_url: '/uploads/beautyclay.jpg',
     sold: 0,
     colors: []
   },
@@ -282,7 +379,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'Transparent measuring cup for accurate mixing',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/cupmeasurement.jpg',
+    image_url: '/uploads/cupmeasurement.jpg',
     sold: 0,
     colors: []
   },
@@ -294,7 +391,7 @@ const hardcodedProducts = [
     stock: 10, 
     description: 'High-quality foam cannon for car washing',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/mjjcfoamcannon.jpg',
+    image_url: '/uploads/mjjcfoamcannon.jpg',
     sold: 0,
     colors: []
   },
@@ -306,7 +403,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: 'Advanced foam cannon V3 model',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/mjjcv3.jpg',
+    image_url: '/uploads/mjjcv3.jpg',
     sold: 0,
     colors: []
   },
@@ -318,7 +415,7 @@ const hardcodedProducts = [
     stock: 100, 
     description: 'Large unicorn brush for wheel cleaning',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/largeunicorn.jpg',
+    image_url: '/uploads/largeunicorn.jpg',
     sold: 0,
     colors: [
       { id: 7, product_id: 21, color_name: 'Small', color_code: null, color_image_url: null, price_adjustment: 0, stock: 100, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -333,7 +430,7 @@ const hardcodedProducts = [
     stock: 50, 
     description: 'Pig hair brush for gentle cleaning',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/pighairbrush.jpg',
+    image_url: '/uploads/pighairbrush.jpg',
     sold: 0,
     colors: [
       { id: 9, product_id: 22, color_name: 'Pig Hair (猪毛)', color_code: null, color_image_url: null, price_adjustment: 0, stock: 50, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -348,7 +445,7 @@ const hardcodedProducts = [
     stock: 80, 
     description: 'Tear-off towel for easy disposal',
     category: 'Towels',
-    image_url: 'http://localhost:5001/uploads/tearOffTowel.jpg',
+    image_url: '/uploads/tearOffTowel.jpg',
     sold: 0,
     colors: [
       { id: 11, product_id: 23, color_name: 'Pink', color_code: null, color_image_url: null, price_adjustment: 0, stock: 80, is_available: 1, sort_order: 0, created_at: '2025-10-22 18:32:26' },
@@ -365,7 +462,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: 'High pressure washer F4 model',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/panther-f4.jpg',
+    image_url: '/uploads/panther-f4.jpg',
     sold: 0,
     colors: []
   },
@@ -377,7 +474,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: 'High pressure washer P4 model',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/panther-p4-1.jpg',
+    image_url: '/uploads/panther-p4-1.jpg',
     sold: 0,
     colors: []
   },
@@ -389,7 +486,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: 'High pressure washer P6 PRO',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/panther-p6.jpg',
+    image_url: '/uploads/panther-p6.jpg',
     sold: 0,
     colors: []
   },
@@ -401,7 +498,7 @@ const hardcodedProducts = [
     stock: 3, 
     description: 'P6PRO with trolley bundle',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/trolleybundle.jpg',
+    image_url: '/uploads/trolleybundle.jpg',
     sold: 0,
     colors: []
   },
@@ -413,7 +510,7 @@ const hardcodedProducts = [
     stock: 10, 
     description: 'Telescopic brush mop for car washing',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/carwashbrush1.jpg',
+    image_url: '/uploads/carwashbrush1.jpg',
     sold: 0,
     colors: []
   },
@@ -425,7 +522,7 @@ const hardcodedProducts = [
     stock: 8, 
     description: 'Detachable chenille brush mop',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/detachablebrush1.jpg',
+    image_url: '/uploads/detachablebrush1.jpg',
     sold: 0,
     colors: []
   },
@@ -437,7 +534,7 @@ const hardcodedProducts = [
     stock: 3, 
     description: 'Metal high-pressure foam generator',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/easyPA.jpg',
+    image_url: '/uploads/easyPA.jpg',
     sold: 0,
     colors: []
   },
@@ -449,7 +546,7 @@ const hardcodedProducts = [
     stock: 8, 
     description: 'F15 foamer with blizzard pressure',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/foamerf15.jpg',
+    image_url: '/uploads/foamerf15.jpg',
     sold: 0,
     colors: []
   },
@@ -461,7 +558,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: 'Snow Pro foam cannon PA bottle',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/snowprofoamcannon.jpg',
+    image_url: '/uploads/snowprofoamcannon.jpg',
     sold: 0,
     colors: []
   },
@@ -473,7 +570,7 @@ const hardcodedProducts = [
     stock: 5, 
     description: '36L collapsible storage box',
     category: 'Accessories',
-    image_url: 'http://localhost:5001/uploads/collapsablebox.jpg',
+    image_url: '/uploads/collapsablebox.jpg',
     sold: 0,
     colors: []
   },
@@ -485,7 +582,7 @@ const hardcodedProducts = [
     stock: 6, 
     description: 'PA bottle separator for chemicals',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/blizzardPApot.jpg',
+    image_url: '/uploads/blizzardPApot.jpg',
     sold: 0,
     colors: []
   },
@@ -497,7 +594,7 @@ const hardcodedProducts = [
     stock: 3, 
     description: '10L Windstorm vacuum cleaner',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/ws10.jpg',
+    image_url: '/uploads/ws10.jpg',
     sold: 0,
     colors: []
   },
@@ -509,7 +606,7 @@ const hardcodedProducts = [
     stock: 3, 
     description: '20L Windstorm vacuum cleaner',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/ws20.jpg',
+    image_url: '/uploads/ws20.jpg',
     sold: 0,
     colors: []
   },
@@ -521,7 +618,7 @@ const hardcodedProducts = [
     stock: 2, 
     description: '30L Windstorm vacuum cleaner',
     category: 'Equipment',
-    image_url: 'http://localhost:5001/uploads/ws30.jpg',
+    image_url: '/uploads/ws30.jpg',
     sold: 0,
     colors: []
   },
@@ -559,7 +656,7 @@ const hardcodedProducts = [
     stock: 15, 
     description: 'Complete detail brush set for precision cleaning',
     category: 'Tools',
-    image_url: 'http://localhost:5001/uploads/brushset3pcs.jpg',
+    image_url: '/uploads/brushset3pcs.jpg',
     sold: 0,
     colors: []
   },
@@ -640,6 +737,30 @@ router.get('/', (req, res) => {
         success: false,
         message: 'Failed to fetch products'
       });
+    }
+    
+    // If no products in database, use hardcoded products and seed them
+    if (!products || products.length === 0) {
+      console.log('📦 No products in database, using hardcoded products and seeding database...');
+      
+      // Seed hardcoded products into database
+      seedHardcodedProducts(db)
+        .then(() => {
+          // Return hardcoded products immediately
+          res.json({
+            success: true,
+            products: hardcodedProducts
+          });
+        })
+        .catch(seedErr => {
+          console.error('Error seeding products:', seedErr);
+          // Still return hardcoded products even if seeding fails
+          res.json({
+            success: true,
+            products: hardcodedProducts
+          });
+        });
+      return;
     }
     
     // Get images for all products

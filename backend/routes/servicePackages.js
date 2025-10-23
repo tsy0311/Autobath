@@ -23,6 +23,50 @@ router.get('/', (req, res) => {
       });
     }
 
+    // If no packages in database, trigger database initialization
+    if (!rows || rows.length === 0) {
+      console.log('📦 No service packages in database, triggering initialization...');
+      const { initDatabase } = require('../database/init');
+      initDatabase()
+        .then(() => {
+          // Retry the query after initialization
+          db.all(query, [], (retryErr, retryRows) => {
+            if (retryErr) {
+              console.error('Database error on retry:', retryErr);
+              return res.status(500).json({
+                error: 'Database error',
+                message: 'Failed to fetch service packages after initialization'
+              });
+            }
+            
+            const packages = (retryRows || []).map(pkg => {
+              const services = JSON.parse(pkg.services || '[]');
+              const finalPrice = pkg.base_price * (1 - pkg.discount_percentage / 100);
+              
+              return {
+                ...pkg,
+                services,
+                finalPrice: Math.round(finalPrice * 100) / 100,
+                savings: pkg.base_price - finalPrice
+              };
+            });
+
+            res.json({
+              success: true,
+              packages
+            });
+          });
+        })
+        .catch(initErr => {
+          console.error('Error initializing database:', initErr);
+          res.json({
+            success: true,
+            packages: []
+          });
+        });
+      return;
+    }
+
     // Parse JSON fields and calculate final price
     const packages = rows.map(pkg => {
       const services = JSON.parse(pkg.services || '[]');

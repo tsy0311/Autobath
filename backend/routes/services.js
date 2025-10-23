@@ -23,6 +23,44 @@ router.get('/', (req, res) => {
       });
     }
 
+    // If no services in database, trigger database initialization
+    if (!rows || rows.length === 0) {
+      console.log('📦 No services in database, triggering initialization...');
+      const { initDatabase } = require('../database/init');
+      initDatabase()
+        .then(() => {
+          // Retry the query after initialization
+          db.all(query, [], (retryErr, retryRows) => {
+            if (retryErr) {
+              console.error('Database error on retry:', retryErr);
+              return res.status(500).json({
+                error: 'Database error',
+                message: 'Failed to fetch services after initialization'
+              });
+            }
+            
+            const services = (retryRows || []).map(service => ({
+              ...service,
+              vehicle_types: JSON.parse(service.vehicle_types || '[]'),
+              requirements: JSON.parse(service.requirements || '[]')
+            }));
+
+            res.json({
+              success: true,
+              services
+            });
+          });
+        })
+        .catch(initErr => {
+          console.error('Error initializing database:', initErr);
+          res.json({
+            success: true,
+            services: []
+          });
+        });
+      return;
+    }
+
     // Parse JSON fields
     const services = rows.map(service => ({
       ...service,
