@@ -118,3 +118,4 @@ backend/*.sqlite*
 env.txt
 backend/env.txt
 frontend/env.txt
+backend/images-for-github/
