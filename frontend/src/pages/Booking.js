@@ -438,7 +438,7 @@ const Booking = () => {
                       {serviceType === 'package' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {packages
-                            .filter(pkg => pkg.vehicle_type === vehicleType)
+                            .filter(pkg => !pkg.vehicle_type || pkg.vehicle_type === vehicleType)
                             .map(packageData => (
                             <div 
                               key={packageData.id}
@@ -530,7 +530,14 @@ const Booking = () => {
                               if (vehicleType === 'motorcycle') {
                                 return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
                               } else {
-                                return svc.vehicle_types && svc.vehicle_types.includes(vehicleType);
+                                // Map vehicle types for compatibility
+                                const vehicleTypeMap = {
+                                  'hatchback': 'sedan',
+                                  'sedan/suv': 'suv', 
+                                  'truck/mpv': 'truck'
+                                };
+                                const mappedType = vehicleTypeMap[vehicleType] || vehicleType;
+                                return svc.vehicle_types && svc.vehicle_types.includes(mappedType);
                               }
                             })
                             .length === 0 ? (
@@ -543,7 +550,14 @@ const Booking = () => {
                                 if (vehicleType === 'motorcycle') {
                                   return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
                                 } else {
-                                  return svc.vehicle_types && svc.vehicle_types.includes(vehicleType);
+                                  // Map vehicle types for compatibility
+                                  const vehicleTypeMap = {
+                                    'hatchback': 'sedan',
+                                    'sedan/suv': 'suv', 
+                                    'truck/mpv': 'truck'
+                                  };
+                                  const mappedType = vehicleTypeMap[vehicleType] || vehicleType;
+                                  return svc.vehicle_types && svc.vehicle_types.includes(mappedType);
                                 }
                               })
                               .map((svc) => (
