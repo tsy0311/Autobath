@@ -1475,6 +1475,16 @@ router.delete('/:id/colors/:colorId', authenticateToken, requireAdmin, (req, res
   });
 });
 
+// Test endpoint to verify deployment
+router.get('/test-deployment', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Deployment test successful',
+    timestamp: new Date().toISOString(),
+    version: 'v2.0.0'
+  });
+});
+
 // Admin endpoint to update image URLs (for live deployment)
 router.post('/admin/update-images', (req, res) => {
   console.log('🔄 Admin requested image URL update...');
