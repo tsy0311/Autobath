@@ -24,7 +24,7 @@ const customerRoutes = require('./routes/customers');
 const reviewRoutes = require('./routes/reviews');
 const productBundleRoutes = require('./routes/productBundles');
 const paymentRoutes = require('./routes/payments');
-const migrateRoutes = require('./routes/migrate');
+// const migrateRoutes = require('./routes/migrate'); // Removed - file doesn't exist
 
 // Import database
 const { initDatabase } = require('./database/init');
@@ -103,6 +103,14 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(uploadsDir));
 
+// Serve static files from img directory
+const imgDir = path.join(__dirname, 'img');
+app.use('/img', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(imgDir));
+
 // Simple local upload handling (single image)
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -137,7 +145,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/product-bundles', productBundleRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/migrate', migrateRoutes);
+// app.use('/api/migrate', migrateRoutes); // Removed - route doesn't exist
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
