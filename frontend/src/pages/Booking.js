@@ -24,7 +24,7 @@ const Booking = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [vehicleType, setVehicleType] = useState('hatchback');
+  const [vehicleType, setVehicleType] = useState('sedan/suv');
   const [serviceType, setServiceType] = useState('package'); // package or individual
   const [motorcycleCategory, setMotorcycleCategory] = useState('normal'); // normal | sportbike
 
@@ -201,6 +201,49 @@ const Booking = () => {
     return `${mins}m`;
   };
 
+  // Calculate price based on vehicle type and service
+  const calculateServicePrice = (service, vehicleType) => {
+    const basePrice = service.base_price;
+    
+    // Vehicle type multipliers based on official menu
+    const multipliers = {
+      'hatchback': 1.0,
+      'sedan/suv': 1.0,
+      'truck/mpv': 1.2
+    };
+    
+    // Special pricing for specific services based on official menu
+    if (service.name.includes('Basic Wash')) {
+      const prices = {
+        'hatchback': 78,
+        'sedan/suv': 88,
+        'truck/mpv': 108
+      };
+      return prices[vehicleType] || basePrice;
+    }
+    
+    if (service.name.includes('Premium Wash')) {
+      const prices = {
+        'hatchback': 120,
+        'sedan/suv': 150,
+        'truck/mpv': 190
+      };
+      return prices[vehicleType] || basePrice;
+    }
+    
+    if (service.name.includes('Ultra')) {
+      const prices = {
+        'hatchback': 190,
+        'sedan/suv': 230,
+        'truck/mpv': 260
+      };
+      return prices[vehicleType] || basePrice;
+    }
+    
+    // For individual services, apply multiplier
+    return Math.round(basePrice * (multipliers[vehicleType] || 1.0));
+  };
+
   const handleSubmit = async () => {
     if (submitting) return;
     setSubmitting(true);
@@ -319,19 +362,6 @@ const Booking = () => {
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-primary mb-6">Select Your Service</h3>
                   
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Type:</label>
-                    <select 
-                      value={vehicleType} 
-                      onChange={(e) => setVehicleType(e.target.value)}
-                      className="form-control max-w-xs mx-auto"
-                    >
-                      <option value="motorcycle">Motorcycle</option>
-                      <option value="hatchback">Hatchback</option>
-                      <option value="sedan/suv">Sedan/SUV</option>
-                      <option value="truck/mpv">Truck/MPV</option>
-                    </select>
-                  </div>
 
                   {vehicleType === 'motorcycle' ? (
                     <>
@@ -386,7 +416,7 @@ const Booking = () => {
                                 </div>
                                 <div className="space-y-2 text-sm mt-auto">
                                   <div className="flex justify-between items-center">
-                                    <span className="font-semibold text-secondary text-lg">RM {svc.base_price.toFixed(2)}</span>
+                                    <span className="font-semibold text-secondary text-lg">RM {calculateServicePrice(svc, vehicleType).toFixed(2)}</span>
                                     <div className="flex items-center gap-1 text-gray-500">
                                       <FaClock className="text-xs" />
                                       <span>{Math.floor(svc.duration_minutes / 60)}h {svc.duration_minutes % 60}m</span>
@@ -438,7 +468,12 @@ const Booking = () => {
                       {serviceType === 'package' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {packages
-                            .filter(pkg => !pkg.vehicle_type || pkg.vehicle_type === vehicleType)
+                            .filter(pkg => pkg.vehicle_type === 'sedan/suv')
+                            .sort((a, b) => {
+                              // Sort: Basic (left), Premium (middle), Ultra (right)
+                              const order = { 'Basic': 1, 'Premium': 2, 'Ultra': 3 };
+                              return order[a.name.split(' ')[0]] - order[b.name.split(' ')[0]];
+                            })
                             .map(packageData => (
                             <div 
                               key={packageData.id}
@@ -457,47 +492,9 @@ const Booking = () => {
                               <div className="flex flex-col justify-between h-full">
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
-                                    <h4 className="text-lg font-semibold text-primary mb-2">{packageData.name}</h4>
-                                    <p className="text-gray-600 mb-3">{packageData.description}</p>
-                                    {packageData.name.includes('Basic Wash') && (
-                                      <div className="mb-3">
-                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
-                                        <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Exterior wash</li>
-                                          <li>• Wheel cleaning</li>
-                                          <li>• Interior vacuum</li>
-                                          <li>• Basic protection</li>
-                                        </ul>
-                                      </div>
-                                    )}
-                                    {packageData.name.includes('Premium Wash') && (
-                                      <div className="mb-3">
-                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
-                                        <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Pre-wash treatment</li>
-                                          <li>• Premium exterior wash</li>
-                                          <li>• Interior deep clean</li>
-                                          <li>• Premium wax protection</li>
-                                          <li>• Tire shine</li>
-                                          <li>• Wheel detailing</li>
-                                        </ul>
-                                      </div>
-                                    )}
-                                    {packageData.name.includes('Ultra') && (
-                                      <div className="mb-3">
-                                        <h5 className="text-sm font-semibold text-gray-800 mb-1">Includes:</h5>
-                                        <ul className="text-xs text-gray-600 space-y-1">
-                                          <li>• Complete pre-wash</li>
-                                          <li>• Premium exterior wash</li>
-                                          <li>• Interior deep cleaning</li>
-                                          <li>• Ceramic coating application</li>
-                                          <li>• Paint protection</li>
-                                          <li>• Premium tire treatment</li>
-                                          <li>• Wheel ceramic coating</li>
-                                          <li>• VIP treatment</li>
-                                        </ul>
-                                      </div>
-                                    )}
+                                    <h4 className="text-lg font-semibold text-primary mb-2">
+                                      {packageData.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - Truck/MPV', '')}
+                                    </h4>
                                   </div>
                                   <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
                                     selectedPackage?.id === packageData.id 
@@ -572,10 +569,9 @@ const Booking = () => {
                                 <div className="flex flex-col justify-between h-full">
                                   <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
-                                      <h4 className="text-lg font-semibold text-primary mb-2">{svc.name}</h4>
-                                      {svc.description && (
-                                        <p className="text-gray-600">{svc.description}</p>
-                                      )}
+                                      <h4 className="text-lg font-semibold text-primary mb-2">
+                                        {svc.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - MPV/Truck', '').replace(' - Normal Bike', '').replace(' - Sportbike', '')}
+                                      </h4>
                                     </div>
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
                                       selectedService?.id === svc.id ? 'bg-secondary text-white' : 'border-2 border-gray-300'
@@ -585,7 +581,7 @@ const Booking = () => {
                                   </div>
                                   <div className="space-y-2 text-sm mt-auto">
                                     <div className="flex justify-between items-center">
-                                      <span className="font-semibold text-secondary text-lg">RM {svc.base_price.toFixed(2)}</span>
+                                      <span className="font-semibold text-secondary text-lg">RM {calculateServicePrice(svc, vehicleType).toFixed(2)}</span>
                                       <div className="flex items-center gap-1 text-gray-500">
                                         <FaClock className="text-xs" />
                                         <span>{Math.floor(svc.duration_minutes / 60)}h {svc.duration_minutes % 60}m</span>
