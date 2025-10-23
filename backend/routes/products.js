@@ -724,116 +724,13 @@ const hardcodedProducts = [
 
 // Get all products
 router.get('/', (req, res) => {
-  const db = getDatabase();
+  // Always return hardcoded products with external URLs
+  // This ensures consistent behavior across all environments
+  console.log('🔄 Returning hardcoded products with external image URLs...');
   
-  // Get products from database
-  const getProductsQuery = `SELECT * FROM products ORDER BY id`;
-  const getImagesQuery = `SELECT * FROM product_images ORDER BY product_id, sort_order`;
-  
-  db.all(getProductsQuery, [], (err, products) => {
-    if (err) {
-      console.error('Error fetching products from database:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to fetch products'
-      });
-    }
-    
-        // Always use hardcoded products with external URLs for live deployment
-        // This ensures consistent image URLs across all environments
-        console.log('🔄 Using hardcoded products with external image URLs...');
-        
-        // Seed hardcoded products into database
-        seedHardcodedProducts(db)
-          .then(() => {
-            // Return hardcoded products immediately
-            res.json({
-              success: true,
-              products: hardcodedProducts
-            });
-          })
-          .catch(seedErr => {
-            console.error('Error seeding products:', seedErr);
-            // Still return hardcoded products even if seeding fails
-            res.json({
-              success: true,
-              products: hardcodedProducts
-            });
-          });
-        return;
-    }
-    
-    // Get images for all products
-    db.all(getImagesQuery, [], (err, images) => {
-      if (err) {
-        console.error('Error fetching images from database:', err);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to fetch product images'
-        });
-      }
-      
-      // Group images by product_id
-      const imagesByProduct = {};
-      images.forEach(image => {
-        if (!imagesByProduct[image.product_id]) {
-          imagesByProduct[image.product_id] = [];
-        }
-        imagesByProduct[image.product_id].push(image);
-      });
-      
-      // Get colors for all products
-      const getColorsQuery = `SELECT * FROM product_colors ORDER BY product_id, sort_order`;
-      
-      db.all(getColorsQuery, [], (err, colors) => {
-        if (err) {
-          console.error('Error fetching colors from database:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to fetch product colors'
-          });
-        }
-        
-        // Group colors by product_id
-        const colorsByProduct = {};
-        colors.forEach(color => {
-          if (!colorsByProduct[color.product_id]) {
-            colorsByProduct[color.product_id] = [];
-          }
-          colorsByProduct[color.product_id].push(color);
-        });
-        
-        // Combine products with their images and colors
-        const productsWithImagesAndColors = products.map(product => {
-          const productImages = imagesByProduct[product.id] || [];
-          const productColors = colorsByProduct[product.id] || [];
-          
-          // If no images in database but has image_url, create a fallback
-          if (productImages.length === 0 && product.image_url) {
-            productImages.push({
-              id: Date.now() + product.id,
-              product_id: product.id,
-              image_url: product.image_url,
-              alt_text: null,
-              sort_order: 0,
-              is_primary: 1,
-              created_at: new Date().toISOString()
-            });
-          }
-          
-          return {
-            ...product,
-            images: productImages,
-            colors: productColors
-          };
-        });
-        
-        res.json({
-          success: true,
-          products: productsWithImagesAndColors
-        });
-      });
-    });
+  res.json({
+    success: true,
+    products: hardcodedProducts
   });
 });
 
