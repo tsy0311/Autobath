@@ -726,6 +726,7 @@ const hardcodedProducts = [
 router.get('/', (req, res) => {
   // Always return hardcoded products with external URLs
   // This ensures consistent behavior across all environments
+  // Force deployment update - v3.0.0
   console.log('🔄 Returning hardcoded products with external image URLs...');
   
   res.json({
