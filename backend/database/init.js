@@ -30,12 +30,24 @@ const initDatabase = () => {
           category TEXT,
           brand TEXT,
           stock INTEGER DEFAULT 0,
+          sold INTEGER DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `, (err) => {
         if (err) console.error('Error creating products table:', err);
         else console.log('✅ Products table ready');
+      });
+
+      // Add sold column if it doesn't exist (migration)
+      db.run(`
+        ALTER TABLE products ADD COLUMN sold INTEGER DEFAULT 0
+      `, (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+          console.error('Error adding sold column:', err);
+        } else if (!err) {
+          console.log('✅ Added sold column to products table');
+        }
       });
 
       // Product images table
