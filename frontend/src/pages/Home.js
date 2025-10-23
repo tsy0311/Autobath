@@ -2,32 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FaCar, FaChair, FaClock,
-  FaCheck, FaTag, FaShieldAlt, FaMobile, FaGift,
+  FaClock, FaMobile, FaGift,
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
 import api from '../services/api';
 
 const Home = () => {
   const [packages, setPackages] = useState([]);
-  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
+    fetchServicePackages();
   }, []);
 
-  const fetchData = async () => {
+  const fetchServicePackages = async () => {
     try {
       setLoading(true);
-      const [packagesRes, servicesRes] = await Promise.all([
-        api.get('/api/service-packages'),
-        api.get('/api/services')
-      ]);
-      setPackages(packagesRes.data.packages || []);
-      setServices(servicesRes.data.services || []);
+      const response = await api.get('/api/service-packages');
+      setPackages(response.data.packages || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching service packages:', error);
     } finally {
       setLoading(false);
     }
@@ -223,74 +217,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="container">
-          <div className="section-title">
-            <h2>{"Our Services"}</h2>
-            <p>{"Individual services tailored to your needs"}</p>
-            <Link to="/booking" className="inline-flex items-center gap-2 text-primary font-semibold mt-4 transition-all duration-300 hover:text-secondary hover:translate-x-1">
-              {"Book Services"} <FaArrowRight />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              // Loading skeleton for services
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
-                  <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
-                  <div className="p-6 text-center">
-                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              services.slice(0, 3).map((service, index) => {
-                const icons = [FaCar, FaChair, FaShieldAlt];
-                const IconComponent = icons[index] || FaCar;
-                
-                return (
-                  <div key={service.id} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-                    <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                      <div className="text-white text-6xl">
-                        <IconComponent />
-                      </div>
-                    </div>
-                    <div className="p-6 text-center">
-                      <h3 className="text-2xl font-bold text-primary mb-4">{service.name}</h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed">{service.description || 'Professional detailing service'}</p>
-                      <div className="flex flex-col gap-2 mb-6 p-4 bg-secondary/5 rounded-lg">
-                        <span className="flex items-center gap-2 text-sm text-gray-600">
-                          <FaCheck className="text-secondary" /> 
-                          {service.category || 'Professional Service'}
-                        </span>
-                        <span className="flex items-center gap-2 text-sm text-gray-600">
-                          <FaClock className="text-secondary" /> 
-                          {Math.floor(service.duration_minutes / 60)}h {service.duration_minutes % 60}m
-                        </span>
-                        <span className="flex items-center gap-2 text-sm text-gray-600">
-                          <FaTag className="text-secondary" /> 
-                          RM{service.base_price?.toFixed(2)}
-                        </span>
-                      </div>
-                      <Link 
-                        to={`/booking?service=${service.id}&type=individual`} 
-                        className="btn w-full text-center"
-                      >
-                        Book {service.name}
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Instagram Feeds (3 posts) */}
       <section className="py-12 sm:py-16 md:py-20 bg-white">
