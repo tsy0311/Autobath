@@ -200,7 +200,7 @@ const Home = () => {
                             <li>• Pre-wash treatment</li>
                             <li>• Premium exterior wash</li>
                             <li>• Interior deep clean</li>
-                            <li>• Premium wax protection</li>
+                            <li>• S002 Spray selant protection</li>
                             <li>• Tire shine</li>
                             <li>• Wheel detailing</li>
                           </>
@@ -209,11 +209,11 @@ const Home = () => {
                             <li>• Complete pre-wash</li>
                             <li>• Premium exterior wash</li>
                             <li>• Interior deep cleaning</li>
-                            <li>• Ceramic coating application</li>
+                            <li>• S002 Spray selant protection</li>
                             <li>• Paint protection</li>
                             <li>• Premium tire treatment</li>
                             <li>• Wheel ceramic coating</li>
-                            <li>• VIP treatment</li>
+                            <li>• VIP treatment - Free Snooker Playing</li>
                           </>
                         ) : pkg.includedServices && pkg.includedServices.length > 0 ? (
                           pkg.includedServices.map((service, serviceIndex) => (
