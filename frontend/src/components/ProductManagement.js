@@ -201,10 +201,14 @@ const ProductManagement = () => {
   };
 
   const handleDeleteImage = async (imageId) => {
+    console.log('Deleting image:', imageId, 'for product:', editingProduct?.id);
+    
     if (editingProduct) {
       // For existing products, delete from database
       try {
-        const response = await api.delete(`/api/products/images/${imageId}`);
+        const response = await api.delete(`/api/products/images/${imageId}?productId=${editingProduct.id}`);
+        console.log('Delete response:', response.data);
+        
         if (response.data.success) {
           toast.success('Image deleted successfully');
           // Reload the product to get updated images
@@ -212,10 +216,12 @@ const ProductManagement = () => {
           if (productResponse.data.success) {
             setProductImages(productResponse.data.product.images || []);
           }
+        } else {
+          toast.error(response.data.message || 'Failed to delete image');
         }
       } catch (error) {
         console.error('Error deleting image:', error);
-        toast.error('Failed to delete image');
+        toast.error('Failed to delete image: ' + (error.response?.data?.message || error.message));
       }
     } else {
       // For new products, remove from local state
@@ -224,7 +230,70 @@ const ProductManagement = () => {
     }
   };
 
+  const handleAddVariant = async () => {
+    if (!newColor.color_name.trim()) {
+      toast.error('Please enter a variant name');
+      return;
+    }
 
+    if (!editingProduct) {
+      toast.error('Please save the product first before adding variants');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/api/products/${editingProduct.id}/colors`, {
+        color_name: newColor.color_name,
+        color_code: newColor.color_code,
+        color_image_url: newColor.color_image_url,
+        price_adjustment: newColor.price_adjustment,
+        stock: newColor.stock,
+        is_available: newColor.is_available,
+        sort_order: newColor.sort_order
+      });
+
+      if (response.data.success) {
+        toast.success('Variant added successfully');
+        // Refresh the product data to get updated variants
+        const productResponse = await api.get(`/api/products/${editingProduct.id}`);
+        if (productResponse.data.success) {
+          setProductColors(productResponse.data.product.colors || []);
+        }
+        // Reset form
+        setNewColor({ color_name: '', color_code: '', color_image_url: '', price_adjustment: 0, stock: 0, is_available: true, sort_order: 0 });
+      } else {
+        toast.error(response.data.message || 'Failed to add variant');
+      }
+    } catch (error) {
+      console.error('Error adding variant:', error);
+      toast.error('Failed to add variant: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleDeleteVariant = async (variantId) => {
+    if (!editingProduct) {
+      toast.error('No product selected');
+      return;
+    }
+
+    try {
+      const response = await api.delete(`/api/products/${editingProduct.id}/colors/${variantId}`);
+      
+      if (response.data.success) {
+        toast.success('Variant deleted successfully');
+        // Refresh the product data to get updated variants
+        const productResponse = await api.get(`/api/products/${editingProduct.id}`);
+        if (productResponse.data.success) {
+          setProductColors(productResponse.data.product.colors || []);
+        }
+      } else {
+        toast.error(response.data.message || 'Failed to delete variant');
+      }
+    } catch (error) {
+      console.error('Error deleting variant:', error);
+      toast.error('Failed to delete variant: ' + (error.response?.data?.message || error.message));
+    }
+  };
 
   const handleAddTypeOption = () => {
     if (!newTypeOption.name.trim()) {
@@ -499,7 +568,15 @@ const ProductManagement = () => {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-primary mb-1">{product.name}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-primary">{product.name}</h3>
+                      {product.colors && product.colors.length > 0 && (
+                        <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                          <FaTags className="text-xs" />
+                          {product.colors.length} variant{product.colors.length > 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
                     {product.brand && (
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-secondary/10 text-secondary text-xs font-semibold rounded-full">
                         <FaTags /> {product.brand}
@@ -833,10 +910,11 @@ const ProductManagement = () => {
 
                     {/* Existing Images */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {console.log('Rendering images:', productImages)}
                       {productImages.map((image, index) => {
-                        console.log('Rendering image:', image.image_url);
+                        console.log('Rendering image:', image);
                         return (
-                        <div key={image.id} className="relative group">
+                        <div key={image.id || `image-${index}-${image.image_url}`} className="relative group">
                           <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                             <img
                               src={image.image_url}
@@ -851,7 +929,12 @@ const ProductManagement = () => {
                           </div>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={() => handleDeleteImage(image.id)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('Delete button clicked for image:', image.id);
+                                handleDeleteImage(image.id);
+                              }}
                               className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                             >
                               <FaTrash className="text-xs" />
@@ -897,82 +980,114 @@ const ProductManagement = () => {
                 <div className="space-y-6">
                   <div>
                     <h4 className="text-lg font-semibold text-primary mb-2">Product Variants</h4>
-                    <p className="text-sm text-gray-600 mb-4">Define product options like Size (Small/Large) or Color (Red/Green)</p>
+                    <p className="text-sm text-gray-600 mb-4">Manage product variants like Size (Small/Large) or Color (Red/Green)</p>
                     
-                    {/* Variant Type */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Variant Type (e.g., Size, Color, Model)
-                      </label>
-                      <input
-                        type="text"
-                        value={typeSelectionTitle}
-                        onChange={(e) => setTypeSelectionTitle(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                        placeholder="e.g., Size, Color, Model"
-                      />
-                    </div>
-
-                    {/* Add New Variant */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-medium text-gray-700 mb-3">Add Variant Option</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Option Name *</label>
-                          <input
-                            type="text"
-                            value={newTypeOption.name}
-                            onChange={(e) => setNewTypeOption({...newTypeOption, name: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="e.g., Small, Red, Standard"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-                          <input
-                            type="number"
-                            value={newTypeOption.stock}
-                            onChange={(e) => setNewTypeOption({...newTypeOption, stock: parseInt(e.target.value) || 0})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleAddTypeOption}
-                        className="mt-3 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
-                      >
-                        <FaPlus className="inline mr-2" />
-                        Add Option
-                      </button>
-                    </div>
-
-                    {/* Existing Variants */}
-                    {typeSelectionOptions.length > 0 && (
-                      <div>
-                        <h5 className="font-medium text-gray-700 mb-3">Variant Options ({typeSelectionOptions.length})</h5>
+                    {/* Existing Variants from Database */}
+                    {productColors && productColors.length > 0 && (
+                      <div className="mb-6">
+                        <h5 className="font-medium text-gray-700 mb-3">Current Variants ({productColors.length})</h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {typeSelectionOptions.map((option) => (
-                            <div key={option.id} className="border border-gray-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium">{option.name}</span>
+                          {productColors.map((variant) => (
+                            <div key={variant.id} className="border border-gray-200 rounded-lg p-4 bg-white">
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="font-medium text-gray-800">{variant.color_name}</span>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteTypeOption(option.id)}
+                                  onClick={() => handleDeleteVariant(variant.id)}
                                   className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                                  title="Delete variant"
                                 >
                                   <FaTrash className="text-sm" />
                                 </button>
                               </div>
-                              <div className="text-sm text-gray-600">
-                                <div>Stock: {option.stock}</div>
+                              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                                <div>
+                                  <span className="font-medium">Stock:</span> {variant.stock}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Price:</span> +RM {variant.price_adjustment || 0}
+                                </div>
+                                <div className="col-span-2">
+                                  <span className="font-medium">Status:</span> 
+                                  <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
+                                    variant.is_available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {variant.is_available ? 'Available' : 'Unavailable'}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
+
+                    {/* Add New Variant */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h5 className="font-medium text-gray-700 mb-3">Add New Variant</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Variant Name *</label>
+                          <input
+                            type="text"
+                            value={newColor.color_name}
+                            onChange={(e) => setNewColor({...newColor, color_name: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="e.g., Small, Red, 40x40"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                          <input
+                            type="number"
+                            value={newColor.stock}
+                            onChange={(e) => setNewColor({...newColor, stock: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment (RM)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={newColor.price_adjustment}
+                            onChange={(e) => setNewColor({...newColor, price_adjustment: parseFloat(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                          <input
+                            type="number"
+                            value={newColor.sort_order}
+                            onChange={(e) => setNewColor({...newColor, sort_order: parseInt(e.target.value) || 0})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mt-4">
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={newColor.is_available}
+                            onChange={(e) => setNewColor({...newColor, is_available: e.target.checked})}
+                            className="mr-2"
+                          />
+                          <span className="text-sm text-gray-700">Available for purchase</span>
+                        </label>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddVariant}
+                        className="mt-4 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors"
+                      >
+                        <FaPlus className="inline mr-2" />
+                        Add Variant
+                      </button>
+                    </div>
                   </div>
 
                   {/* Action Buttons for Variants Tab */}

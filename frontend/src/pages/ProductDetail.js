@@ -167,9 +167,17 @@ const ProductDetail = () => {
                   {product.category}
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">
-                {product.name}
-              </h1>
+              <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-primary">
+                  {product.name}
+                </h1>
+                {product.colors && product.colors.length > 0 && (
+                  <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full font-medium">
+                    <FaPalette className="text-sm" />
+                    {product.colors.length} variant{product.colors.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center gap-1">
                   <FaStar className="text-yellow-400" />

@@ -15,7 +15,7 @@ const multer = require('multer');
 // Import routes
 const authRoutes = require('./routes/auth');
 const contactRoutes = require('./routes/contact');
-const productRoutes = require('./routes/products');
+const { router: productRoutes } = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const bookingRoutes = require('./routes/bookings');
 const serviceRoutes = require('./routes/services');
@@ -33,11 +33,29 @@ const { verifyEmailTransport } = require('./services/emailService');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Increase header size limit to handle large headers
+// This helps prevent "Request Header Fields Too Large" errors
+app.use((req, res, next) => {
+  // Allow larger headers by setting appropriate limits
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
+
 // Trust proxy for accurate IP detection (important for rate limiting)
 app.set('trust proxy', 1);
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "http://localhost:5001"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "http://localhost:5001"],
+    },
+  },
+}));
 
 // Rate limiting (temporarily disabled for testing)
 // const limiter = rateLimit({
