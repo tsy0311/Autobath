@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FaClock, FaMobile, FaGift,
+  FaClock, FaMobile, FaGift,FaTag,
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
 import api from '../services/api';
@@ -188,7 +188,37 @@ const Home = () => {
                     <div className="mb-6">
                       <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        {pkg.services && pkg.services.length > 0 ? (
+                        {pkg.name === 'Basic' ? (
+                          <>
+                            <li>• Wash</li>
+                            <li>• Vacuum</li>
+                            <li>• Protect wax</li>
+                          </>
+                        ) : pkg.name === 'Premium' ? (
+                          <>
+                            <li>• Pre-wash</li>
+                            <li>• Wash</li>
+                            <li>• Vacuum</li>
+                            <li>• Premium protection</li>
+                            <li>• Deep cleaning rim</li>
+                            <li>• Tyre protection</li>
+                          </>
+                        ) : pkg.name === 'Ultra' ? (
+                          <>
+                            <li>• Pre-wash</li>
+                            <li>• Wash</li>
+                            <li>• Vacuum</li>
+                            <li>• S002 Spray selant protection</li>
+                            <li>• Interior deep cleaning</li>
+                            <li>• Deep cleaning rim</li>
+                            <li>• Tyre protection</li>
+                            <li>• Treat you like VVIP</li>
+                          </>
+                        ) : pkg.includedServices && pkg.includedServices.length > 0 ? (
+                          pkg.includedServices.map((service, serviceIndex) => (
+                            <li key={serviceIndex}>• {service.name}</li>
+                          ))
+                        ) : pkg.services && pkg.services.length > 0 ? (
                           pkg.services.map((serviceId, serviceIndex) => (
                             <li key={serviceIndex}>• Service {serviceId}</li>
                           ))
