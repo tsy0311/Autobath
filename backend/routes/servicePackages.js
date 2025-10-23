@@ -39,22 +39,7 @@ router.get('/', (req, res) => {
               });
             }
             
-            const packages = (retryRows || []).map(pkg => {
-              const services = JSON.parse(pkg.services || '[]');
-              const finalPrice = pkg.base_price * (1 - pkg.discount_percentage / 100);
-              
-              return {
-                ...pkg,
-                services,
-                finalPrice: Math.round(finalPrice * 100) / 100,
-                savings: pkg.base_price - finalPrice
-              };
-            });
-
-            res.json({
-              success: true,
-              packages
-            });
+            processPackages(retryRows || [], res);
           });
         })
         .catch(initErr => {
@@ -67,8 +52,29 @@ router.get('/', (req, res) => {
       return;
     }
 
-    // Parse JSON fields and calculate final price
-    const packages = rows.map(pkg => {
+    processPackages(rows, res);
+  });
+});
+
+// Helper function to process packages and fetch included services
+const processPackages = (packages, res) => {
+  if (packages.length === 0) {
+    return res.json({
+      success: true,
+      packages: []
+    });
+  }
+
+  // Get all unique service IDs from all packages
+  const allServiceIds = new Set();
+  packages.forEach(pkg => {
+    const serviceIds = JSON.parse(pkg.services || '[]');
+    serviceIds.forEach(id => allServiceIds.add(id));
+  });
+
+  if (allServiceIds.size === 0) {
+    // No services to fetch, return packages as is
+    const processedPackages = packages.map(pkg => {
       const services = JSON.parse(pkg.services || '[]');
       const finalPrice = pkg.base_price * (1 - pkg.discount_percentage / 100);
       
@@ -80,12 +86,59 @@ router.get('/', (req, res) => {
       };
     });
 
+    return res.json({
+      success: true,
+      packages: processedPackages
+    });
+  }
+
+  // Fetch all services
+  const serviceIds = Array.from(allServiceIds);
+  const placeholders = serviceIds.map(() => '?').join(',');
+  const servicesQuery = `
+    SELECT id, name, description, base_price, duration_minutes, category
+    FROM services 
+    WHERE id IN (${placeholders}) AND is_active = 1
+  `;
+
+  db.all(servicesQuery, serviceIds, (err, serviceRows) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({
+        error: 'Database error',
+        message: 'Failed to fetch included services'
+      });
+    }
+
+    // Create a map of service ID to service details
+    const servicesMap = {};
+    serviceRows.forEach(service => {
+      servicesMap[service.id] = service;
+    });
+
+    // Process packages with service details
+    const processedPackages = packages.map(pkg => {
+      const serviceIds = JSON.parse(pkg.services || '[]');
+      const finalPrice = pkg.base_price * (1 - pkg.discount_percentage / 100);
+      
+      // Map service IDs to service details
+      const includedServices = serviceIds.map(id => servicesMap[id]).filter(Boolean);
+      
+      return {
+        ...pkg,
+        services: serviceIds, // Keep original IDs for compatibility
+        includedServices, // Add detailed service information
+        finalPrice: Math.round(finalPrice * 100) / 100,
+        savings: pkg.base_price - finalPrice
+      };
+    });
+
     res.json({
       success: true,
-      packages
+      packages: processedPackages
     });
   });
-});
+};
 
 // Get service package by ID
 router.get('/:id', (req, res) => {
