@@ -739,9 +739,10 @@ router.get('/', (req, res) => {
       });
     }
     
-    // If no products in database, use hardcoded products and seed them
-    if (!products || products.length === 0) {
-      console.log('📦 No products in database, using hardcoded products and seeding database...');
+        // If no products in database, use hardcoded products and seed them
+        // Force deployment update - ensure external image URLs are used
+        if (!products || products.length === 0) {
+          console.log('📦 No products in database, using hardcoded products and seeding database...');
       
       // Seed hardcoded products into database
       seedHardcodedProducts(db)
