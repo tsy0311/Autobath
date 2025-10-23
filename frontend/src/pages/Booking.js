@@ -166,19 +166,51 @@ const Booking = () => {
     // Calculate estimated duration
     const duration = selectedPackage?.duration_minutes || selectedService?.duration_minutes || 60;
     
+    // Check if service requires daytime booking (coating or polish)
+    const serviceName = selectedPackage?.name || selectedService?.name || '';
+    const requiresDaytime = serviceName.toLowerCase().includes('coating') || serviceName.toLowerCase().includes('polish');
+    
     api
-      .get('/api/bookings/availability', { params: { date, duration } })
+      .get('/api/bookings/availability', { params: { date, duration, requiresDaytime } })
       .then(({ data }) => {
-        setAvailableSlots(data?.slots || []);
+        let slots = data?.slots || [];
+        
+        // Filter slots for daytime services (coating/polish)
+        if (requiresDaytime) {
+          slots = slots.filter(slot => {
+            const [hours, minutes] = slot.split(':').map(Number);
+            const slotTime = hours + (minutes / 60);
+            const endTime = slotTime + (duration / 60);
+            
+            // Ensure service can complete before 2am (shop closes at 2am)
+            // For 8-hour polish, latest start time is 6pm (18:00)
+            // For 6-hour coating, latest start time is 8pm (20:00)
+            const maxStartTime = 24 - (duration / 60) - 2; // 2 hours buffer before closing
+            
+            return slotTime <= maxStartTime;
+          });
+        }
+        
+        setAvailableSlots(slots);
         setExistingBookings(data?.existingBookings || []);
         setBufferTime(data?.bufferTime || 15);
         
         if (data?.closed) {
           toast.info('We are closed on the selected date. Please choose another day.');
-        } else if (data?.slots?.length === 0 && data?.existingBookings?.length > 0) {
-          toast.warning(`No available slots for this service duration (${formatDuration(duration)}). The bay is fully booked on this date.`);
-        } else if (data?.slots?.length === 0) {
-          toast.info('No available time slots for the selected date and service.');
+        } else if (slots.length === 0 && data?.existingBookings?.length > 0) {
+          if (requiresDaytime) {
+            toast.warning(`No available daytime slots for ${serviceName}. This service requires completion before shop closing (2am). Please choose an earlier time slot.`);
+          } else {
+            toast.warning(`No available slots for this service duration (${formatDuration(duration)}). The bay is fully booked on this date.`);
+          }
+        } else if (slots.length === 0) {
+          if (requiresDaytime) {
+            toast.info(`No available daytime slots for ${serviceName}. Please choose an earlier time slot to ensure completion before shop closing.`);
+          } else {
+            toast.info('No available time slots for the selected date and service.');
+          }
+        } else if (requiresDaytime) {
+          toast.info(`Daytime booking required for ${serviceName}. Service must complete before shop closing (2am).`);
         }
       })
       .catch(() => toast.error('Failed to load availability'))
@@ -494,6 +526,11 @@ const Booking = () => {
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">
                                       {packageData.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - Truck/MPV', '')}
+                                      {(packageData.name.toLowerCase().includes('coating') || packageData.name.toLowerCase().includes('polish')) && (
+                                        <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                                          Daytime Only
+                                        </span>
+                                      )}
                                     </h4>
                                   </div>
                                   <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
@@ -571,6 +608,11 @@ const Booking = () => {
                                     <div className="flex-1">
                                       <h4 className="text-lg font-semibold text-primary mb-2">
                                         {svc.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - MPV/Truck', '').replace(' - Normal Bike', '').replace(' - Sportbike', '')}
+                                        {(svc.name.toLowerCase().includes('coating') || svc.name.toLowerCase().includes('polish')) && (
+                                          <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                                            Daytime Only
+                                          </span>
+                                        )}
                                       </h4>
                                     </div>
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${

@@ -225,14 +225,15 @@ router.get('/', (req, res) => {
   });
 });
 
-// GET /api/bookings/availability?date=YYYY-MM-DD&duration=120
+// GET /api/bookings/availability?date=YYYY-MM-DD&duration=120&requiresDaytime=true
 router.get('/availability', (req, res) => {
-  const { date, duration } = req.query;
+  const { date, duration, requiresDaytime } = req.query;
   if (!date || !validateIsoDate(date)) {
     return res.status(400).json({ error: 'Invalid date', message: 'Use YYYY-MM-DD' });
   }
 
   const serviceDuration = parseInt(duration) || 60;
+  const isDaytimeRequired = requiresDaytime === 'true';
   const allSlots = generateDailySlots(date, serviceDuration);
   
   if (allSlots.length === 0) {
@@ -256,7 +257,7 @@ router.get('/availability', (req, res) => {
       }
       
       // Filter out slots that would overlap with existing bookings
-      const availableSlots = [];
+      let availableSlots = [];
       const unavailableSlots = [];
       
       allSlots.forEach(slot => {
@@ -271,6 +272,21 @@ router.get('/availability', (req, res) => {
           });
         }
       });
+      
+      // Apply daytime filtering for coating/polish services
+      if (isDaytimeRequired) {
+        availableSlots = availableSlots.filter(slot => {
+          const [hours, minutes] = slot.split(':').map(Number);
+          const slotTime = hours + (minutes / 60);
+          const endTime = slotTime + (serviceDuration / 60);
+          
+          // Ensure service can complete before 2am (shop closes at 2am)
+          // Add 2-hour buffer before closing time
+          const maxStartTime = 24 - (serviceDuration / 60) - 2;
+          
+          return slotTime <= maxStartTime;
+        });
+      }
       
       res.json({ 
         success: true, 
