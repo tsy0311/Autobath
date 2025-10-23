@@ -148,23 +148,30 @@ const Home = () => {
               {"Book Services"} <FaArrowRight />
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
-                  <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-32"></div>
-                  <div className="p-6">
-                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              packages.map((pkg, index) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {loading ? (
+                      // Loading skeleton
+                      Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
+                          <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-32"></div>
+                          <div className="p-6">
+                            <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                            <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                            <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                            <div className="h-10 bg-gray-200 rounded"></div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      packages
+                        .filter(pkg => pkg.vehicle_type === 'sedan/suv')
+                        .sort((a, b) => {
+                          // Sort: Basic (left), Premium (middle), Ultra (right)
+                          const order = { 'Basic': 1, 'Premium': 2, 'Ultra': 3 };
+                          return order[a.name.split(' ')[0]] - order[b.name.split(' ')[0]];
+                        })
+                        .map((pkg, index) => (
                 <div 
                   key={pkg.id} 
                   className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary ${pkg.is_popular ? 'relative' : ''}`}
