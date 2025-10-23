@@ -1,14 +1,37 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FaCar, FaChair, FaClock,
   FaCheck, FaTag, FaShieldAlt, FaMobile, FaGift,
   FaArrowRight, FaCalendarAlt
 } from 'react-icons/fa';
+import api from '../services/api';
 
 const Home = () => {
-  
+  const [packages, setPackages] = useState([]);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [packagesRes, servicesRes] = await Promise.all([
+        api.get('/api/service-packages'),
+        api.get('/api/services')
+      ]);
+      setPackages(packagesRes.data.packages || []);
+      setServices(servicesRes.data.services || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
@@ -132,106 +155,70 @@ const Home = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Basic Package */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-              <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">{"Basic Package"}</h3>
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM88.00</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <p className="text-gray-600 mb-4 leading-relaxed">{"Essential detailing for regular maintenance"}</p>
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Wash</li>
-                    <li>• Vacuum</li>
-                    <li>• Protect wax</li>
-                  </ul>
-                </div>
-                <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                    <FaClock /> 1h 15m
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
+                  <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-32"></div>
+                  <div className="p-6">
+                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
                 </div>
-                <Link to="/booking?package=1&type=package" className="btn btn-primary w-full text-center">
-                  {"Book Basic Package"}
-                </Link>
-              </div>
-            </div>
-
-            {/* Premium Package */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary relative">
-              <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
-                {"Most Popular"}
-              </div>
-              <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">{"Premium Package"}</h3>
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 150.00</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <p className="text-gray-600 mb-4 leading-relaxed">{"Comprehensive detailing with premium products"}</p>
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Pre-wash</li>
-                    <li>• Wash</li>
-                    <li>• Vacuum</li>
-                    <li>• Premium protection</li>
-                    <li>• Deep cleaning rim</li>
-                    <li>• Tyre protection</li>
-                  </ul>
-                </div>
-                <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                    <FaClock /> 3h 0m
+              ))
+            ) : (
+              packages.map((pkg, index) => (
+                <div 
+                  key={pkg.id} 
+                  className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary ${pkg.is_popular ? 'relative' : ''}`}
+                >
+                  {pkg.is_popular && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
+                    <h3 className="text-2xl font-bold mb-4">{pkg.name}</h3>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-4xl font-bold">RM{pkg.finalPrice?.toFixed(2) || pkg.base_price?.toFixed(2)}</span>
+                      {pkg.discount_percentage > 0 && (
+                        <span className="text-sm opacity-80 line-through">RM{pkg.base_price?.toFixed(2)}</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
-                </div>
-                <Link to="/booking?package=2&type=package" className="btn btn-primary w-full text-center">
-                  {"Book Premium Package"}
-                </Link>
-              </div>
-            </div>
-
-            {/* Ultra Package */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-              <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">{"Ultra Package"}</h3>
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-4xl font-bold">RM 230.00</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <p className="text-gray-600 mb-4 leading-relaxed">{"Complete transformation with ceramic coating"}</p>
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Pre-wash</li>
-                    <li>• Wash</li>
-                    <li>• Vacuum</li>
-                    <li>• S002 Spray selant protection</li>
-                    <li>• Interior deep cleaning</li>
-                    <li>• Deep cleaning rim</li>
-                    <li>• Tyre protection</li>
-                    <li>• Treat you   like VVIP</li>
-                  </ul>
-                </div>
-                <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                    <FaClock /> 8h 0m
+                  <div className="p-6">
+                    <p className="text-gray-600 mb-4 leading-relaxed">{pkg.description}</p>
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        {pkg.services && pkg.services.length > 0 ? (
+                          pkg.services.map((serviceId, serviceIndex) => (
+                            <li key={serviceIndex}>• Service {serviceId}</li>
+                          ))
+                        ) : (
+                          <li>• Professional detailing services</li>
+                        )}
+                      </ul>
+                    </div>
+                    <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
+                      <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                        <FaClock /> {Math.floor(pkg.duration_minutes / 60)}h {pkg.duration_minutes % 60}m
+                      </div>
+                      <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
+                    </div>
+                    <Link 
+                      to={`/booking?package=${pkg.id}&type=package`} 
+                      className="btn btn-primary w-full text-center"
+                    >
+                      Book {pkg.name}
+                    </Link>
                   </div>
-                  <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
                 </div>
-                <Link to="/booking?package=3&type=package" className="btn btn-primary w-full text-center">
-                  {"Book Ultra Package"}
-                </Link>
-              </div>
-            </div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -247,57 +234,60 @@ const Home = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-              <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaCar />
+            {loading ? (
+              // Loading skeleton for services
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
+                  <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
+                  <div className="p-6 text-center">
+                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
+                  </div>
                 </div>
-              </div>
-              <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary mb-4">{"Exterior Detailing"}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Complete exterior cleaning and protection"}</p>
-                <div className="flex flex-col gap-2 mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Paint Correction"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Ceramic Coating"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Wheel Cleaning"}</span>
-                </div>
-                <Link to="/booking?service=exterior&type=individual" className="btn w-full text-center">{"Book Exterior"}</Link>
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-              <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaChair />
-                </div>
-              </div>
-              <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary mb-4">{"Interior Detailing"}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Deep cleaning and protection for your interior"}</p>
-                <div className="flex flex-col gap-2 mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Leather Treatment"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Steam Cleaning"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Odor Elimination"}</span>
-                </div>
-                <Link to="/booking?service=interior&type=individual" className="btn w-full text-center">{"Book Interior"}</Link>
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
-              <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaShieldAlt />
-                </div>
-              </div>
-              <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary mb-4">{"Protection Services"}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{"Long-lasting protection for your vehicle"}</p>
-                <div className="flex flex-col gap-2 mb-6 p-4 bg-secondary/5 rounded-lg">
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Paint Protection Film"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"Ceramic Coating"}</span>
-                  <span className="flex items-center gap-2 text-sm text-gray-600"><FaCheck className="text-secondary" /> {"UV Protection"}</span>
-                </div>
-                <Link to="/booking?service=paint&type=individual" className="btn w-full text-center">{"Book Protection"}</Link>
-              </div>
-            </div>
+              ))
+            ) : (
+              services.slice(0, 3).map((service, index) => {
+                const icons = [FaCar, FaChair, FaShieldAlt];
+                const IconComponent = icons[index] || FaCar;
+                
+                return (
+                  <div key={service.id} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary">
+                    <div className="w-full h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                      <div className="text-white text-6xl">
+                        <IconComponent />
+                      </div>
+                    </div>
+                    <div className="p-6 text-center">
+                      <h3 className="text-2xl font-bold text-primary mb-4">{service.name}</h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed">{service.description || 'Professional detailing service'}</p>
+                      <div className="flex flex-col gap-2 mb-6 p-4 bg-secondary/5 rounded-lg">
+                        <span className="flex items-center gap-2 text-sm text-gray-600">
+                          <FaCheck className="text-secondary" /> 
+                          {service.category || 'Professional Service'}
+                        </span>
+                        <span className="flex items-center gap-2 text-sm text-gray-600">
+                          <FaClock className="text-secondary" /> 
+                          {Math.floor(service.duration_minutes / 60)}h {service.duration_minutes % 60}m
+                        </span>
+                        <span className="flex items-center gap-2 text-sm text-gray-600">
+                          <FaTag className="text-secondary" /> 
+                          RM{service.base_price?.toFixed(2)}
+                        </span>
+                      </div>
+                      <Link 
+                        to={`/booking?service=${service.id}&type=individual`} 
+                        className="btn w-full text-center"
+                      >
+                        Book {service.name}
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </section>
