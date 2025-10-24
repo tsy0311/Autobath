@@ -503,7 +503,16 @@ const Home = () => {
                 <div className="flex justify-between items-center py-3 px-4 bg-pink-50 rounded-lg border-l-4 border-pink-400">
                   <div>
                     <h4 className="text-lg font-bold text-black">SNOW MOCHI 雪梅娘</h4>
-                    <p className="text-sm text-gray-600">4pcs per box</p>
+                    <p className="text-sm text-gray-600">4pcs per box • Pre-order Only</p>
+                    <div className="mt-2">
+                      <p className="text-xs text-gray-500 font-semibold">Flavors:</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Thailand Mango</span>
+                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">Durian (Limited)</span>
+                        <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Strawberry</span>
+                        <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Oreo</span>
+                      </div>
+                    </div>
                   </div>
                   <span className="text-lg font-bold text-pink-600">20.00</span>
                 </div>
