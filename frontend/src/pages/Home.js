@@ -276,7 +276,7 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DP_DUZOD_Iy.jpg"
                   alt="AUTOBATH car detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
@@ -298,7 +298,7 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1563720228757-4b4a4a4a4a4a?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DP0RuDyktzy.jpg"
                   alt="AUTOBATH premium detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
@@ -320,7 +320,7 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
+                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DQFJJMDk8u_.jpg"
                   alt="AUTOBATH ceramic coating reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
