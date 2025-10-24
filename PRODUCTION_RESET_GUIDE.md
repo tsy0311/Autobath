@@ -24,7 +24,19 @@ The changes are pushed to GitHub and should deploy automatically. Wait 5-10 minu
 - https://api.autobath.co/api/services
 - https://api.autobath.co/api/service-packages
 
-### Option 2: Manual Reset (If automatic doesn't work)
+### Option 2: Add Missing Products Only (If services work but products are missing)
+If services and service packages are working but products are missing:
+
+1. **Access your Render dashboard**
+2. **Go to your backend service** (autobath-api)
+3. **Open the shell/console**
+4. **Run the add products script**:
+   ```bash
+   cd backend
+   node database/add-missing-products-to-live.js
+   ```
+
+### Option 3: Manual Reset (If automatic doesn't work)
 If the production database still has old data, you need to manually reset it:
 
 1. **Access your Render dashboard**
@@ -36,14 +48,14 @@ If the production database still has old data, you need to manually reset it:
    node database/force-reset-production.js
    ```
 
-### Option 3: Alternative Reset (If force reset doesn't work)
+### Option 4: Alternative Reset (If force reset doesn't work)
 If the above doesn't work, try the regular reset:
 ```bash
 cd backend
 node database/reset-production-db.js
 ```
 
-### Option 4: Force Database Recreation
+### Option 5: Force Database Recreation
 If the above doesn't work, delete the database file and let it recreate:
 1. **Delete** `database.sqlite` from production
 2. **Restart** the backend service
