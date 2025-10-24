@@ -276,7 +276,7 @@ const Home = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     console.error('Error loading g63.jpeg:', e);
-                    e.target.src = require('../img/placeholder.jpg');
+                    e.target.src = require('../img/dashboard.jpg');
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -318,7 +318,7 @@ const Home = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     console.error('Error loading shop.jpeg:', e);
-                    e.target.src = require('../img/placeholder.jpg');
+                    e.target.src = require('../img/dashboard.jpg');
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
