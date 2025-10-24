@@ -276,12 +276,9 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://instagram.com/p/DP_DUZOD_Iy/media/?size=m"
+                  src={require('../img/g63.jpeg')}
                   alt="AUTOBATH car detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3";
-                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
@@ -298,12 +295,9 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://instagram.com/p/DP0RuDyktzy/media/?size=m"
+                  src={require('../img/mers.jpeg')}
                   alt="AUTOBATH premium detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = "https://images.unsplash.com/photo-1563720228757-4b4a4a4a4a4a?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3";
-                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
@@ -320,12 +314,9 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src="https://instagram.com/p/DQFJJMDk8u_/media/?size=m"
+                  src={require('../img/shop.HEIC')}
                   alt="AUTOBATH ceramic coating reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3";
-                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
