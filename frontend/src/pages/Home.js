@@ -76,11 +76,6 @@ const Home = () => {
           <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-6 sm:mb-10 px-2">
             All services use Koch Chemie products directly from Germany
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12">
-            <Link to="/booking" className="btn btn-primary flex items-center gap-2">
-              <FaCalendarAlt /> Book Now
-            </Link>
-          </div>
         </div>
       </section>
 
