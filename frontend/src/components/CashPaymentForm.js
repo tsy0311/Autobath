@@ -110,7 +110,7 @@ const CashPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
         </h4>
         <div className="text-sm text-gray-700 space-y-1">
           <p><strong>Service Areas:</strong> Kajang, Cheras, and surrounding areas</p>
-          <p><strong>Operating Hours:</strong> Monday - Sunday, 8:00 AM - 6:00 PM</p>
+          <p><strong>Operating Hours:</strong> Monday - Sunday, 12:00 PM - 1:00 AM</p>
           <p><strong>Advance Booking:</strong> Recommended 24-48 hours in advance</p>
           <p><strong>Emergency Service:</strong> Available with additional charges</p>
         </div>

@@ -182,7 +182,7 @@ const Booking = () => {
             const slotTime = hours + (minutes / 60);
             const endTime = slotTime + (duration / 60);
             
-            // Ensure service can complete before 2am (shop closes at 2am)
+            // Ensure service can complete before 1am (shop closes at 1am)
             // For 8-hour polish, latest start time is 6pm (18:00)
             // For 6-hour coating, latest start time is 8pm (20:00)
             const maxStartTime = 24 - (duration / 60) - 2; // 2 hours buffer before closing
@@ -199,18 +199,18 @@ const Booking = () => {
           toast.info('We are closed on the selected date. Please choose another day.');
         } else if (slots.length === 0 && data?.existingBookings?.length > 0) {
           if (requiresDaytime) {
-            toast.warning(`No available daytime slots for ${serviceName}. This service requires completion before shop closing (2am). Please choose an earlier time slot.`);
+            toast.warning(`No available daytime slots for ${serviceName}. This service requires completion before shop closing (1am). Please choose an earlier time slot.`);
           } else {
             toast.warning(`No available slots for this service duration (${formatDuration(duration)}). The bay is fully booked on this date.`);
           }
         } else if (slots.length === 0) {
           if (requiresDaytime) {
-            toast.info(`No available daytime slots for ${serviceName}. Please choose an earlier time slot to ensure completion before shop closing.`);
+            toast.info(`No available daytime slots for ${serviceName}. Please choose an earlier time slot to ensure completion before shop closing (1am).`);
           } else {
             toast.info('No available time slots for the selected date and service.');
           }
         } else if (requiresDaytime) {
-          toast.info(`Daytime booking required for ${serviceName}. Service must complete before shop closing (2am).`);
+          toast.info(`Daytime booking required for ${serviceName}. Service must complete before shop closing (1am).`);
         }
       })
       .catch(() => toast.error('Failed to load availability'))
