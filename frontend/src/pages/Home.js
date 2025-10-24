@@ -517,6 +517,11 @@ const Home = () => {
               <p className="text-gray-700 mb-6 text-lg">
                 Located within AUTOBATH car detailing shop - enjoy fresh beverages and light snacks while waiting for your car service!
               </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <p className="text-gray-800 font-semibold">
+                  📞 Call <span className="text-primary font-bold">+6012-3574548</span> for pre-order
+                </p>
+              </div>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
