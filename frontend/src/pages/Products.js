@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import VariantSelectionModal from '../components/VariantSelectionModal';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -226,9 +227,9 @@ const Products = () => {
                     if (product.images && product.images.length > 0) {
                       // Prefer .jpg files over .heic files for better browser compatibility
                       const jpgImage = product.images.find(img => img.image_url && img.image_url.toLowerCase().endsWith('.jpg'));
-                      imageUrl = jpgImage ? jpgImage.image_url : product.images[0].image_url;
+                      imageUrl = jpgImage ? getImageUrl(jpgImage.image_url) : getImageUrl(product.images[0].image_url);
                     } else if (product.image_url && product.image_url.trim() !== '') {
-                      imageUrl = product.image_url;
+                      imageUrl = getImageUrl(product.image_url);
                     }
                     
                     
@@ -244,7 +245,7 @@ const Products = () => {
                               if (imageUrl && imageUrl.toLowerCase().endsWith('.heic') && product.images && product.images.length > 1) {
                                 const jpgImage = product.images.find(img => img.image_url && img.image_url.toLowerCase().endsWith('.jpg'));
                                 if (jpgImage) {
-                                  e.target.src = jpgImage.image_url;
+                                  e.target.src = getImageUrl(jpgImage.image_url);
                                   return;
                                 }
                               }

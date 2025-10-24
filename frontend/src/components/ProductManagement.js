@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaImage, FaTimes, FaBox, FaWarehouse, FaTags, FaDollarSign, FaPalette } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -541,7 +542,7 @@ const ProductManagement = () => {
               <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                 {product.images && product.images.length > 0 ? (
                   <img
-                    src={product.images[0].image_url}
+                    src={getImageUrl(product.images[0].image_url)}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -551,7 +552,7 @@ const ProductManagement = () => {
                   />
                 ) : product.image_url ? (
                   <img
-                    src={product.image_url}
+                    src={getImageUrl(product.image_url)}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -917,7 +918,7 @@ const ProductManagement = () => {
                         <div key={image.id || `image-${index}-${image.image_url}`} className="relative group">
                           <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                             <img
-                              src={image.image_url}
+                              src={getImageUrl(image.image_url)}
                               alt={image.alt_text || formData.name || 'Product image'}
                               className="w-full h-full object-cover"
                             onError={(e) => {

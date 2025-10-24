@@ -4,6 +4,7 @@ import { FaArrowLeft, FaShoppingCart, FaHeart, FaShare, FaStar, FaPlus, FaMinus,
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -59,9 +60,9 @@ const ProductDetail = () => {
 
   const getCurrentImage = () => {
     if (product.images && product.images.length > 0) {
-      return product.images[selectedImage]?.image_url || product.image_url;
+      return getImageUrl(product.images[selectedImage]?.image_url || product.image_url);
     }
-    return product.image_url;
+    return getImageUrl(product.image_url);
   };
 
   const getFinalPrice = () => {
@@ -145,7 +146,7 @@ const ProductDetail = () => {
                     }`}
                   >
                     <img
-                      src={image.image_url}
+                      src={getImageUrl(image.image_url)}
                       alt={image.alt_text || product.name}
                       className="w-full h-full object-cover"
                     />
