@@ -38,7 +38,7 @@ const Cart = () => {
       setLoading(true);
       
       // Order is already created in the payment form, just handle success
-      toast.success('Order placed successfully!');
+      toast.success('Order placed successfully! Stock will be reduced once payment is verified.');
       clearCart();
       setCustomerInfo({ name: '', email: '', phone: '' });
       navigate('/');

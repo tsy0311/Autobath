@@ -100,7 +100,7 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
       const orderResponse = await api.post('/api/orders', orderPayload);
 
       if (orderResponse.data.success) {
-        toast.success('Order submitted successfully! We will verify your payment and contact you soon.');
+        toast.success('Order submitted successfully! We will verify your payment and reduce stock once confirmed.');
         
         // Pass success data back
         onSuccess({

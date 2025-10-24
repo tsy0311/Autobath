@@ -153,16 +153,8 @@ router.post('/', async (req, res) => {
         );
       }
 
-      // Update product stock
-      const stockStmt = db.prepare(`
-        UPDATE products 
-        SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `);
-
-      for (const item of orderItems) {
-        stockStmt.run(item.quantity, item.productId);
-      }
+      // Note: Stock will be reduced when admin confirms payment
+      // This prevents stock issues if payment verification fails
 
       db.run('COMMIT', (err) => {
         if (err) {
@@ -208,7 +200,6 @@ router.post('/', async (req, res) => {
 
       orderStmt.finalize();
       itemStmt.finalize();
-      stockStmt.finalize();
     });
 
   } catch (error) {
@@ -379,10 +370,50 @@ router.put('/:id/status', (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Order status updated successfully'
-    });
+    // If order is cancelled, restore stock
+    if (status === 'cancelled') {
+      db.all('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [id], (err, orderItems) => {
+        if (err) {
+          console.error('Error fetching order items for stock restoration:', err);
+          return res.status(500).json({
+            error: 'Database error',
+            message: 'Failed to restore stock'
+          });
+        }
+
+        // Restore stock for each item
+        const stockStmt = db.prepare(`
+          UPDATE products 
+          SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `);
+
+        let stockRestored = 0;
+        orderItems.forEach((item) => {
+          stockStmt.run(item.quantity, item.product_id, function(err) {
+            if (err) {
+              console.error(`Error restoring stock for product ${item.product_id}:`, err);
+            } else {
+              stockRestored++;
+              console.log(`Restored stock for product ${item.product_id} by ${item.quantity}`);
+            }
+          });
+        });
+
+        stockStmt.finalize();
+
+        res.json({
+          success: true,
+          message: 'Order cancelled and stock restored',
+          stockRestored: stockRestored
+        });
+      });
+    } else {
+      res.json({
+        success: true,
+        message: 'Order status updated successfully'
+      });
+    }
   });
 
   stmt.finalize();
@@ -426,31 +457,103 @@ router.put('/:id/verify-payment', (req, res) => {
       });
     }
 
-    // Send email notification to customer
+    // If payment is verified, reduce stock
     if (verified) {
-      db.get('SELECT customer_name, customer_email, total_amount FROM orders WHERE id = ?', [id], (err, order) => {
-        if (!err && order) {
-          const emailData = {
-            to: order.customer_email,
-            subject: `Payment Confirmed - Order #${id}`,
-            template: 'paymentConfirmation',
-            data: {
-              orderId: id,
-              customerName: order.customer_name,
-              totalAmount: order.total_amount.toFixed(2)
-            }
-          };
-          sendEmail(emailData).catch(error => {
-            console.error('Failed to send payment confirmation email:', error);
+      // Get order items to reduce stock
+      db.all('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [id], (err, orderItems) => {
+        if (err) {
+          console.error('Error fetching order items for stock reduction:', err);
+          return res.status(500).json({
+            error: 'Database error',
+            message: 'Failed to reduce stock'
           });
         }
+
+        // Reduce stock for each item
+        const stockStmt = db.prepare(`
+          UPDATE products 
+          SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `);
+
+        let stockReduced = 0;
+        orderItems.forEach((item) => {
+          stockStmt.run(item.quantity, item.product_id, function(err) {
+            if (err) {
+              console.error(`Error reducing stock for product ${item.product_id}:`, err);
+            } else {
+              stockReduced++;
+              console.log(`Reduced stock for product ${item.product_id} by ${item.quantity}`);
+            }
+          });
+        });
+
+        stockStmt.finalize();
+
+        // Send email notification to customer
+        db.get('SELECT customer_name, customer_email, total_amount FROM orders WHERE id = ?', [id], (err, order) => {
+          if (!err && order) {
+            const emailData = {
+              to: order.customer_email,
+              subject: `Payment Confirmed - Order #${id}`,
+              template: 'paymentConfirmation',
+              data: {
+                orderId: id,
+                customerName: order.customer_name,
+                totalAmount: order.total_amount.toFixed(2)
+              }
+            };
+            sendEmail(emailData).catch(error => {
+              console.error('Failed to send payment confirmation email:', error);
+            });
+          }
+        });
+
+        res.json({
+          success: true,
+          message: 'Payment verified successfully and stock reduced',
+          stockReduced: stockReduced
+        });
+      });
+    } else {
+      // If payment verification is removed, restore stock
+      db.all('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [id], (err, orderItems) => {
+        if (err) {
+          console.error('Error fetching order items for stock restoration:', err);
+          return res.status(500).json({
+            error: 'Database error',
+            message: 'Failed to restore stock'
+          });
+        }
+
+        // Restore stock for each item
+        const stockStmt = db.prepare(`
+          UPDATE products 
+          SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `);
+
+        let stockRestored = 0;
+        orderItems.forEach((item) => {
+          stockStmt.run(item.quantity, item.product_id, function(err) {
+            if (err) {
+              console.error(`Error restoring stock for product ${item.product_id}:`, err);
+            } else {
+              stockRestored++;
+              console.log(`Restored stock for product ${item.product_id} by ${item.quantity}`);
+            }
+          });
+        });
+
+        stockStmt.finalize();
+
+        res.json({
+          success: true,
+          message: 'Payment verification removed and stock restored',
+          stockRestored: stockRestored
+        });
       });
     }
-
-    res.json({
-      success: true,
-      message: verified ? 'Payment verified successfully' : 'Payment verification removed'
-    });
   });
 
   stmt.finalize();
