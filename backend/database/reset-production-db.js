@@ -43,8 +43,26 @@ db.run('DELETE FROM products', (err) => {
   console.log('✅ Products cleared');
 });
 
+console.log('4. Clearing existing product images...');
+db.run('DELETE FROM product_images', (err) => {
+  if (err) {
+    console.error('Error clearing product images:', err.message);
+    process.exit(1);
+  }
+  console.log('✅ Product images cleared');
+});
+
+console.log('5. Clearing existing product colors...');
+db.run('DELETE FROM product_colors', (err) => {
+  if (err) {
+    console.error('Error clearing product colors:', err.message);
+    process.exit(1);
+  }
+  console.log('✅ Product colors cleared');
+});
+
 // Step 2: Reinitialize with correct data
-console.log('4. Reinitializing database...');
+console.log('6. Reinitializing database...');
 const { initDatabase } = require('./init');
 
 initDatabase()
