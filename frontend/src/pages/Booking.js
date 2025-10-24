@@ -400,12 +400,25 @@ const Booking = () => {
                   
                   {/* Vehicle Type Selection */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Vehicle Type</label>
-                    <div className="flex flex-wrap justify-center gap-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Choose One</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
                       <button
                         type="button"
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'hatchback' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'motorcycle' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={() => { 
+                          setVehicleType('motorcycle'); 
+                          setSelectedService(null); 
+                          setSelectedPackage(null);
+                        }}
+                      >
+                        Motorcycle
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'hatchback' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={() => { 
                           setVehicleType('hatchback'); 
@@ -417,8 +430,8 @@ const Booking = () => {
                       </button>
                       <button
                         type="button"
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'sedan/suv' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'sedan/suv' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={() => { 
                           setVehicleType('sedan/suv'); 
@@ -430,8 +443,8 @@ const Booking = () => {
                       </button>
                       <button
                         type="button"
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'truck/mpv' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'truck/mpv' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={() => { 
                           setVehicleType('truck/mpv'); 
@@ -440,19 +453,6 @@ const Booking = () => {
                         }}
                       >
                         Truck/MPV
-                      </button>
-                      <button
-                        type="button"
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'motorcycle' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                        onClick={() => { 
-                          setVehicleType('motorcycle'); 
-                          setSelectedService(null); 
-                          setSelectedPackage(null);
-                        }}
-                      >
-                        Motorcycle
                       </button>
                     </div>
                   </div>
