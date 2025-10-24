@@ -357,8 +357,8 @@ const Home = () => {
         </div>
         
         <div className="container relative z-10">
-          {/* Black Horizontal Bar for Header */}
-          <div className="bg-black py-8 sm:py-12 mb-16 relative">
+          {/* Black Horizontal Bar - 112px height matching logo */}
+          <div className="bg-black h-28 w-full mb-16 relative flex items-center justify-center">
             {/* Racing Flag Pattern on Black Bar */}
             <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
               <div className="w-full h-full bg-white opacity-10" style={{
@@ -367,35 +367,37 @@ const Home = () => {
               }}></div>
             </div>
             
-            <div className="text-center relative z-10">
-              <div className="flex justify-center mb-8">
-                <img 
-                  src={require('../img/autobathCafe.PNG')} 
-                  alt="AUTOBATH Cafe Logo" 
-                  className="h-20 sm:h-24 md:h-28 w-auto"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              </div>
-              
-              {/* Beverages Title with Icon */}
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">Beverages</h2>
-                <div className="w-12 h-16 sm:w-16 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <div className="w-8 h-12 sm:w-10 sm:h-14 bg-gradient-to-b from-amber-200 to-amber-400 rounded-sm relative">
-                    <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-600 rounded-full"></div>
-                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-amber-600"></div>
-                    <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-amber-600"></div>
-                  </div>
+            {/* Logo centered in the black bar */}
+            <div className="relative z-10">
+              <img 
+                src={require('../img/autobathCafe.PNG')} 
+                alt="AUTOBATH Cafe Logo" 
+                className="h-28 w-auto"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          </div>
+          
+          {/* Header Content below black bar */}
+          <div className="text-center mb-16">
+            {/* Beverages Title with Icon */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black">Beverages</h2>
+              <div className="w-12 h-16 sm:w-16 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-12 sm:w-10 sm:h-14 bg-gradient-to-b from-amber-200 to-amber-400 rounded-sm relative">
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-600 rounded-full"></div>
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-amber-600"></div>
+                  <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-amber-600"></div>
                 </div>
               </div>
-              
-              {/* Highlight Notice */}
-              <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-full text-sm font-bold border-2 border-yellow-300">
-                <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
-                Hot Snacks • Creamy Drinks • Fresh Juices Only
-              </div>
+            </div>
+            
+            {/* Highlight Notice */}
+            <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-full text-sm font-bold border-2 border-yellow-300">
+              <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
+              Hot Snacks • Creamy Drinks • Fresh Juices Only
             </div>
           </div>
 
