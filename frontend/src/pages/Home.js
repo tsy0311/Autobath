@@ -271,13 +271,9 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src={require('../img/g63.jpeg')}
+                  src={require('../img/g63.jpg')}
                   alt="AUTOBATH car detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    console.error('Error loading g63.jpeg:', e);
-                    e.target.src = require('../img/dashboard.jpg');
-                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
@@ -313,13 +309,9 @@ const Home = () => {
             >
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
-                  src={require('../img/shop.jpeg')}
+                  src={require('../img/shop.jpg')}
                   alt="AUTOBATH ceramic coating reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    console.error('Error loading shop.jpeg:', e);
-                    e.target.src = require('../img/dashboard.jpg');
-                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
