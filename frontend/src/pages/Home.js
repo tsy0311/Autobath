@@ -19,7 +19,10 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await api.get('/api/service-packages');
-      setPackages(response.data.packages || []);
+      console.log('Service packages response:', response.data);
+      const packages = response.data.packages || [];
+      console.log('Filtered packages (sedan/suv):', packages.filter(pkg => pkg.vehicle_type === 'sedan/suv'));
+      setPackages(packages);
     } catch (error) {
       console.error('Error fetching service packages:', error);
     } finally {
@@ -174,9 +177,9 @@ const Home = () => {
                         .map((pkg, index) => (
                 <div 
                   key={pkg.id} 
-                  className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary ${pkg.is_popular ? 'relative' : ''}`}
+                  className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary ${pkg.is_popular === 1 ? 'relative' : ''}`}
                 >
-                  {pkg.is_popular && (
+                  {pkg.is_popular === 1 && (
                     <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
                       Most Popular
                     </div>

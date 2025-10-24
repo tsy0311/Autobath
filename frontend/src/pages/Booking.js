@@ -565,12 +565,12 @@ const Booking = () => {
                               } else {
                                 // Map vehicle types for compatibility
                                 const vehicleTypeMap = {
-                                  'hatchback': 'sedan',
-                                  'sedan/suv': 'suv', 
-                                  'truck/mpv': 'truck'
+                                  'hatchback': ['hatchback'],
+                                  'sedan/suv': ['sedan', 'suv'], 
+                                  'truck/mpv': ['truck', 'mpv']
                                 };
-                                const mappedType = vehicleTypeMap[vehicleType] || vehicleType;
-                                return svc.vehicle_types && svc.vehicle_types.includes(mappedType);
+                                const mappedTypes = vehicleTypeMap[vehicleType] || [vehicleType];
+                                return svc.vehicle_types && mappedTypes.some(type => svc.vehicle_types.includes(type));
                               }
                             })
                             .length === 0 ? (
