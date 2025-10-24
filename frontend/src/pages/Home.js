@@ -358,7 +358,7 @@ const Home = () => {
         
         <div className="container relative z-10">
           {/* Horizontal Bar - 112px height matching logo */}
-          <div className="bg-amber-800 h-28 w-full mb-16 flex items-center justify-center">
+          <div className="h-28 w-full mb-16 flex items-center justify-center" style={{ backgroundColor: '#222222' }}>
             {/* Logo centered in the bar */}
             <img 
               src={require('../img/autobathCafe.PNG')} 
