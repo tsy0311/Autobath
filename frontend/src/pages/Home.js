@@ -274,18 +274,15 @@ const Home = () => {
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
             >
-              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                <img
-                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DP_DUZOD_Iy.jpg"
-                  alt="AUTOBATH car detailing reel"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = require('../img/placeholder.jpg');
-                  }}
-                />
+              <div className="relative w-full h-64 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="text-6xl mb-2">🎬</div>
+                  <div className="text-lg font-semibold">Car Detailing Reel</div>
+                  <div className="text-sm opacity-90">Click to watch</div>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
-                <div className="absolute top-3 right-3 text-white text-2xl">🎬</div>
+                <div className="absolute top-3 right-3 text-white text-2xl">📸</div>
               </div>
             </a>
 
@@ -296,15 +293,12 @@ const Home = () => {
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
             >
-              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                <img
-                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DP0RuDyktzy.jpg"
-                  alt="AUTOBATH premium detailing reel"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = require('../img/placeholder.jpg');
-                  }}
-                />
+              <div className="relative w-full h-64 bg-gradient-to-br from-green-500 to-blue-600 overflow-hidden flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="text-6xl mb-2">✨</div>
+                  <div className="text-lg font-semibold">Premium Detailing</div>
+                  <div className="text-sm opacity-90">Click to watch</div>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
                 <div className="absolute top-3 right-3 text-white text-2xl">✨</div>
@@ -318,15 +312,12 @@ const Home = () => {
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
             >
-              <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                <img
-                  src="https://scontent.cdninstagram.com/v/t51.2885-15/DQFJJMDk8u_.jpg"
-                  alt="AUTOBATH ceramic coating reel"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = require('../img/placeholder.jpg');
-                  }}
-                />
+              <div className="relative w-full h-64 bg-gradient-to-br from-orange-500 to-red-600 overflow-hidden flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="text-6xl mb-2">🚗</div>
+                  <div className="text-lg font-semibold">Ceramic Coating</div>
+                  <div className="text-sm opacity-90">Click to watch</div>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
                 <div className="absolute top-3 right-3 text-white text-2xl">🚗</div>
