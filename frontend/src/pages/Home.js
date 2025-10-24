@@ -357,27 +357,17 @@ const Home = () => {
         </div>
         
         <div className="container relative z-10">
-          {/* Black Horizontal Bar - 112px height matching logo */}
-          <div className="bg-black h-28 w-full mb-16 relative flex items-center justify-center">
-            {/* Racing Flag Pattern on Black Bar */}
-            <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
-              <div className="w-full h-full bg-white opacity-10" style={{
-                backgroundImage: `repeating-conic-gradient(#fff 0deg 90deg, #000 90deg 180deg)`,
-                backgroundSize: '20px 20px'
-              }}></div>
-            </div>
-            
-            {/* Logo centered in the black bar */}
-            <div className="relative z-10">
-              <img 
-                src={require('../img/autobathCafe.PNG')} 
-                alt="AUTOBATH Cafe Logo" 
-                className="h-28 w-auto"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
+          {/* Horizontal Bar - 112px height matching logo */}
+          <div className="bg-amber-800 h-28 w-full mb-16 flex items-center justify-center">
+            {/* Logo centered in the bar */}
+            <img 
+              src={require('../img/autobathCafe.PNG')} 
+              alt="AUTOBATH Cafe Logo" 
+              className="h-28 w-auto"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
           
           {/* Header Content below black bar */}
