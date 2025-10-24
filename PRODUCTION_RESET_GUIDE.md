@@ -36,6 +36,30 @@ If services and service packages are working but products are missing:
    node database/add-missing-products-to-live.js
    ```
 
+### Option 2b: Fix Image URLs (If products show but images don't display)
+If products are showing but images are not displaying:
+
+1. **Access your Render dashboard**
+2. **Go to your backend service** (autobath-api)
+3. **Open the shell/console**
+4. **Run the image URL fix script**:
+   ```bash
+   cd backend
+   node database/fix-live-image-urls.js
+   ```
+
+### Option 2c: Complete Fix (Add products + Fix images in one go)
+If you want to fix both products and images at once:
+
+1. **Access your Render dashboard**
+2. **Go to your backend service** (autobath-api)
+3. **Open the shell/console**
+4. **Run the complete fix script**:
+   ```bash
+   cd backend
+   node database/fix-live-products-and-images.js
+   ```
+
 ### Option 3: Manual Reset (If automatic doesn't work)
 If the production database still has old data, you need to manually reset it:
 
