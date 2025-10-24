@@ -348,14 +348,6 @@ const Home = () => {
 
       {/* AUTOBATH Cafe Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-white relative overflow-hidden">
-        {/* Racing Flag Pattern Background */}
-        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64">
-          <div className="w-full h-full bg-black opacity-5" style={{
-            backgroundImage: `repeating-conic-gradient(#000 0deg 90deg, #fff 90deg 180deg)`,
-            backgroundSize: '20px 20px'
-          }}></div>
-        </div>
-        
         <div className="container relative z-10">
           {/* Horizontal Bar - 112px height matching logo */}
           <div className="h-28 w-full mb-16 flex items-center justify-center" style={{ backgroundColor: '#222222' }}>
@@ -486,7 +478,7 @@ const Home = () => {
           <div className="mt-16 max-w-4xl mx-auto">
             <h3 className="text-3xl sm:text-4xl font-bold text-black mb-8 text-center">SNACKS</h3>
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex justify-between items-center py-3 px-4 bg-red-50 rounded-lg border-l-4 border-red-400">
                   <div>
                     <h4 className="text-lg font-bold text-black">CURLY FRIES</h4>
@@ -508,6 +500,13 @@ const Home = () => {
                   </div>
                   <span className="text-lg font-bold text-red-600">7.50</span>
                 </div>
+                <div className="flex justify-between items-center py-3 px-4 bg-pink-50 rounded-lg border-l-4 border-pink-400">
+                  <div>
+                    <h4 className="text-lg font-bold text-black">SNOW MOCHI 雪梅娘</h4>
+                    <p className="text-sm text-gray-600">4pcs per box</p>
+                  </div>
+                  <span className="text-lg font-bold text-pink-600">20.00</span>
+                </div>
               </div>
             </div>
           </div>
@@ -526,9 +525,9 @@ const Home = () => {
                 <div className="flex justify-center gap-4">
                   <a 
                     href="tel:+60123574548" 
-                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
+                    className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
                   >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                     </svg>
                     Call Now
