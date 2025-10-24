@@ -259,7 +259,6 @@ const Home = () => {
         <div className="container">
           <div className="section-title">
             <h2>{"Instagram Feeds"}</h2>
-            <p>{"Follow our latest work on Instagram @autobath_my"}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Instagram Reel 1 */}
@@ -277,7 +276,6 @@ const Home = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
-                <div className="absolute top-3 right-3 text-white text-2xl">🎬</div>
               </div>
             </a>
 
@@ -296,7 +294,6 @@ const Home = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
-                <div className="absolute top-3 right-3 text-white text-2xl">✨</div>
               </div>
             </a>
 
@@ -315,7 +312,6 @@ const Home = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
-                <div className="absolute top-3 right-3 text-white text-2xl">🚗</div>
               </div>
             </a>
           </div>
