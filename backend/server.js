@@ -30,6 +30,9 @@ const paymentRoutes = require('./routes/payments');
 const { initDatabase } = require('./database/init');
 const { verifyEmailTransport } = require('./services/emailService');
 
+// Import fix script
+const { exec } = require('child_process');
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 
@@ -208,6 +211,33 @@ app.post('/api/_email/test', async (req, res) => {
       hasCredentials: !!(process.env.EMAIL_USER && process.env.EMAIL_PASS)
     });
   }
+});
+
+// Admin endpoint to fix live website (add variants and multiple images)
+app.post('/api/admin/fix-live-website', (req, res) => {
+  console.log('🔧 Admin requested live website fix...');
+  
+  exec('node database/fix-live-website.js', { cwd: __dirname }, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error running fix script:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: error.message,
+        stderr: stderr
+      });
+    }
+    
+    console.log('Fix script output:', stdout);
+    if (stderr) {
+      console.error('Fix script stderr:', stderr);
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Live website fix completed successfully',
+      output: stdout
+    });
+  });
 });
 
 // Serve static files from React build in production
