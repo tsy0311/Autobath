@@ -427,49 +427,145 @@ const insertSampleServices = () => {
   return new Promise((resolve, reject) => {
     const services = [
       {
-        name: 'Basic Car Wash',
-        description: 'Exterior wash, wheel cleaning, and basic interior vacuum',
-        base_price: 25.00,
-        duration_minutes: 45,
-        category: 'Wash',
-        vehicle_types: JSON.stringify(['sedan', 'suv', 'truck']),
-        requirements: JSON.stringify(['Water access', 'Parking space'])
+        name: 'Engine Bay Wash & Protect',
+        description: 'Complete engine bay cleaning and protection',
+        base_price: 88.00,
+        duration_minutes: 60,
+        category: 'Add-on',
+        vehicle_types: JSON.stringify(['hatchback', 'sedan', 'suv', 'truck', 'mpv']),
+        requirements: JSON.stringify(['Water access', 'Ventilation'])
       },
       {
-        name: 'Premium Detailing',
-        description: 'Full exterior wash, wax, interior cleaning, and tire shine',
-        base_price: 85.00,
+        name: 'Interior Detailing & Protect (5-seater)',
+        description: 'Complete interior detailing and protection for 5-seater vehicles',
+        base_price: 280.00,
         duration_minutes: 120,
-        category: 'Detailing',
-        vehicle_types: JSON.stringify(['sedan', 'suv', 'truck']),
-        requirements: JSON.stringify(['Water access', 'Parking space', 'Shade preferred'])
+        category: 'Add-on',
+        vehicle_types: JSON.stringify(['hatchback', 'sedan', 'suv']),
+        requirements: JSON.stringify(['Water access', 'Ventilation'])
       },
       {
-        name: 'Ceramic Coating',
-        description: 'Professional ceramic coating application with paint correction',
-        base_price: 299.00,
-        duration_minutes: 360,
-        category: 'Protection',
-        vehicle_types: JSON.stringify(['sedan', 'suv', 'truck']),
+        name: 'Interior Detailing & Protect (7-seater)',
+        description: 'Complete interior detailing and protection for 7-seater vehicles',
+        base_price: 389.00,
+        duration_minutes: 150,
+        category: 'Add-on',
+        vehicle_types: JSON.stringify(['truck', 'mpv']),
+        requirements: JSON.stringify(['Water access', 'Ventilation'])
+      },
+      {
+        name: 'GYEON Coating - Hatchback',
+        description: 'Professional GYEON ceramic coating application for hatchback',
+        base_price: 1400.00,
+        duration_minutes: 480,
+        category: 'Coating',
+        vehicle_types: JSON.stringify(['hatchback']),
         requirements: JSON.stringify(['Indoor facility', '24-48 hours curing time'])
       },
       {
-        name: 'Paint Correction',
-        description: 'Multi-stage paint correction to remove swirls and scratches',
-        base_price: 199.00,
+        name: 'GYEON Coating - Sedan/SUV',
+        description: 'Professional GYEON ceramic coating application for sedan/SUV',
+        base_price: 1600.00,
+        duration_minutes: 540,
+        category: 'Coating',
+        vehicle_types: JSON.stringify(['sedan', 'suv']),
+        requirements: JSON.stringify(['Indoor facility', '24-48 hours curing time'])
+      },
+      {
+        name: 'GYEON Coating - MPV/Truck',
+        description: 'Professional GYEON ceramic coating application for MPV/Truck',
+        base_price: 1800.00,
+        duration_minutes: 600,
+        category: 'Coating',
+        vehicle_types: JSON.stringify(['truck', 'mpv']),
+        requirements: JSON.stringify(['Indoor facility', '24-48 hours curing time'])
+      },
+      {
+        name: 'Polish - Hatchback',
+        description: 'Professional paint correction and polish for hatchback',
+        base_price: 400.00,
         duration_minutes: 240,
-        category: 'Correction',
-        vehicle_types: JSON.stringify(['sedan', 'suv', 'truck']),
+        category: 'Polish',
+        vehicle_types: JSON.stringify(['hatchback']),
         requirements: JSON.stringify(['Indoor facility', 'Good lighting'])
       },
       {
-        name: 'Interior Deep Clean',
-        description: 'Complete interior cleaning including leather treatment and fabric protection',
+        name: 'Polish - Sedan/SUV',
+        description: 'Professional paint correction and polish for sedan/SUV',
+        base_price: 600.00,
+        duration_minutes: 270,
+        category: 'Polish',
+        vehicle_types: JSON.stringify(['sedan', 'suv']),
+        requirements: JSON.stringify(['Indoor facility', 'Good lighting'])
+      },
+      {
+        name: 'Polish - MPV/Truck',
+        description: 'Professional paint correction and polish for MPV/Truck',
+        base_price: 800.00,
+        duration_minutes: 360,
+        category: 'Polish',
+        vehicle_types: JSON.stringify(['truck', 'mpv']),
+        requirements: JSON.stringify(['Indoor facility', 'Good lighting'])
+      },
+      {
+        name: 'Basic Wash - Normal Bike',
+        description: 'Essential motorcycle wash with basic cleaning',
+        base_price: 35.00,
+        duration_minutes: 40,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'normal',
+        requirements: JSON.stringify(['Water access', 'Parking space'])
+      },
+      {
+        name: 'Basic Wash - Sportbike',
+        description: 'Essential sportbike wash with detailed cleaning',
+        base_price: 45.00,
+        duration_minutes: 70,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'sportbike',
+        requirements: JSON.stringify(['Water access', 'Parking space'])
+      },
+      {
+        name: 'Detailing + Wax - Normal Bike',
+        description: 'Complete motorcycle detailing with wax protection',
+        base_price: 55.00,
+        duration_minutes: 50,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'normal',
+        requirements: JSON.stringify(['Water access', 'Parking space', 'Shade preferred'])
+      },
+      {
+        name: 'Detailing + Wax - Sportbike',
+        description: 'Complete sportbike detailing with premium wax protection',
         base_price: 75.00,
-        duration_minutes: 90,
-        category: 'Interior',
-        vehicle_types: JSON.stringify(['sedan', 'suv', 'truck']),
-        requirements: JSON.stringify(['Water access', 'Ventilation'])
+        duration_minutes: 120,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'sportbike',
+        requirements: JSON.stringify(['Water access', 'Parking space', 'Shade preferred'])
+      },
+      {
+        name: 'Polish - Normal Bike',
+        description: 'Professional motorcycle polish service',
+        base_price: 120.00,
+        duration_minutes: 120,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'normal',
+        requirements: JSON.stringify(['Indoor facility', 'Good lighting'])
+      },
+      {
+        name: 'Polish - Sportbike',
+        description: 'Professional sportbike polish service',
+        base_price: 150.00,
+        duration_minutes: 150,
+        category: 'Motorcycle',
+        vehicle_types: JSON.stringify([]),
+        bike_type: 'sportbike',
+        requirements: JSON.stringify(['Indoor facility', 'Good lighting'])
       }
     ];
 
@@ -514,40 +610,99 @@ const insertSampleServicePackages = () => {
 
       const packages = [
         {
-          name: 'Basic',
+          name: 'Basic Wash - Hatchback',
           description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
-          base_price: 45.00,
-          duration_minutes: 75,
-          services: JSON.stringify([1, 5]), // Basic Car Wash + Interior Deep Clean
-          discount_percentage: 10.00
+          base_price: 78.00,
+          duration_minutes: 90,
+          vehicle_type: 'hatchback',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
         },
         {
-          name: 'Premium',
-          description: 'Comprehensive detailing with paint protection - Our most popular choice',
+          name: 'Basic Wash - Sedan/SUV',
+          description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
+          base_price: 88.00,
+          duration_minutes: 120,
+          vehicle_type: 'sedan/suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Basic Wash - Truck/MPV',
+          description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
+          base_price: 108.00,
+          duration_minutes: 150,
+          vehicle_type: 'truck/mpv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Premium Wash - Hatchback',
+          description: 'Comprehensive detailing with premium products - Our most popular choice',
           base_price: 120.00,
-          duration_minutes: 180,
-          services: JSON.stringify([2, 5]), // Premium Detailing + Interior Deep Clean
-          discount_percentage: 15.00,
+          duration_minutes: 105,
+          vehicle_type: 'hatchback',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00,
           is_popular: 1
         },
         {
-          name: 'Ultra',
-          description: 'Ultimate protection with ceramic coating and paint correction - The complete package',
-          base_price: 450.00,
-          duration_minutes: 480,
-          services: JSON.stringify([3, 4, 5]), // Ceramic Coating + Paint Correction + Interior Deep Clean
-          discount_percentage: 20.00
+          name: 'Premium Wash - Sedan/SUV',
+          description: 'Comprehensive detailing with premium products - Our most popular choice',
+          base_price: 150.00,
+          duration_minutes: 135,
+          vehicle_type: 'sedan/suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00,
+          is_popular: 1
+        },
+        {
+          name: 'Premium Wash - Truck/MPV',
+          description: 'Comprehensive detailing with premium products - Our most popular choice',
+          base_price: 190.00,
+          duration_minutes: 165,
+          vehicle_type: 'truck/mpv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00,
+          is_popular: 1
+        },
+        {
+          name: 'Ultra - Hatchback',
+          description: 'Complete transformation with ceramic coating - The complete package',
+          base_price: 190.00,
+          duration_minutes: 135,
+          vehicle_type: 'hatchback',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Ultra - Sedan/SUV',
+          description: 'Complete transformation with ceramic coating - The complete package',
+          base_price: 230.00,
+          duration_minutes: 165,
+          vehicle_type: 'sedan/suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Ultra - Truck/MPV',
+          description: 'Complete transformation with ceramic coating - The complete package',
+          base_price: 260.00,
+          duration_minutes: 195,
+          vehicle_type: 'truck/mpv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
         }
       ];
 
       const stmt = db.prepare(`
-        INSERT INTO service_packages (name, description, base_price, duration_minutes, services, discount_percentage, is_popular)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO service_packages (name, description, base_price, duration_minutes, vehicle_type, services, discount_percentage, is_popular)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       packages.forEach(pkg => {
         stmt.run(pkg.name, pkg.description, pkg.base_price, pkg.duration_minutes, 
-                 pkg.services, pkg.discount_percentage, pkg.is_popular);
+                 pkg.vehicle_type, pkg.services, pkg.discount_percentage, pkg.is_popular);
       });
 
       stmt.finalize((err) => {
