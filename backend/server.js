@@ -213,11 +213,11 @@ app.post('/api/_email/test', async (req, res) => {
   }
 });
 
-// Admin endpoint to fix live website (add variants and multiple images)
+// Admin endpoint to fix live website (complete sync with localhost data)
 app.post('/api/admin/fix-live-website', (req, res) => {
-  console.log('🔧 Admin requested live website sync...');
+  console.log('🔧 Admin requested complete live website sync...');
   
-  exec('node database/sync-live-with-localhost.js', { cwd: __dirname }, (error, stdout, stderr) => {
+  exec('node database/sync-live-with-localhost-complete.js', { cwd: __dirname }, (error, stdout, stderr) => {
     if (error) {
       console.error('Error running fix script:', error);
       return res.status(500).json({ 
@@ -234,7 +234,7 @@ app.post('/api/admin/fix-live-website', (req, res) => {
     
     res.json({ 
       success: true, 
-      message: 'Live website fix completed successfully',
+      message: 'Complete live website sync completed successfully',
       output: stdout
     });
   });
