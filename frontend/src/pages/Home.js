@@ -347,181 +347,182 @@ const Home = () => {
       </section>
 
       {/* AUTOBATH Cafe Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="container">
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
+      <section className="py-12 sm:py-16 md:py-20 bg-white relative overflow-hidden">
+        {/* Racing Flag Pattern Background */}
+        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64">
+          <div className="w-full h-full bg-black opacity-5" style={{
+            backgroundImage: `repeating-conic-gradient(#000 0deg 90deg, #fff 90deg 180deg)`,
+            backgroundSize: '20px 20px'
+          }}></div>
+        </div>
+        
+        <div className="container relative z-10">
+          {/* Header with Logo and Title */}
+          <div className="text-center mb-16">
+            <div className="flex justify-center mb-8">
               <img 
                 src={require('../img/autobathCafe.PNG')} 
                 alt="AUTOBATH Cafe Logo" 
-                className="h-16 sm:h-20 md:h-24 w-auto"
+                className="h-20 sm:h-24 md:h-28 w-auto"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              AUTOBATH CAFE
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600 mb-2">
-              Hot Snacks • Creamy Drinks • Fresh Juices
-            </p>
-            <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
-              <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
-              Beverages & Light Snacks Only
+            
+            {/* Beverages Title with Icon */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black">Beverages</h2>
+              <div className="w-12 h-16 sm:w-16 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-12 sm:w-10 sm:h-14 bg-gradient-to-b from-amber-200 to-amber-400 rounded-sm relative">
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-600 rounded-full"></div>
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-amber-600"></div>
+                  <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-amber-600"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Highlight Notice */}
+            <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-6 py-3 rounded-full text-sm font-bold border-2 border-yellow-300">
+              <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
+              Hot Snacks • Creamy Drinks • Fresh Juices Only
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Menu Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Fresh Series */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-orange-100">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🍊</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">FRESH SERIES</h3>
-                <p className="text-gray-600">Refreshing Juices & Teas</p>
-              </div>
+            <div className="space-y-6">
+              <h3 className="text-3xl sm:text-4xl font-bold text-black mb-8 text-center">FRESH SERIES</h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">SUNSET GLOW</h4>
+                    <h4 className="text-lg font-bold text-black">SUNSET GLOW</h4>
                     <p className="text-sm text-gray-600">Orange Juice</p>
                   </div>
-                  <span className="font-bold text-orange-600">RM 10.90</span>
+                  <span className="text-lg font-bold text-orange-600">10.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">MANGO STORM</h4>
+                    <h4 className="text-lg font-bold text-black">MANGO STORM</h4>
                     <p className="text-sm text-gray-600">Mango Juice</p>
                   </div>
-                  <span className="font-bold text-orange-600">RM 10.90</span>
+                  <span className="text-lg font-bold text-orange-600">10.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">RED RUSH</h4>
+                    <h4 className="text-lg font-bold text-black">RED RUSH</h4>
                     <p className="text-sm text-gray-600">Watermelon Juice</p>
                   </div>
-                  <span className="font-bold text-orange-600">RM 10.90</span>
+                  <span className="text-lg font-bold text-orange-600">10.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">LEMON SPARK</h4>
+                    <h4 className="text-lg font-bold text-black">LEMON SPARK</h4>
                     <p className="text-sm text-gray-600">Lemon Black Tea</p>
                   </div>
-                  <span className="font-bold text-orange-600">RM 7.90</span>
+                  <span className="text-lg font-bold text-orange-600">7.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
+                <div className="flex justify-between items-center py-3 px-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">GOLDEN PASSION</h4>
+                    <h4 className="text-lg font-bold text-black">GOLDEN PASSION</h4>
                     <p className="text-sm text-gray-600">Passion Fruit Tea</p>
                   </div>
-                  <span className="font-bold text-orange-600">RM 7.90</span>
+                  <span className="text-lg font-bold text-orange-600">7.90</span>
                 </div>
               </div>
             </div>
 
             {/* Creamy Series */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-amber-100">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🥤</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">CREAMY SERIES</h3>
-                <p className="text-gray-600">Milk Teas & Creamy Drinks</p>
-              </div>
+            <div className="space-y-6">
+              <h3 className="text-3xl sm:text-4xl font-bold text-black mb-8 text-center">CREAMY SERIES</h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">ORIGINAL THAI</h4>
+                    <h4 className="text-lg font-bold text-black">ORIGINAL THAI</h4>
                     <p className="text-sm text-gray-600">Thai Milk Tea</p>
                   </div>
-                  <span className="font-bold text-amber-600">RM 8.90</span>
+                  <span className="text-lg font-bold text-amber-600">8.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">CREAMY OOLONG</h4>
+                    <h4 className="text-lg font-bold text-black">CREAMY OOLONG</h4>
                     <p className="text-sm text-gray-600">Oolong Milk Tea</p>
                   </div>
-                  <span className="font-bold text-amber-600">RM 8.90</span>
+                  <span className="text-lg font-bold text-amber-600">8.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">THAI GREEN</h4>
+                    <h4 className="text-lg font-bold text-black">THAI GREEN</h4>
                     <p className="text-sm text-gray-600">Thai Green Milk Tea</p>
                   </div>
-                  <span className="font-bold text-amber-600">RM 8.90</span>
+                  <span className="text-lg font-bold text-amber-600">8.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">HONEY WHISPER</h4>
+                    <h4 className="text-lg font-bold text-black">HONEY WHISPER BLACK TEA</h4>
                     <p className="text-sm text-gray-600">Honey Black Tea</p>
                   </div>
-                  <span className="font-bold text-amber-600">RM 6.90</span>
+                  <span className="text-lg font-bold text-amber-600">6.90</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
+                <div className="flex justify-between items-center py-3 px-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
                   <div>
-                    <h4 className="font-bold text-gray-800">MILO BLAST</h4>
+                    <h4 className="text-lg font-bold text-black">MILO BLAST</h4>
                     <p className="text-sm text-gray-600">MILO FRESH MILK</p>
                   </div>
-                  <span className="font-bold text-amber-600">RM 6.90</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Snacks */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-red-100">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🍟</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">SNACKS</h3>
-                <p className="text-gray-600">Hot & Crispy Snacks</p>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <div>
-                    <h4 className="font-bold text-gray-800">CURLY FRIES</h4>
-                    <p className="text-sm text-gray-600">Crispy & Golden</p>
-                  </div>
-                  <span className="font-bold text-red-600">RM 5.50</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <div>
-                    <h4 className="font-bold text-gray-800">NUGGETS</h4>
-                    <p className="text-sm text-gray-600">Tender & Juicy</p>
-                  </div>
-                  <span className="font-bold text-red-600">RM 6.50</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div>
-                    <h4 className="font-bold text-gray-800">POPCORN CHICKEN</h4>
-                    <p className="text-sm text-gray-600">Spicy & Crunchy</p>
-                  </div>
-                  <span className="font-bold text-red-600">RM 7.50</span>
+                  <span className="text-lg font-bold text-amber-600">6.90</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="text-center mt-12">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">📍 Visit Our Cafe</h3>
-              <p className="text-gray-600 mb-4">
+          {/* Snacks Section */}
+          <div className="mt-16 max-w-4xl mx-auto">
+            <h3 className="text-3xl sm:text-4xl font-bold text-black mb-8 text-center">SNACKS</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex justify-between items-center py-3 px-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                <div>
+                  <h4 className="text-lg font-bold text-black">CURLY FRIES</h4>
+                  <p className="text-sm text-gray-600">Crispy & Golden</p>
+                </div>
+                <span className="text-lg font-bold text-red-600">5.50</span>
+              </div>
+              <div className="flex justify-between items-center py-3 px-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                <div>
+                  <h4 className="text-lg font-bold text-black">NUGGETS</h4>
+                  <p className="text-sm text-gray-600">Tender & Juicy</p>
+                </div>
+                <span className="text-lg font-bold text-red-600">6.50</span>
+              </div>
+              <div className="flex justify-between items-center py-3 px-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                <div>
+                  <h4 className="text-lg font-bold text-black">POPCORN CHICKEN</h4>
+                  <p className="text-sm text-gray-600">Spicy & Crunchy</p>
+                </div>
+                <span className="text-lg font-bold text-red-600">7.50</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Info */}
+          <div className="text-center mt-16">
+            <div className="bg-gray-50 rounded-2xl p-8 max-w-3xl mx-auto border-2 border-gray-200">
+              <h3 className="text-2xl font-bold text-black mb-4">📍 Visit AUTOBATH Cafe</h3>
+              <p className="text-gray-700 mb-6 text-lg">
                 Located within AUTOBATH car detailing shop - enjoy fresh beverages and light snacks while waiting for your car service!
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span>Open Daily</span>
+              <div className="flex flex-wrap justify-center gap-6 text-sm">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span className="font-semibold">Open Daily</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                  <span>Fresh Made</span>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                  <span className="font-semibold">Fresh Made</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                  <span>Light Snacks Only</span>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                  <span className="font-semibold">Light Snacks Only</span>
                 </div>
               </div>
             </div>
