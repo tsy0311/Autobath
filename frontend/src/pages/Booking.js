@@ -241,7 +241,8 @@ const Booking = () => {
     const multipliers = {
       'hatchback': 1.0,
       'sedan/suv': 1.0,
-      'truck/mpv': 1.2
+      'truck/mpv': 1.2,
+      'motorcycle': 0.5 // Motorcycles typically cost less
     };
     
     // Special pricing for specific services based on official menu
@@ -249,7 +250,8 @@ const Booking = () => {
       const prices = {
         'hatchback': 78,
         'sedan/suv': 88,
-        'truck/mpv': 108
+        'truck/mpv': 108,
+        'motorcycle': 45
       };
       return prices[vehicleType] || basePrice;
     }
@@ -258,7 +260,8 @@ const Booking = () => {
       const prices = {
         'hatchback': 120,
         'sedan/suv': 150,
-        'truck/mpv': 190
+        'truck/mpv': 190,
+        'motorcycle': 75
       };
       return prices[vehicleType] || basePrice;
     }
@@ -267,7 +270,8 @@ const Booking = () => {
       const prices = {
         'hatchback': 190,
         'sedan/suv': 230,
-        'truck/mpv': 260
+        'truck/mpv': 260,
+        'motorcycle': 115
       };
       return prices[vehicleType] || basePrice;
     }
@@ -558,7 +562,7 @@ const Booking = () => {
                       {serviceType === 'package' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {packages
-                            .filter(pkg => pkg.vehicle_type === 'sedan/suv')
+                            .filter(pkg => pkg.vehicle_type === vehicleType)
                             .sort((a, b) => {
                               // Sort: Basic (left), Premium (middle), Ultra (right)
                               const order = { 'Basic': 1, 'Premium': 2, 'Ultra': 3 };
