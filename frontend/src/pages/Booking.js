@@ -394,6 +394,64 @@ const Booking = () => {
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-primary mb-6">Select Your Service</h3>
                   
+                  {/* Vehicle Type Selection */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Vehicle Type</label>
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <button
+                        type="button"
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'hatchback' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={() => { 
+                          setVehicleType('hatchback'); 
+                          setSelectedService(null); 
+                          setSelectedPackage(null);
+                        }}
+                      >
+                        Hatchback
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'sedan/suv' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={() => { 
+                          setVehicleType('sedan/suv'); 
+                          setSelectedService(null); 
+                          setSelectedPackage(null);
+                        }}
+                      >
+                        Sedan/SUV
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'truck/mpv' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={() => { 
+                          setVehicleType('truck/mpv'); 
+                          setSelectedService(null); 
+                          setSelectedPackage(null);
+                        }}
+                      >
+                        Truck/MPV
+                      </button>
+                      <button
+                        type="button"
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                          vehicleType === 'motorcycle' ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                        onClick={() => { 
+                          setVehicleType('motorcycle'); 
+                          setSelectedService(null); 
+                          setSelectedPackage(null);
+                        }}
+                      >
+                        Motorcycle
+                      </button>
+                    </div>
+                  </div>
 
                   {vehicleType === 'motorcycle' ? (
                     <>
