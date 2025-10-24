@@ -349,13 +349,13 @@ const Home = () => {
       {/* AUTOBATH Cafe Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-white relative overflow-hidden">
         <div className="container relative z-10">
-          {/* Horizontal Bar - 112px height matching logo */}
-          <div className="h-28 w-full mb-16 flex items-center justify-center" style={{ backgroundColor: '#222222' }}>
+          {/* Horizontal Bar - 224px height matching logo */}
+          <div className="h-56 w-full mb-16 flex items-center justify-center" style={{ backgroundColor: '#222222' }}>
             {/* Logo centered in the bar */}
             <img 
               src={require('../img/autobathCafe.PNG')} 
               alt="AUTOBATH Cafe Logo" 
-              className="h-28 w-auto"
+              className="h-56 w-auto"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
@@ -367,13 +367,6 @@ const Home = () => {
             {/* Beverages Title with Icon */}
             <div className="flex items-center justify-center gap-4 mb-6">
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black">Beverages</h2>
-              <div className="w-12 h-16 sm:w-16 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                <div className="w-8 h-12 sm:w-10 sm:h-14 bg-gradient-to-b from-amber-200 to-amber-400 rounded-sm relative">
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-amber-600 rounded-full"></div>
-                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-amber-600"></div>
-                  <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0.5 h-2 bg-amber-600"></div>
-                </div>
-              </div>
             </div>
             
             {/* Highlight Notice */}
@@ -481,7 +474,7 @@ const Home = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex justify-between items-center py-3 px-4 bg-red-50 rounded-lg border-l-4 border-red-400">
                   <div>
-                    <h4 className="text-lg font-bold text-black">CURLY FRIES</h4>
+                    <h4 className="text-lg font-bold text-black">FRIES</h4>
                     <p className="text-sm text-gray-600">Crispy & Golden</p>
                   </div>
                   <span className="text-lg font-bold text-red-600">5.50</span>
