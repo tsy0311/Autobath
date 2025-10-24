@@ -30,13 +30,20 @@ If the production database still has old data, you need to manually reset it:
 1. **Access your Render dashboard**
 2. **Go to your backend service** (autobath-api)
 3. **Open the shell/console**
-4. **Run the reset script**:
+4. **Run the force reset script**:
    ```bash
    cd backend
-   node database/reset-production-db.js
+   node database/force-reset-production.js
    ```
 
-### Option 3: Force Database Recreation
+### Option 3: Alternative Reset (If force reset doesn't work)
+If the above doesn't work, try the regular reset:
+```bash
+cd backend
+node database/reset-production-db.js
+```
+
+### Option 4: Force Database Recreation
 If the above doesn't work, delete the database file and let it recreate:
 1. **Delete** `database.sqlite` from production
 2. **Restart** the backend service
