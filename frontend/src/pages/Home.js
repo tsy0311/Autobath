@@ -267,9 +267,9 @@ const Home = () => {
             <p>{"Follow our latest work on Instagram @autobath_my"}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Instagram Post 1 */}
+            {/* Instagram Reel 1 */}
             <a
-              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              href="https://www.instagram.com/reel/DP_DUZOD_Iy/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
@@ -277,21 +277,21 @@ const Home = () => {
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
-                  alt="AUTOBATH car detailing work"
+                  alt="AUTOBATH car detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     e.target.src = require('../img/placeholder.jpg');
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
-                <div className="absolute top-3 right-3 text-white text-2xl">📸</div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
+                <div className="absolute top-3 right-3 text-white text-2xl">🎬</div>
               </div>
             </a>
 
-            {/* Instagram Post 2 */}
+            {/* Instagram Reel 2 */}
             <a
-              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              href="https://www.instagram.com/reel/DP0RuDyktzy/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
@@ -299,21 +299,21 @@ const Home = () => {
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1563720228757-4b4a4a4a4a4a?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
-                  alt="AUTOBATH premium detailing"
+                  alt="AUTOBATH premium detailing reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     e.target.src = require('../img/placeholder.jpg');
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
                 <div className="absolute top-3 right-3 text-white text-2xl">✨</div>
               </div>
             </a>
 
-            {/* Instagram Post 3 */}
+            {/* Instagram Reel 3 */}
             <a
-              href="https://www.instagram.com/p/C8XxYxYxYxY/"
+              href="https://www.instagram.com/reel/DQFJJMDk8u_/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary"
@@ -321,14 +321,14 @@ const Home = () => {
               <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3"
-                  alt="AUTOBATH ceramic coating"
+                  alt="AUTOBATH ceramic coating reel"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     e.target.src = require('../img/placeholder.jpg');
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">View on Instagram</div>
+                <div className="absolute bottom-3 left-3 text-white text-sm font-semibold bg-black/50 rounded-full px-3 py-1">Watch Reel</div>
                 <div className="absolute top-3 right-3 text-white text-2xl">🚗</div>
               </div>
             </a>
