@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaMapMarkerAlt, FaEnvelope, FaClock, FaInstagram, FaWhatsapp } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEnvelope, FaClock, FaInstagram, FaWhatsapp, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
@@ -101,7 +101,10 @@ const Contact = () => {
                   WhatsApp Us
                 </a>
               </p>
-              <p><FaClock /> {"Mon-Sat: 9AM-6PM"}</p>
+              <p><FaClock /> {"Fri-Sun: 9AM-6PM"}</p>
+              <p className="text-sm text-gray-600 mt-2">
+                <FaCalendarAlt /> {"Also open on public holidays"}
+              </p>
             </div>
             <div className="social-icons">
               <a 

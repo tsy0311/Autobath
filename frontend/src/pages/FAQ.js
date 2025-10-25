@@ -7,6 +7,27 @@ const FAQ = () => {
 
   const faqData = [
     {
+      category: 'Operating Hours & Availability',
+      questions: [
+        {
+          q: 'What are your operating hours?',
+          a: 'We operate Friday, Saturday, and Sunday from 9:00 AM to 6:00 PM. We are also open on public holidays during the same hours.'
+        },
+        {
+          q: 'Are you open on public holidays?',
+          a: 'Yes! We are open on public holidays during our regular operating hours (Friday-Sunday, 9:00 AM - 6:00 PM). This includes all Malaysian public holidays.'
+        },
+        {
+          q: 'Why are you only open on weekends?',
+          a: 'We focus on providing quality service during weekends when most customers are available. This allows us to dedicate full attention to each customer and maintain our high service standards.'
+        },
+        {
+          q: 'Can I book for weekdays?',
+          a: 'Currently, we only operate on Fridays, Saturdays, and Sundays. However, you can book online anytime through our website or WhatsApp, and we\'ll schedule your appointment for the next available weekend slot.'
+        }
+      ]
+    },
+    {
       category: 'Booking & Appointments',
       questions: [
         {

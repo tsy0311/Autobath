@@ -499,9 +499,20 @@ const Home = () => {
           <div className="text-center mt-16">
             <div className="bg-white rounded-2xl p-8 max-w-3xl mx-auto border-2 border-gray-200">
               <h3 className="text-2xl font-bold text-black mb-4">📍 Visit AUTOBATH Cafe</h3>
-              <p className="text-gray-700 mb-6 text-lg">
+              <p className="text-gray-700 mb-4 text-lg">
                 Located within AUTOBATH car detailing shop - enjoy fresh beverages and light snacks while waiting for your car service!
               </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-gray-800 font-semibold mb-2">
+                  🕒 Operating Hours
+                </p>
+                <p className="text-gray-700">
+                  <strong>Friday - Sunday:</strong> 9:00 AM - 6:00 PM
+                </p>
+                <p className="text-gray-600 text-sm mt-1">
+                  📅 Also open on public holidays
+                </p>
+              </div>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
                 <p className="text-gray-800 font-semibold mb-3">
                   📞 Call <span className="text-primary font-bold">+6012-3574548</span> for pre-order

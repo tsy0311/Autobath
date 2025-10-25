@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaMapMarkerAlt, FaEnvelope,FaInstagram,FaWhatsapp } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEnvelope, FaInstagram, FaWhatsapp, FaClock, FaCalendarAlt } from 'react-icons/fa';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -94,6 +94,14 @@ const Footer = () => {
                 <FaWhatsapp className="text-green-400 group-hover:scale-110 transition-transform text-xl" />
                 <span className="group-hover:underline">{"WhatsApp Us"}</span>
               </a>
+              <div className="text-gray-300 flex items-center gap-2 mt-3">
+                <FaClock className="text-secondary" />
+                <span>{"Fri-Sun: 9AM-6PM"}</span>
+              </div>
+              <div className="text-gray-300 flex items-center gap-2 text-sm">
+                <FaCalendarAlt className="text-secondary" />
+                <span>{"Also open on public holidays"}</span>
+              </div>
             </div>
           </div>
           
