@@ -131,3 +131,4 @@ After running the update script, verify on the live website:
 - `backend/database/update-live-images.js` - Production update script
 - `backend/package.json` - Added `update:images` command
 - `backend/database/update-images-to-local.js` - Local development script
+
