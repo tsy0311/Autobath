@@ -1,8 +1,17 @@
 # Render Commands - Quick Reference
 
-## 🚀 **Complete Update (Images + Variants)**
+## 🚀 **Complete Update (All Improvements)**
 
 Run this command in Render shell to update everything:
+
+```bash
+cd backend
+npm run update:all
+```
+
+## 📸 **Images + Variants Only**
+
+If you only want to update images and variants:
 
 ```bash
 cd backend
@@ -42,7 +51,11 @@ sqlite3 database.sqlite "SELECT p.name, COUNT(pc.id) as variants FROM products p
 
 - **62 images** stored in database
 - **15 variants** across 7 products
-- **37 products** with proper data
+- **37 products** with detailed descriptions
+- **Professional-grade product information**
+- **Fixed buy now button functionality**
+- **Brand and category display**
+- **New high-resolution home page image**
 
 ### Products with Multiple Images:
 - Metal Sprayer: 2 images

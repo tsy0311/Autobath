@@ -53,7 +53,7 @@ const FAQ = () => {
       questions: [
         {
           q: 'What payment methods do you accept?',
-          a: 'We accept Credit/Debit Cards (via Stripe), Touch \'n Go eWallet, Bank Transfer, and Cash on completion. All major cards are accepted.'
+          a: 'We accept Touch \'n Go eWallet and Cash on completion.'
         },
         {
           q: 'When do I need to pay?',
