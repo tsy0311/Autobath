@@ -152,7 +152,7 @@ const productImageMappings = {
   ],
   36: [ // Windstorm Vacuum-20L
     { filename: 'ws20.jpg', is_primary: 1, sort_order: 0 }
-  },
+  ],
   37: [ // Windstorm Vacuum-30L
     { filename: 'ws30.jpg', is_primary: 1, sort_order: 0 }
   ]
