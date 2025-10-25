@@ -15,6 +15,7 @@
     "create:admin": "node database/add-admin-users.js",
     "update:images": "node database/update-live-images.js",
     "update:complete": "node database/update-live-complete.js",
+    "update:descriptions": "node database/update-product-descriptions.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {

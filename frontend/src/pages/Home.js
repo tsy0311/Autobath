@@ -56,8 +56,8 @@ const Home = () => {
       <section className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex flex-col items-center justify-center text-white text-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={require('../img/dashboard.jpg')} 
-            alt="Professional car detailing"
+            src={require('../img/professional-car-detailing.jpg')} 
+            alt="Professional car detailing service"
             loading="eager"
             className="w-full h-full object-cover"
             onError={(e) => {

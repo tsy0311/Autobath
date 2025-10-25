@@ -58,6 +58,27 @@ const ProductDetail = () => {
     toast.success(`${product.name} added to cart!`);
   };
 
+  const handleBuyNow = () => {
+    if (!product) return;
+
+    // Add to cart first
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: getFinalPrice(),
+      image: getCurrentImage(),
+      color: selectedColor ? selectedColor.color_name : null,
+      colorId: selectedColor ? selectedColor.id : null,
+      quantity: quantity
+    };
+
+    addToCart(cartItem);
+    
+    // Navigate to cart page
+    navigate('/cart');
+    toast.success(`${product.name} added to cart! Redirecting to checkout...`);
+  };
+
   const getCurrentImage = () => {
     if (product.images && product.images.length > 0) {
       return getImageUrl(product.images[selectedImage]?.image_url || product.image_url);
@@ -286,7 +307,10 @@ const ProductDetail = () => {
                 <FaShoppingCart />
                 Add to Cart
               </button>
-              <button className="px-6 py-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white rounded-xl font-bold transition-colors">
+              <button 
+                onClick={handleBuyNow}
+                className="px-6 py-4 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white rounded-xl font-bold transition-colors"
+              >
                 Buy Now
               </button>
             </div>

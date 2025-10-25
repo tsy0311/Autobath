@@ -281,9 +281,14 @@ const Products = () => {
                   </div>
                   <p className="text-gray-600 mb-4 leading-relaxed line-clamp-2">{product.description}</p>
                   <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
-                    <span className="inline-flex items-center gap-1 bg-secondary/10 text-secondary px-3 py-1 rounded-full">
-                      <FaTags /> {product.brand || 'Unbranded'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 bg-secondary/10 text-secondary px-3 py-1 rounded-full">
+                        <FaTags /> {product.brand || 'Unbranded'}
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                        {product.category || 'General'}
+                      </span>
+                    </div>
                     <span>Stock: {product.stock}</span>
                   </div>
                   <div className="text-sm text-gray-500 mb-4">Sold: {product.sold ?? 0}</div>
