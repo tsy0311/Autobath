@@ -348,8 +348,39 @@ db.serialize(() => {
 
   updateDescriptionStmt.finalize();
 
-  // 6. Update main product image_url fields
-  console.log('\n🔄 Step 6: Updating main product image URLs...');
+  // 6. Update product brands
+  console.log('\n🏷️ Step 6: Updating product brands...');
+  const brandAssignments = {
+    1: 'An-Riddle', 2: 'An-Riddle', 3: 'An-Riddle', 4: 'An-Riddle', 5: 'An-Riddle',
+    6: 'An-Riddle', 7: 'An-Riddle', 8: 'An-Riddle', 9: 'An-Riddle', 10: 'An-Riddle',
+    11: 'An-Riddle', 12: 'An-Riddle', 13: 'An-Riddle', 14: 'An-Riddle', 15: 'An-Riddle',
+    16: 'An-Riddle', 17: 'Benzhi', 18: 'Benzhi', 19: 'Lutian', 20: 'Lutian',
+    21: 'An-Riddle', 22: 'An-Riddle', 23: 'An-Riddle', 24: 'Lutian', 25: 'Lutian',
+    26: 'Lutian', 27: 'Lutian', 28: 'An-Riddle', 29: 'An-Riddle', 30: 'An-Riddle',
+    31: 'An-Riddle', 32: 'Lutian', 33: 'An-Riddle', 34: 'An-Riddle', 35: 'Other',
+    36: 'Other', 37: 'Other'
+  };
+
+  const updateBrandStmt = db.prepare(`
+    UPDATE products SET brand = ? WHERE id = ?
+  `);
+
+  let totalBrands = 0;
+  Object.entries(brandAssignments).forEach(([productId, brand]) => {
+    updateBrandStmt.run(brand, parseInt(productId), (err) => {
+      if (err) {
+        console.error(`❌ Error updating brand for product ${productId}:`, err);
+      } else {
+        totalBrands++;
+        console.log(`✅ Updated product ${productId} with brand: ${brand}`);
+      }
+    });
+  });
+
+  updateBrandStmt.finalize();
+
+  // 7. Update main product image_url fields
+  console.log('\n🔄 Step 7: Updating main product image URLs...');
   Object.entries(productImageMappings).forEach(([productId, images]) => {
     const primaryImage = images.find(img => img.is_primary === 1);
     if (primaryImage) {
@@ -378,6 +409,7 @@ db.serialize(() => {
       console.log(`   • ${totalImages} images updated`);
       console.log(`   • ${totalVariants} variants updated`);
       console.log(`   • ${totalDescriptions} descriptions updated`);
+      console.log(`   • ${totalBrands} brands updated`);
       console.log(`   • 37 products processed`);
       console.log(`\n🌐 Live website now includes:`);
       console.log(`   • Multiple images per product with proper sorting`);
@@ -386,6 +418,8 @@ db.serialize(() => {
       console.log(`   • Professional-grade product information`);
       console.log(`   • Fixed buy now button functionality`);
       console.log(`   • Brand and category display on product pages`);
+      console.log(`   • Brand filtering (An-Riddle, Lutian, Benzhi, Other)`);
+      console.log(`   • Category filtering (Tools, Towels, Storage, etc.)`);
       console.log(`   • New high-resolution home page image`);
       console.log(`\n🔗 Test at: https://autobath.co/products`);
     }

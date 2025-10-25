@@ -12,6 +12,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [brands, setBrands] = useState(['All']);
+  const [categories, setCategories] = useState(['All']);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const { addToCart } = useCart();
@@ -21,20 +22,24 @@ const Products = () => {
   // Initialize state from URL parameters
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'All');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
 
   const ProductIcon = FaPumpSoap;
 
   useEffect(() => {
     fetchProducts();
     fetchBrands();
+    fetchCategories();
   }, []);
 
   // Sync state with URL parameters on page load/back navigation
   useEffect(() => {
     const search = searchParams.get('search') || '';
     const brand = searchParams.get('brand') || 'All';
+    const category = searchParams.get('category') || 'All';
     setSearchQuery(search);
     setSelectedBrand(brand);
+    setSelectedCategory(category);
   }, [searchParams]);
 
   const fetchProducts = async () => {
@@ -59,14 +64,27 @@ const Products = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/api/products');
+      const uniqueCategories = [...new Set(response.data.products.map(p => p.category).filter(Boolean))];
+      setCategories(['All', ...uniqueCategories.sort()]);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
+
   // Update URL when search parameters change
-  const updateSearchParams = (search, brand) => {
+  const updateSearchParams = (search, brand, category) => {
     const params = new URLSearchParams();
     if (search && search.trim()) {
       params.set('search', search.trim());
     }
     if (brand && brand !== 'All') {
       params.set('brand', brand);
+    }
+    if (category && category !== 'All') {
+      params.set('category', category);
     }
     setSearchParams(params);
   };
@@ -79,22 +97,29 @@ const Products = () => {
   // Debounce URL update for search query
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      updateSearchParams(searchQuery, selectedBrand);
+      updateSearchParams(searchQuery, selectedBrand, selectedCategory);
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedBrand]);
+  }, [searchQuery, selectedBrand, selectedCategory]);
 
   // Handle brand filter change
   const handleBrandChange = (brand) => {
     setSelectedBrand(brand);
-    updateSearchParams(searchQuery, brand);
+    updateSearchParams(searchQuery, brand, selectedCategory);
+  };
+
+  // Handle category filter change
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    updateSearchParams(searchQuery, selectedBrand, category);
   };
 
   // Clear all filters
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedBrand('All');
+    setSelectedCategory('All');
     setSearchParams({});
   };
 
@@ -116,6 +141,7 @@ const Products = () => {
 
   const filteredProducts = products
     .filter(product => selectedBrand === 'All' || product.brand === selectedBrand)
+    .filter(product => selectedCategory === 'All' || product.category === selectedCategory)
     .filter(p =>
     p.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
@@ -146,7 +172,7 @@ const Products = () => {
     );
   }
 
-  const isSearching = searchQuery.trim().length > 0;
+  const isSearching = searchQuery.trim().length > 0 || selectedBrand !== 'All' || selectedCategory !== 'All';
   return (
     <div className="py-12 sm:py-16 md:py-20">
       <div className="container px-4">
@@ -175,40 +201,67 @@ const Products = () => {
           )}
         </div>
 
-        {(isSearching || selectedBrand !== 'All') && (
+        {isSearching && (
           <div className="text-center text-gray-600 mb-6">
               {filteredProducts.length} products found
           </div>
         )}
 
+        {/* Category Filter */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-center text-gray-800 mb-4">Filter by Category</h3>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+            {categories.map(category => {
+              const displayText = category === 'All' ? 'All' : category;
+              const isSelected = selectedCategory === category || (category === 'All' && selectedCategory === 'All');
+              return (
+                <button
+                  key={category}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 ${
+                    isSelected
+                      ? 'bg-primary text-white shadow-lg' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-primary hover:text-white'
+                  }`}
+                  onClick={() => handleCategoryChange(category)}
+                >
+                  {displayText}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Brand Filter */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
-          {brands.map(brand => {
-            const displayText = brand === 'All' ? 'All' : brand;
-            const isSelected = selectedBrand === brand || (brand === 'All' && selectedBrand === 'All');
-            return (
+        <div className="mb-8 sm:mb-12">
+          <h3 className="text-lg font-semibold text-center text-gray-800 mb-4">Filter by Brand</h3>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+            {brands.map(brand => {
+              const displayText = brand === 'All' ? 'All' : brand;
+              const isSelected = selectedBrand === brand || (brand === 'All' && selectedBrand === 'All');
+              return (
+                <button
+                  key={brand}
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 ${
+                    isSelected
+                      ? 'bg-secondary text-white shadow-lg' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-secondary hover:text-white'
+                  }`}
+                  onClick={() => handleBrandChange(brand)}
+                >
+                  {displayText}
+                </button>
+              );
+            })}
+            {isSearching && (
               <button
-                key={brand}
-                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 ${
-                  isSelected
-                    ? 'bg-secondary text-white shadow-lg' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-secondary hover:text-white'
-                }`}
-                onClick={() => handleBrandChange(brand)}
+                onClick={clearFilters}
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all duration-300 flex items-center gap-2"
+                title="Clear all filters"
               >
-                {displayText}
+                <FaTimes /> Clear
               </button>
-            );
-          })}
-          {(searchQuery || selectedBrand !== 'All') && (
-            <button
-              onClick={clearFilters}
-              className="px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all duration-300 flex items-center gap-2"
-              title="Clear all filters"
-            >
-              <FaTimes /> Clear
-            </button>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Products Grid */}
