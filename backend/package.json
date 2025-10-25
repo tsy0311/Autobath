@@ -14,6 +14,7 @@
     "clear:bookings": "node database/clear-bookings.js",
     "create:admin": "node database/add-admin-users.js",
     "update:images": "node database/update-live-images.js",
+    "update:complete": "node database/update-live-complete.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
