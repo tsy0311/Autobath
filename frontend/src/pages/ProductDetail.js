@@ -44,39 +44,20 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    const cartItem = {
-      id: product.id,
-      name: product.name,
-      price: getFinalPrice(),
-      image: getCurrentImage(),
-      color: selectedColor ? selectedColor.color_name : null,
-      colorId: selectedColor ? selectedColor.id : null,
-      quantity: quantity
-    };
-
-    addToCart(cartItem);
-    toast.success(`${product.name} added to cart!`);
+    // Pass product and selectedVariant to match CartContext expectations
+    addToCart(product, selectedColor || null);
+    toast.success(`${product.name}${selectedColor ? ` (${selectedColor.color_name})` : ''} added to cart!`);
   };
 
   const handleBuyNow = () => {
     if (!product) return;
 
-    // Add to cart first
-    const cartItem = {
-      id: product.id,
-      name: product.name,
-      price: getFinalPrice(),
-      image: getCurrentImage(),
-      color: selectedColor ? selectedColor.color_name : null,
-      colorId: selectedColor ? selectedColor.id : null,
-      quantity: quantity
-    };
-
-    addToCart(cartItem);
+    // Add to cart first - pass product and selectedVariant to match CartContext expectations
+    addToCart(product, selectedColor || null);
     
     // Navigate to cart page
     navigate('/cart');
-    toast.success(`${product.name} added to cart! Redirecting to checkout...`);
+    toast.success(`${product.name}${selectedColor ? ` (${selectedColor.color_name})` : ''} added to cart! Redirecting to checkout...`);
   };
 
   const getCurrentImage = () => {
@@ -87,8 +68,9 @@ const ProductDetail = () => {
   };
 
   const getFinalPrice = () => {
+    if (!product) return 0;
     let basePrice = parseFloat(product.price);
-    if (selectedColor && selectedColor.price_adjustment) {
+    if (selectedColor && selectedColor.price_adjustment != null) {
       basePrice += parseFloat(selectedColor.price_adjustment);
     }
     return basePrice;

@@ -507,7 +507,7 @@ const Home = () => {
                   🕒 Operating Hours
                 </p>
                 <p className="text-gray-700">
-                  <strong>Friday - Sunday:</strong> 9:00 AM - 6:00 PM
+                  <strong>Friday - Sunday:</strong> 3:30 PM - 1:30 AM
                 </p>
                 <p className="text-gray-600 text-sm mt-1">
                   📅 Also open on public holidays

@@ -11,11 +11,11 @@ const FAQ = () => {
       questions: [
         {
           q: 'What are your operating hours?',
-          a: 'We operate Friday, Saturday, and Sunday from 9:00 AM to 6:00 PM. We are also open on public holidays during the same hours.'
+          a: 'We operate Friday, Saturday, and Sunday from 3:30 PM to 1:30 AM. We are also open on public holidays during the same hours.'
         },
         {
           q: 'Are you open on public holidays?',
-          a: 'Yes! We are open on public holidays during our regular operating hours (Friday-Sunday, 9:00 AM - 6:00 PM). This includes all Malaysian public holidays.'
+          a: 'Yes! We are open on public holidays during our regular operating hours (Friday-Sunday, 3:30 PM - 1:30 AM). This includes all Malaysian public holidays.'
         },
         {
           q: 'Why are you only open on weekends?',
