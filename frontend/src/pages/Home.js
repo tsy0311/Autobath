@@ -1,34 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FaClock, FaMobile, FaGift,FaTag,
-  FaArrowRight, FaCalendarAlt
+  FaArrowRight, FaCalendarAlt, FaCar, FaTruck, FaTools, FaSprayCan, FaStar
 } from 'react-icons/fa';
-import api from '../services/api';
 
 const Home = () => {
-  const [packages, setPackages] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchServicePackages();
-  }, []);
-
-  const fetchServicePackages = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/api/service-packages');
-      console.log('Service packages response:', response.data);
-      const packages = response.data.packages || [];
-      console.log('Filtered packages (sedan/suv):', packages.filter(pkg => pkg.vehicle_type === 'sedan/suv'));
-      setPackages(packages);
-    } catch (error) {
-      console.error('Error fetching service packages:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     const revealEls = document.querySelectorAll('.reveal');
@@ -80,175 +57,227 @@ const Home = () => {
       </section>
 
 
-      {/* Features Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-            alt="Car detailing background"
-            loading="lazy"
-            className="w-full h-full object-cover opacity-10"
-          />
-        </div>
-        <div className="container relative z-10">
-          <div className="section-title">
-            <h2>{"Why Choose AUTOBATH?"}</h2>
-            <p>{"We provide exceptional car detailing services with cutting-edge technology"}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-2xl p-0 text-center shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary overflow-hidden">
-              <div className="w-full h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaTag />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4 px-6">{"Dynamic Pricing"}</h3>
-              <p className="text-gray-600 leading-relaxed px-6 pb-6">{"Our pricing adapts based on vehicle size, condition, and service complexity"}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-0 text-center shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary overflow-hidden">
-              <div className="w-full h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaClock />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4 px-6">{"Smart Booking System"}</h3>
-              <p className="text-gray-600 leading-relaxed px-6 pb-6">{"AI-powered scheduling prevents conflicts and optimizes service delivery"}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-0 text-center shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary overflow-hidden">
-              <div className="w-full h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaGift />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4 px-6">{"Loyalty Program"}</h3>
-              <p className="text-gray-600 leading-relaxed px-6 pb-6">{"Earn points with every service and enjoy exclusive discounts"}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-0 text-center shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary overflow-hidden">
-              <div className="w-full h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="text-white text-6xl">
-                  <FaMobile />
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4 px-6">{"Mobile Ready"}</h3>
-              <p className="text-gray-600 leading-relaxed px-6 pb-6">{"Fully responsive design works perfectly on all devices"}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Packages Section */}
+      {/* Price Menu Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="container">
           <div className="section-title">
-            <h2>{"Service Packages"}</h2>
-            <p>{"Choose from our carefully crafted packages"}</p>
+            <h2>{"Service Pricing"}</h2>
+            <p>{"Transparent pricing for all vehicle types"}</p>
             <Link to="/booking" className="inline-flex items-center gap-2 text-primary font-semibold mt-4 transition-all duration-300 hover:text-secondary hover:translate-x-1">
               {"Book Services"} <FaArrowRight />
             </Link>
           </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {loading ? (
-                      // Loading skeleton
-                      Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 animate-pulse">
-                          <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-32"></div>
-                          <div className="p-6">
-                            <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                            <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                            <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                            <div className="h-10 bg-gray-200 rounded"></div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      packages
-                        .filter(pkg => pkg.vehicle_type === 'sedan/suv')
-                        .sort((a, b) => {
-                          // Sort: Basic (left), Premium (middle), Ultra (right)
-                          const order = { 'Basic': 1, 'Premium': 2, 'Ultra': 3 };
-                          return order[a.name.split(' ')[0]] - order[b.name.split(' ')[0]];
-                        })
-                        .map((pkg, index) => (
-                <div 
-                  key={pkg.id} 
-                  className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-secondary/10 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-secondary ${pkg.is_popular === 1 ? 'relative' : ''}`}
-                >
-                  {pkg.is_popular === 1 && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold z-10">
-                      Most Popular
-                    </div>
-                  )}
-                  <div className="bg-gradient-to-br from-primary to-secondary text-white p-8 text-center">
-                    <h3 className="text-2xl font-bold mb-4">{pkg.name}</h3>
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-4xl font-bold">RM{pkg.finalPrice?.toFixed(2) || pkg.base_price?.toFixed(2)}</span>
-                      {pkg.discount_percentage > 0 && (
-                        <span className="text-sm opacity-80 line-through">RM{pkg.base_price?.toFixed(2)}</span>
-                      )}
-                    </div>
+
+          {/* Main Services */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+              <FaCar />
+              Main Services
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Basic Wash */}
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden transition-all hover:shadow-xl">
+                <div className="bg-gradient-to-br from-primary to-secondary text-white p-6 text-center">
+                  <div className="flex justify-center mb-3">
+                    <FaCar className="text-2xl" />
                   </div>
-                  <div className="p-6">
-                    <p className="text-gray-600 mb-4 leading-relaxed">{pkg.description}</p>
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-800 mb-2">Includes:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        {pkg.name.includes('Basic Wash') ? (
-                          <>
-                            <li>• Exterior wash</li>
-                            <li>• Wheel cleaning</li>
-                            <li>• Interior vacuum</li>
-                            <li>• Basic protection</li>
-                          </>
-                        ) : pkg.name.includes('Premium Wash') ? (
-                          <>
-                            <li>• Pre-wash treatment</li>
-                            <li>• Premium exterior wash</li>
-                            <li>• Interior deep clean</li>
-                            <li>• S002 Spray selant protection</li>
-                            <li>• Tire shine</li>
-                            <li>• Wheel detailing</li>
-                          </>
-                        ) : pkg.name.includes('Ultra') ? (
-                          <>
-                            <li>• Complete pre-wash</li>
-                            <li>• Premium exterior wash</li>
-                            <li>• Interior deep cleaning</li>
-                            <li>• S002 Spray selant protection</li>
-                            <li>• Paint protection</li>
-                            <li>• Premium tire treatment</li>
-                            <li>• Wheel ceramic coating</li>
-                            <li>• VIP treatment - Free Snooker Playing</li>
-                          </>
-                        ) : pkg.includedServices && pkg.includedServices.length > 0 ? (
-                          pkg.includedServices.map((service, serviceIndex) => (
-                            <li key={serviceIndex}>• {service.name}</li>
-                          ))
-                        ) : pkg.services && pkg.services.length > 0 ? (
-                          pkg.services.map((serviceId, serviceIndex) => (
-                            <li key={serviceIndex}>• Service {serviceId}</li>
-                          ))
-                        ) : (
-                          <li>• Professional detailing services</li>
-                        )}
-                      </ul>
+                  <h4 className="text-2xl font-bold">Basic Wash</h4>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Hatchback/Sedan</span>
+                      <span className="text-2xl font-bold text-secondary">RM80</span>
                     </div>
-                    <div className="flex justify-between items-center mb-6 p-4 bg-secondary/5 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                        <FaClock /> {Math.floor(pkg.duration_minutes / 60)}h {pkg.duration_minutes % 60}m
-                      </div>
-                      <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">All-in-one</div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">SUV</span>
+                      <span className="text-2xl font-bold text-secondary">RM90</span>
                     </div>
-                    <Link 
-                      to={`/booking?package=${pkg.id}&type=package`} 
-                      className="btn btn-primary w-full text-center"
-                    >
-                      Book {pkg.name}
-                    </Link>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">MPV/Truck</span>
+                      <span className="text-2xl font-bold text-secondary">RM100</span>
+                    </div>
                   </div>
                 </div>
-              ))
-            )}
+              </div>
+
+              {/* Premium Wash */}
+              <div className="bg-white rounded-2xl shadow-lg border-4 border-secondary overflow-hidden transition-all hover:shadow-xl relative">
+                <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold z-10">
+                  Most Popular
+                </div>
+                <div className="bg-gradient-to-br from-primary to-secondary text-white p-6 text-center">
+                  <div className="flex justify-center mb-3">
+                    <FaStar className="text-2xl" />
+                  </div>
+                  <h4 className="text-2xl font-bold">Premium Wash</h4>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Hatchback/Sedan</span>
+                      <span className="text-2xl font-bold text-secondary">RM100</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">SUV</span>
+                      <span className="text-2xl font-bold text-secondary">RM110</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">MPV/Truck</span>
+                      <span className="text-2xl font-bold text-secondary">RM120</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ultra Wash */}
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden transition-all hover:shadow-xl">
+                <div className="bg-gradient-to-br from-primary to-secondary text-white p-6 text-center">
+                  <div className="flex justify-center mb-3">
+                    <FaSprayCan className="text-2xl" />
+                  </div>
+                  <h4 className="text-2xl font-bold">Ultra Wash</h4>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Hatchback/Sedan</span>
+                      <span className="text-2xl font-bold text-secondary">RM200</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">SUV</span>
+                      <span className="text-2xl font-bold text-secondary">RM230</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">MPV/Truck</span>
+                      <span className="text-2xl font-bold text-secondary">RM250</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Polish & Coating Services */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+              <FaSprayCan />
+              Polish & Coating Services
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 4 Step Polish Wax */}
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-500 text-white p-6 text-center">
+                  <h4 className="text-2xl font-bold">4 Step Polish Wax</h4>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Hatchback/Sedan</span>
+                      <span className="text-2xl font-bold text-secondary">RM360</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">SUV</span>
+                      <span className="text-2xl font-bold text-secondary">RM460</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">MPV/Truck</span>
+                      <span className="text-2xl font-bold text-secondary">RM560</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 Steps Polish Ceramic Coating */}
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-500 text-white p-6 text-center">
+                  <h4 className="text-2xl font-bold">4 Steps Polish Ceramic Coating</h4>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">Hatchback/Sedan</span>
+                      <span className="text-2xl font-bold text-secondary">RM1100</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">SUV</span>
+                      <span className="text-2xl font-bold text-secondary">RM1300</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-semibold text-gray-700">MPV/Truck</span>
+                      <span className="text-2xl font-bold text-secondary">RM1500</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Add-on Services */}
+          <div>
+            <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+              <FaTools />
+              Add-on Services
+            </h3>
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Fabric Seat Cleaning</span>
+                    <p className="text-sm text-gray-500 mt-1">Per seat</p>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM40</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Leather Seat Cleaning</span>
+                    <p className="text-sm text-gray-500 mt-1">Per seat</p>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM40</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Engine Bay Wash and Coat</span>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM80</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Part Polish</span>
+                    <p className="text-sm text-gray-500 mt-1">Varies by area</p>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM35-50</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Steam Interior</span>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM30</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Carpet Wash</span>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM40</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <span className="font-semibold text-gray-800">Rim Out Wash</span>
+                  </div>
+                  <span className="text-xl font-bold text-secondary">RM100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* View Full Price Menu Link */}
+          <div className="mt-8 text-center">
+            <Link 
+              to="/price-menu" 
+              className="inline-flex items-center gap-2 text-primary font-semibold text-lg transition-all duration-300 hover:text-secondary hover:translate-x-1"
+            >
+              View Full Price Menu <FaArrowRight />
+            </Link>
           </div>
         </div>
       </section>

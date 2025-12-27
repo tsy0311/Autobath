@@ -570,13 +570,13 @@ const insertSampleServices = () => {
     ];
 
     const stmt = db.prepare(`
-      INSERT OR IGNORE INTO services (name, description, base_price, duration_minutes, category, vehicle_types, requirements)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO services (name, description, base_price, duration_minutes, category, vehicle_types, bike_type, requirements)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     services.forEach(service => {
       stmt.run(service.name, service.description, service.base_price, service.duration_minutes, 
-               service.category, service.vehicle_types, service.requirements);
+               service.category, service.vehicle_types, service.bike_type || null, service.requirements);
     });
 
     stmt.finalize((err) => {
@@ -619,18 +619,27 @@ const insertSampleServicePackages = () => {
           discount_percentage: 0.00
         },
         {
-          name: 'Basic Wash - Sedan/SUV',
+          name: 'Basic Wash - Sedan',
           description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
-          base_price: 88.00,
+          base_price: 80.00,
           duration_minutes: 120,
-          vehicle_type: 'sedan/suv',
+          vehicle_type: 'sedan',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Basic Wash - SUV',
+          description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
+          base_price: 90.00,
+          duration_minutes: 120,
+          vehicle_type: 'suv',
           services: JSON.stringify([]),
           discount_percentage: 0.00
         },
         {
           name: 'Basic Wash - Truck/MPV',
           description: 'Essential car wash with interior cleaning - Perfect for regular maintenance',
-          base_price: 108.00,
+          base_price: 100.00,
           duration_minutes: 150,
           vehicle_type: 'truck/mpv',
           services: JSON.stringify([]),
@@ -647,11 +656,21 @@ const insertSampleServicePackages = () => {
           is_popular: 1
         },
         {
-          name: 'Premium Wash - Sedan/SUV',
+          name: 'Premium Wash - Sedan',
           description: 'Comprehensive detailing with premium products - Our most popular choice',
-          base_price: 150.00,
+          base_price: 100.00,
           duration_minutes: 135,
-          vehicle_type: 'sedan/suv',
+          vehicle_type: 'sedan',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00,
+          is_popular: 1
+        },
+        {
+          name: 'Premium Wash - SUV',
+          description: 'Comprehensive detailing with premium products - Our most popular choice',
+          base_price: 110.00,
+          duration_minutes: 135,
+          vehicle_type: 'suv',
           services: JSON.stringify([]),
           discount_percentage: 0.00,
           is_popular: 1
@@ -659,7 +678,7 @@ const insertSampleServicePackages = () => {
         {
           name: 'Premium Wash - Truck/MPV',
           description: 'Comprehensive detailing with premium products - Our most popular choice',
-          base_price: 190.00,
+          base_price: 120.00,
           duration_minutes: 165,
           vehicle_type: 'truck/mpv',
           services: JSON.stringify([]),
@@ -676,19 +695,100 @@ const insertSampleServicePackages = () => {
           discount_percentage: 0.00
         },
         {
-          name: 'Ultra - Sedan/SUV',
+          name: 'Ultra Wash - Sedan',
           description: 'Complete transformation with ceramic coating - The complete package',
-          base_price: 230.00,
+          base_price: 200.00,
           duration_minutes: 165,
-          vehicle_type: 'sedan/suv',
+          vehicle_type: 'sedan',
           services: JSON.stringify([]),
           discount_percentage: 0.00
         },
         {
-          name: 'Ultra - Truck/MPV',
+          name: 'Ultra Wash - SUV',
           description: 'Complete transformation with ceramic coating - The complete package',
-          base_price: 260.00,
+          base_price: 230.00,
+          duration_minutes: 165,
+          vehicle_type: 'suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: 'Ultra Wash - Truck/MPV',
+          description: 'Complete transformation with ceramic coating - The complete package',
+          base_price: 250.00,
           duration_minutes: 195,
+          vehicle_type: 'truck/mpv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Step Polish Wax - Hatchback',
+          description: 'Professional 4-step polish and wax treatment for hatchback',
+          base_price: 360.00,
+          duration_minutes: 240,
+          vehicle_type: 'hatchback',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Step Polish Wax - Sedan',
+          description: 'Professional 4-step polish and wax treatment for sedan',
+          base_price: 360.00,
+          duration_minutes: 240,
+          vehicle_type: 'sedan',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Step Polish Wax - SUV',
+          description: 'Professional 4-step polish and wax treatment for SUV',
+          base_price: 460.00,
+          duration_minutes: 270,
+          vehicle_type: 'suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Step Polish Wax - Truck/MPV',
+          description: 'Professional 4-step polish and wax treatment for truck/MPV',
+          base_price: 560.00,
+          duration_minutes: 360,
+          vehicle_type: 'truck/mpv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Steps Polish Ceramic Coating - Hatchback',
+          description: 'Complete 4-step polish and ceramic coating protection for hatchback',
+          base_price: 1100.00,
+          duration_minutes: 480,
+          vehicle_type: 'hatchback',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Steps Polish Ceramic Coating - Sedan',
+          description: 'Complete 4-step polish and ceramic coating protection for sedan',
+          base_price: 1100.00,
+          duration_minutes: 480,
+          vehicle_type: 'sedan',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Steps Polish Ceramic Coating - SUV',
+          description: 'Complete 4-step polish and ceramic coating protection for SUV',
+          base_price: 1300.00,
+          duration_minutes: 540,
+          vehicle_type: 'suv',
+          services: JSON.stringify([]),
+          discount_percentage: 0.00
+        },
+        {
+          name: '4 Steps Polish Ceramic Coating - Truck/MPV',
+          description: 'Complete 4-step polish and ceramic coating protection for truck/MPV',
+          base_price: 1500.00,
+          duration_minutes: 600,
           vehicle_type: 'truck/mpv',
           services: JSON.stringify([]),
           discount_percentage: 0.00

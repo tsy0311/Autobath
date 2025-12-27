@@ -21,6 +21,7 @@ import QuickBooking from './pages/QuickBooking';
 import Gallery from './pages/Gallery';
 import FAQ from './pages/FAQ';
 import MyBookings from './pages/MyBookings';
+import PriceMenu from './pages/PriceMenu';
 
 // Context
 import { CartProvider } from './context/CartContext';
@@ -43,6 +44,7 @@ function App() {
             <Route path="/cart" element={<><Header /><Cart /><Footer /></>} />
             <Route path="/gallery" element={<><Header /><Gallery /><Footer /><FloatingBookButton /></>} />
             <Route path="/faq" element={<><Header /><FAQ /><Footer /></>} />
+            <Route path="/price-menu" element={<><Header /><PriceMenu /><Footer /></>} />
             <Route path="/my-bookings" element={<><Header /><MyBookings /><Footer /></>} />
             {/* Payment test route removed */}
             <Route path="/quick-booking/:token" element={<><Header /><QuickBooking /><Footer /></>} />

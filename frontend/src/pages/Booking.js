@@ -24,7 +24,7 @@ const Booking = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [vehicleType, setVehicleType] = useState('sedan/suv');
+  const [vehicleType, setVehicleType] = useState('suv');
   const [serviceType, setServiceType] = useState('package'); // package or individual
   const [motorcycleCategory, setMotorcycleCategory] = useState('normal'); // normal | sportbike
 
@@ -233,51 +233,173 @@ const Booking = () => {
     return `${mins}m`;
   };
 
+  // Calculate package price based on vehicle type
+  // Latest pricing structure (2024) - Hatchback and Sedan have same price
+  const calculatePackagePrice = (packageData, vehicleType) => {
+    const basePrice = packageData.base_price || 0;
+    const packageName = packageData.name || '';
+    
+    // Normalize vehicle type
+    let normalizedType = vehicleType;
+    if (vehicleType === 'sedan/suv') {
+      normalizedType = 'sedan'; // Default to sedan for combined type
+    }
+    
+    // Basic Wash - Hatchback and Sedan same price (RM80)
+    if (packageName.includes('Basic Wash')) {
+      if (normalizedType === 'hatchback' || normalizedType === 'sedan' || packageName.includes('Hatchback') || packageName.includes('Sedan')) {
+        return 80;
+      }
+      if (normalizedType === 'suv' || packageName.includes('SUV')) {
+        return 90;
+      }
+      if (normalizedType === 'truck' || normalizedType === 'mpv' || normalizedType === 'truck/mpv' || packageName.includes('Truck') || packageName.includes('MPV')) {
+        return 100;
+      }
+      return 80; // Default to sedan price
+    }
+    
+    // Premium Wash - Hatchback and Sedan same price (RM100)
+    if (packageName.includes('Premium Wash')) {
+      if (normalizedType === 'hatchback' || normalizedType === 'sedan' || packageName.includes('Hatchback') || packageName.includes('Sedan')) {
+        return 100;
+      }
+      if (normalizedType === 'suv' || packageName.includes('SUV')) {
+        return 110;
+      }
+      if (normalizedType === 'truck' || normalizedType === 'mpv' || normalizedType === 'truck/mpv' || packageName.includes('Truck') || packageName.includes('MPV')) {
+        return 120;
+      }
+      return 100; // Default to sedan price
+    }
+    
+    // Ultra Wash - Hatchback and Sedan same price (RM200)
+    if (packageName.includes('Ultra')) {
+      if (normalizedType === 'hatchback' || normalizedType === 'sedan' || packageName.includes('Hatchback') || packageName.includes('Sedan')) {
+        return 200;
+      }
+      if (normalizedType === 'suv' || packageName.includes('SUV')) {
+        return 230;
+      }
+      if (normalizedType === 'truck' || normalizedType === 'mpv' || normalizedType === 'truck/mpv' || packageName.includes('Truck') || packageName.includes('MPV')) {
+        return 250;
+      }
+      return 200; // Default to sedan price
+    }
+    
+    // Use base price if no match
+    return basePrice;
+  };
+
   // Calculate price based on vehicle type and service
+  // Latest pricing structure (2024) - Hatchback/Sedan have same price
   const calculateServicePrice = (service, vehicleType) => {
     const basePrice = service.base_price;
     
-    // Vehicle type multipliers based on official menu
-    const multipliers = {
-      'hatchback': 1.0,
-      'sedan/suv': 1.0,
-      'truck/mpv': 1.2,
-      'motorcycle': 0.5 // Motorcycles typically cost less
-    };
-    
-    // Special pricing for specific services based on official menu
+    // Basic Wash
     if (service.name.includes('Basic Wash')) {
-      const prices = {
-        'hatchback': 78,
-        'sedan/suv': 88,
-        'truck/mpv': 108,
-        'motorcycle': 45
-      };
-      return prices[vehicleType] || basePrice;
+      if (vehicleType === 'hatchback/sedan') {
+        return 80;
+      }
+      if (vehicleType === 'suv') {
+        return 90;
+      }
+      if (vehicleType === 'truck/mpv') {
+        return 100;
+      }
+      if (vehicleType === 'motorcycle') {
+        return 45;
+      }
+      return 80; // Default to hatchback/sedan price
     }
     
+    // Premium Wash
     if (service.name.includes('Premium Wash')) {
-      const prices = {
-        'hatchback': 120,
-        'sedan/suv': 150,
-        'truck/mpv': 190,
-        'motorcycle': 75
-      };
-      return prices[vehicleType] || basePrice;
+      if (vehicleType === 'hatchback/sedan') {
+        return 100;
+      }
+      if (vehicleType === 'suv') {
+        return 110;
+      }
+      if (vehicleType === 'truck/mpv') {
+        return 120;
+      }
+      if (vehicleType === 'motorcycle') {
+        return 75;
+      }
+      return 100; // Default to hatchback/sedan price
     }
     
-    if (service.name.includes('Ultra')) {
-      const prices = {
-        'hatchback': 190,
-        'sedan/suv': 230,
-        'truck/mpv': 260,
-        'motorcycle': 115
-      };
-      return prices[vehicleType] || basePrice;
+    // Ultra Wash
+    if (service.name.includes('Ultra') || service.name.includes('Ultra Wash')) {
+      if (vehicleType === 'hatchback/sedan') {
+        return 200;
+      }
+      if (vehicleType === 'suv') {
+        return 230;
+      }
+      if (vehicleType === 'truck/mpv') {
+        return 250;
+      }
+      if (vehicleType === 'motorcycle') {
+        return 115;
+      }
+      return 200; // Default to hatchback/sedan price
     }
     
-    // For individual services, apply multiplier
-    return Math.round(basePrice * (multipliers[vehicleType] || 1.0));
+    // 4 Step Polish Wax
+    if (service.name.includes('4 Step Polish Wax') || service.name.includes('Polish Wax')) {
+      if (vehicleType === 'hatchback/sedan') {
+        return 360;
+      }
+      if (vehicleType === 'suv') {
+        return 460;
+      }
+      if (vehicleType === 'truck/mpv') {
+        return 560;
+      }
+      return 360; // Default to hatchback/sedan price
+    }
+    
+    // 4 Steps Polish Ceramic Coating
+    if (service.name.includes('Polish Ceramic Coating') || service.name.includes('Ceramic Coating')) {
+      if (vehicleType === 'hatchback/sedan') {
+        return 1100;
+      }
+      if (vehicleType === 'suv') {
+        return 1300;
+      }
+      if (vehicleType === 'truck/mpv') {
+        return 1500;
+      }
+      return 1100; // Default to hatchback/sedan price
+    }
+    
+    // Add-on Services
+    if (service.name.includes('Fabric Seat Cleaning')) {
+      return 40;
+    }
+    if (service.name.includes('Leather Seat Cleaning')) {
+      return 40;
+    }
+    if (service.name.includes('Engine Bay Wash and Coat')) {
+      return 80;
+    }
+    if (service.name.includes('Part Polish')) {
+      return 35; // Minimum price, can vary up to 50
+    }
+    if (service.name.includes('Steam Interior')) {
+      return 30;
+    }
+    if (service.name.includes('Carpet Wash')) {
+      return 40;
+    }
+    if (service.name.includes('Rim Out Wash')) {
+      return 100;
+    }
+    
+    // For other services, use base price
+    return basePrice;
   };
 
   const handleSubmit = async () => {
@@ -418,28 +540,28 @@ const Booking = () => {
                       <button
                         type="button"
                         className={`px-4 py-3 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'hatchback' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          vehicleType === 'hatchback/sedan' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={() => { 
-                          setVehicleType('hatchback'); 
+                          setVehicleType('hatchback/sedan'); 
                           setSelectedService(null); 
                           setSelectedPackage(null);
                         }}
                       >
-                        Hatchback
+                        Hatchback/Sedan
                       </button>
                       <button
                         type="button"
                         className={`px-4 py-3 rounded-lg font-medium transition-colors ${
-                          vehicleType === 'sedan/suv' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          vehicleType === 'suv' ? 'bg-secondary text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                         onClick={() => { 
-                          setVehicleType('sedan/suv'); 
+                          setVehicleType('suv'); 
                           setSelectedService(null); 
                           setSelectedPackage(null);
                         }}
                       >
-                        Sedan/SUV
+                        SUV
                       </button>
                       <button
                         type="button"
@@ -480,9 +602,22 @@ const Booking = () => {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {services
-                          .filter(svc => svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory)
-                          .map((svc) => (
+                        {(() => {
+                          // Filter motorcycle services and deduplicate by name
+                          const motorcycleServices = services
+                            .filter(svc => svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory)
+                            .filter((svc, index, self) => 
+                              index === self.findIndex(s => s.name === svc.name && s.bike_type === svc.bike_type)
+                            );
+                          
+                          if (motorcycleServices.length === 0) {
+                            return (
+                              <div className="col-span-full text-center text-gray-600 py-8">
+                                No motorcycle services available for {motorcycleCategory === 'normal' ? 'Normal Bike' : 'Sportbike'}
+                              </div>
+                            );
+                          }
+                          return motorcycleServices.map((svc) => (
                             <div
                               key={svc.id}
                               className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
@@ -495,7 +630,9 @@ const Booking = () => {
                               <div className="flex flex-col justify-between h-full">
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
-                                    <h4 className="text-lg font-semibold text-primary mb-2">{svc.name}</h4>
+                                    <h4 className="text-lg font-semibold text-primary mb-2">
+                                      {svc.name.replace(' - Normal Bike', '').replace(' - Sportbike', '')}
+                                    </h4>
                                     {svc.description && (
                                       <p className="text-gray-600">{svc.description}</p>
                                     )}
@@ -519,7 +656,8 @@ const Booking = () => {
                                 </div>
                               </div>
                             </div>
-                          ))}
+                          ));
+                        })()}
                       </div>
                     </>
                   ) : (
@@ -553,20 +691,57 @@ const Booking = () => {
                               setSelectedPackage(null);
                             }}
                           >
-                            Individual Services
+                            Add-on Services
                           </button>
                         </div>
                       </div>
 
-                      {/* Service Packages */}
+                      {/* Service Packages - Only show Basic, Premium, Ultra, 4 Step Polish Wax, 4 Steps Polish Ceramic Coating */}
                       {serviceType === 'package' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {packages
-                            .filter(pkg => pkg.vehicle_type === vehicleType)
+                            .filter(pkg => {
+                              // Only show the 5 main services
+                              const pkgName = pkg.name || '';
+                              const isMainService = 
+                                pkgName.includes('Basic Wash') ||
+                                pkgName.includes('Premium Wash') ||
+                                pkgName.includes('Ultra') ||
+                                pkgName.includes('4 Step Polish Wax') ||
+                                pkgName.includes('4 Steps Polish Ceramic Coating') ||
+                                pkgName.includes('Polish Ceramic Coating');
+                              
+                              if (!isMainService) return false;
+                              
+                              // Handle vehicle type matching
+                              const pkgVehicleType = pkg.vehicle_type || '';
+                              if (vehicleType === 'hatchback/sedan') {
+                                // Show only sedan packages (not hatchback) to avoid duplicates since they have same price
+                                return (pkgVehicleType === 'sedan' || pkg.name.includes('Sedan')) && !pkg.name.includes('Hatchback');
+                              }
+                              if (vehicleType === 'suv') {
+                                // Show only SUV packages
+                                return pkgVehicleType === 'suv' || pkg.name.includes('SUV');
+                              }
+                              if (vehicleType === 'truck/mpv') {
+                                return pkgVehicleType === 'truck/mpv' || pkgVehicleType === 'truck' || pkgVehicleType === 'mpv' ||
+                                       pkg.name.includes('Truck') || pkg.name.includes('MPV');
+                              }
+                              // Default match
+                              return pkgVehicleType === vehicleType || pkg.name.toLowerCase().includes(vehicleType.toLowerCase());
+                            })
                             .sort((a, b) => {
-                              // Sort: Basic (left), Premium (middle), Ultra (right)
-                              const order = { 'Basic': 1, 'Premium': 2, 'Ultra': 3 };
-                              return order[a.name.split(' ')[0]] - order[b.name.split(' ')[0]];
+                              // Sort: Basic (1), Premium (2), Ultra (3), 4 Step Polish Wax (4), 4 Steps Polish Ceramic Coating (5)
+                              const order = { 
+                                'Basic': 1, 
+                                'Premium': 2, 
+                                'Ultra': 3,
+                                '4 Step': 4,
+                                '4 Steps': 5
+                              };
+                              const aFirst = a.name.split(' ')[0];
+                              const bFirst = b.name.split(' ')[0];
+                              return (order[aFirst] || 99) - (order[bFirst] || 99);
                             })
                             .map(packageData => (
                             <div 
@@ -587,7 +762,7 @@ const Booking = () => {
                                 <div className="flex justify-between items-start mb-4">
                                   <div className="flex-1">
                                     <h4 className="text-lg font-semibold text-primary mb-2">
-                                      {packageData.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - Truck/MPV', '')}
+                                      {packageData.name.replace(' - Hatchback', '').replace(' - Sedan', '').replace(' - SUV', '').replace(' - Sedan/SUV', '').replace(' - Truck/MPV', '').replace(' - Truck', '').replace(' - MPV', '')}
                                       {(packageData.name.toLowerCase().includes('coating') || packageData.name.toLowerCase().includes('polish')) && (
                                         <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
                                           Daytime Only
@@ -605,7 +780,7 @@ const Booking = () => {
                                 </div>
                                 <div className="space-y-2 text-sm mt-auto">
                                   <div className="flex justify-between items-center">
-                                    <span className="font-semibold text-secondary text-lg">RM {packageData.finalPrice?.toFixed(2) || '0.00'}</span>
+                                    <span className="font-semibold text-secondary text-lg">RM {calculatePackagePrice(packageData, vehicleType).toFixed(2)}</span>
                                     <div className="flex items-center gap-1 text-gray-500">
                                       <FaClock /> {formatDuration(packageData.duration_minutes)}
                                     </div>
@@ -617,85 +792,65 @@ const Booking = () => {
                         </div>
                       )}
 
-                      {/* Individual Services (dynamic from backend) */}
+                      {/* Add-on Services */}
                       {serviceType === 'individual' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {services
-                            .filter(svc => {
-                              if (vehicleType === 'motorcycle') {
-                                return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
-                              } else {
-                                // Map vehicle types for compatibility
-                                const vehicleTypeMap = {
-                                  'hatchback': ['hatchback'],
-                                  'sedan/suv': ['sedan', 'suv'], 
-                                  'truck/mpv': ['truck', 'mpv']
-                                };
-                                const mappedTypes = vehicleTypeMap[vehicleType] || [vehicleType];
-                                return svc.vehicle_types && mappedTypes.some(type => svc.vehicle_types.includes(type));
-                              }
-                            })
-                            .length === 0 ? (
-                            <div className="col-span-full text-center text-gray-600">
-                              No individual services available for {vehicleType === 'motorcycle' ? `${motorcycleCategory} motorcycle` : vehicleType}
-                            </div>
-                          ) : (
-                            services
-                              .filter(svc => {
-                                if (vehicleType === 'motorcycle') {
-                                  return svc.category === 'Motorcycle' && svc.bike_type === motorcycleCategory;
-                                } else {
-                                  // Map vehicle types for compatibility
-                                  const vehicleTypeMap = {
-                                    'hatchback': 'sedan',
-                                    'sedan/suv': 'suv', 
-                                    'truck/mpv': 'truck'
-                                  };
-                                  const mappedType = vehicleTypeMap[vehicleType] || vehicleType;
-                                  return svc.vehicle_types && svc.vehicle_types.includes(mappedType);
-                                }
-                              })
-                              .map((svc) => (
-                              <div
-                                key={svc.id}
-                                className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
-                                  selectedService?.id === svc.id
-                                    ? 'border-secondary bg-secondary/5 shadow-lg'
-                                    : 'border-gray-200 hover:border-secondary hover:shadow-md'
-                                }`}
-                                onClick={() => setSelectedService(svc)}
-                              >
-                                <div className="flex flex-col justify-between h-full">
-                                  <div className="flex justify-between items-start mb-4">
-                                    <div className="flex-1">
-                                      <h4 className="text-lg font-semibold text-primary mb-2">
-                                        {svc.name.replace(' - Hatchback', '').replace(' - Sedan/SUV', '').replace(' - MPV/Truck', '').replace(' - Normal Bike', '').replace(' - Sportbike', '')}
-                                        {(svc.name.toLowerCase().includes('coating') || svc.name.toLowerCase().includes('polish')) && (
-                                          <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
-                                            Daytime Only
-                                          </span>
-                                        )}
-                                      </h4>
-                                    </div>
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
-                                      selectedService?.id === svc.id ? 'bg-secondary text-white' : 'border-2 border-gray-300'
-                                    }`}>
-                                      {selectedService?.id === svc.id && <FaCheck className="text-sm" />}
-                                    </div>
+                          {[
+                            { name: 'Fabric Seat Cleaning', price: 40, note: 'Per seat', duration: 30 },
+                            { name: 'Leather Seat Cleaning', price: 40, note: 'Per seat', duration: 30 },
+                            { name: 'Engine Bay Wash and Coat', price: 80, note: '', duration: 45 },
+                            { name: 'Part Polish', price: '35-50', note: 'Varies by area', duration: 60 },
+                            { name: 'Steam Interior', price: 30, note: '', duration: 45 },
+                            { name: 'Carpet Wash', price: 40, note: '', duration: 30 },
+                            { name: 'Rim Out Wash', price: 100, note: '', duration: 60 }
+                          ].map((addon, index) => (
+                            <div
+                              key={index}
+                              className={`p-6 border-2 rounded-xl cursor-pointer transition-all relative h-full ${
+                                selectedService?.name === addon.name
+                                  ? 'border-secondary bg-secondary/5 shadow-lg'
+                                  : 'border-gray-200 hover:border-secondary hover:shadow-md'
+                              }`}
+                              onClick={() => setSelectedService({
+                                id: `addon-${index}`,
+                                name: addon.name,
+                                base_price: typeof addon.price === 'string' ? 35 : addon.price,
+                                duration_minutes: addon.duration,
+                                description: addon.note
+                              })}
+                            >
+                              <div className="flex flex-col justify-between h-full">
+                                <div className="flex justify-between items-start mb-4">
+                                  <div className="flex-1">
+                                    <h4 className="text-lg font-semibold text-primary mb-2">
+                                      {addon.name}
+                                      {addon.note && (
+                                        <span className="block text-sm text-gray-500 mt-1 font-normal">
+                                          {addon.note}
+                                        </span>
+                                      )}
+                                    </h4>
                                   </div>
-                                  <div className="space-y-2 text-sm mt-auto">
-                                    <div className="flex justify-between items-center">
-                                      <span className="font-semibold text-secondary text-lg">RM {calculateServicePrice(svc, vehicleType).toFixed(2)}</span>
-                                      <div className="flex items-center gap-1 text-gray-500">
-                                        <FaClock className="text-xs" />
-                                        <span>{Math.floor(svc.duration_minutes / 60)}h {svc.duration_minutes % 60}m</span>
-                                      </div>
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ml-4 flex-shrink-0 ${
+                                    selectedService?.name === addon.name ? 'bg-secondary text-white' : 'border-2 border-gray-300'
+                                  }`}>
+                                    {selectedService?.name === addon.name && <FaCheck className="text-sm" />}
+                                  </div>
+                                </div>
+                                <div className="space-y-2 text-sm mt-auto">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-secondary text-lg">
+                                      RM {typeof addon.price === 'string' ? addon.price : addon.price.toFixed(2)}
+                                    </span>
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                      <FaClock className="text-xs" />
+                                      <span>{Math.floor(addon.duration / 60)}h {addon.duration % 60}m</span>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            ))
-                          )}
+                            </div>
+                          ))}
                         </div>
                       )}
                     </>
@@ -998,6 +1153,16 @@ const Booking = () => {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Duration:</span>
                           <span className="font-medium">{formatDuration(selectedPackage?.duration_minutes || selectedService?.duration_minutes)}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-secondary/10 -mx-6 px-6 py-3 rounded mt-3">
+                          <span className="text-gray-700 font-semibold">Price:</span>
+                          <span className="font-bold text-secondary text-xl">
+                            RM {selectedPackage 
+                              ? calculatePackagePrice(selectedPackage, vehicleType).toFixed(2)
+                              : selectedService 
+                                ? calculateServicePrice(selectedService, vehicleType).toFixed(2)
+                                : '0.00'}
+                          </span>
                         </div>
                       </div>
                     </div>
