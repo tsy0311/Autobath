@@ -50,12 +50,25 @@ const Home = () => {
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-4 sm:mb-6 text-gray-100 leading-relaxed px-2">
             Transform your vehicle with our premium detailing packages and individual services
           </p>
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-6 sm:mb-10 px-2">
+          <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-8 sm:mb-10 px-2">
             All services use Koch Chemie products directly from Germany
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              to="/booking" 
+              className="bg-secondary hover:bg-secondary/90 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
+            >
+              <FaCalendarAlt /> Book Now
+            </Link>
+            <Link 
+              to="/price-menu" 
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 border-2 border-white/30 hover:border-white/50 flex items-center gap-2"
+            >
+              View Pricing <FaArrowRight />
+            </Link>
+          </div>
         </div>
       </section>
-
 
       {/* Price Menu Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-white">
