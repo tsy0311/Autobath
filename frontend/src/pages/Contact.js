@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaMapMarkerAlt, FaEnvelope, FaClock, FaInstagram, FaWhatsapp, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -41,6 +42,11 @@ const Contact = () => {
 
     try {
       await api.post('/api/contact/submit', formData);
+      if (isPostHogInitialized) {
+        posthog.capture('contact_form_submitted', {
+          service_interest: formData.service || 'unspecified'
+        });
+      }
       toast.success("Message sent successfully!");
       setFormData({
         name: '',

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -33,6 +34,9 @@ const Login = () => {
       const result = await login(username, password);
       
       if (result.success) {
+        if (isPostHogInitialized) {
+          posthog.capture('admin_login_succeeded');
+        }
         toast.success('Login successful! Redirecting...');
         setTimeout(() => {
           navigate('/admin/dev', { replace: true });

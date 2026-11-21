@@ -1,7 +1,25 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const AuthContext = createContext();
+
+const identifyUser = (user) => {
+  const distinctId = user?.id;
+
+  if (!isPostHogInitialized || (typeof distinctId !== 'string' && typeof distinctId !== 'number')) {
+    return;
+  }
+
+  const normalizedDistinctId = String(distinctId);
+  const previousDistinctId = posthog.get_property('$user_id');
+
+  if (previousDistinctId && previousDistinctId !== normalizedDistinctId) {
+    posthog.reset();
+  }
+
+  posthog.identify(normalizedDistinctId);
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -26,6 +44,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.get('/api/auth/verify');
       if (response.data.success) {
+        identifyUser(response.data.user);
         setUser(response.data.user);
         setIsAuthenticated(true);
       } else {
@@ -45,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/api/auth/login', { username, password });
       if (response.data.success) {
+        identifyUser(response.data.user);
         setUser(response.data.user);
         setIsAuthenticated(true);
         // Store token in localStorage as backup
@@ -64,6 +84,9 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      if (isPostHogInitialized) {
+        posthog.reset();
+      }
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('authToken');

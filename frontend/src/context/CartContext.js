@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const CartContext = createContext();
 
@@ -96,6 +97,17 @@ export const CartProvider = ({ children }) => {
   // Cart actions
   const addToCart = (product, selectedVariant = null) => {
     dispatch({ type: 'ADD_TO_CART', payload: { product, selectedVariant } });
+    if (isPostHogInitialized) {
+      posthog.capture('product_added_to_cart', {
+        product_id: product.id,
+        product_category: product.category,
+        product_brand: product.brand,
+        has_variant: Boolean(selectedVariant),
+        unit_price: selectedVariant
+          ? product.price + (selectedVariant.price_adjustment || 0)
+          : product.price
+      });
+    }
   };
 
   const removeFromCart = (cartItemId) => {

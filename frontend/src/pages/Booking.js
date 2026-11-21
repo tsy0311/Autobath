@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { FaClock, FaCheck, FaCalendarAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import posthog, { isPostHogInitialized } from '../posthog';
+import posthogLogger from '../posthogLogger';
 
 const steps = [
   { id: 1, title: 'Select Service' },
@@ -422,6 +424,18 @@ const Booking = () => {
         packageId: selectedPackage?.id,
         serviceId: selectedService?.id,
         duration
+      });
+      if (isPostHogInitialized) {
+        posthog.capture('booking_submitted', {
+          service_type: serviceType,
+          vehicle_type: vehicleType,
+          duration_minutes: duration
+        });
+      }
+      posthogLogger.info('booking request submitted', {
+        service_type: serviceType,
+        vehicle_type: vehicleType,
+        duration_minutes: duration
       });
       toast.success('Booking request submitted! We will confirm shortly.');
       // Reset and go to step 1
