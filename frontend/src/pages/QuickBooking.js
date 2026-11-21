@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaCalendarAlt, FaClock, FaCar, FaCheck } from 'react-icons/fa';
 import api from '../services/api';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const QuickBooking = () => {
   const { token } = useParams();
@@ -45,6 +46,9 @@ const QuickBooking = () => {
         phone
       });
       
+      if (isPostHogInitialized) {
+        posthog.capture('quick_booking_confirmed');
+      }
       toast.success('Booking confirmed successfully!');
       setCompleted(true);
     } catch (error) {

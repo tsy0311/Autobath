@@ -3,6 +3,8 @@ import { FaMobile, FaQrcode, FaCheckCircle, FaUpload, FaTruck, FaStore, FaCopy, 
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import qrCodeImage from '../img/qrcode.jpeg';
+import posthog, { isPostHogInitialized } from '../posthog';
+import posthogLogger from '../posthogLogger';
 
 const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
   const [loading, setLoading] = useState(false);
@@ -100,6 +102,20 @@ const TNGPaymentForm = ({ orderData, onSuccess, onError, onCancel }) => {
       const orderResponse = await api.post('/api/orders', orderPayload);
 
       if (orderResponse.data.success) {
+        if (isPostHogInitialized) {
+          posthog.capture('order_submitted', {
+            item_count: orderData.items.length,
+            order_total: orderData.total,
+            payment_method: 'tng',
+            delivery_option: deliveryOption
+          });
+        }
+        posthogLogger.info('touch n go order submitted', {
+          item_count: orderData.items.length,
+          order_total: orderData.total,
+          payment_method: 'tng',
+          delivery_option: deliveryOption
+        });
         toast.success('Order submitted successfully! We will verify your payment and reduce stock once confirmed.');
         
         // Pass success data back

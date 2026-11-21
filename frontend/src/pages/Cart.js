@@ -5,6 +5,7 @@ import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaMobile } from 'react-icons/
 import { toast } from 'react-toastify';
 // import api from '../services/api'; // Removed unused import
 import PaymentModal from '../components/PaymentModal';
+import posthog, { isPostHogInitialized } from '../posthog';
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, clearCart, getTotalPrice } = useCart();
@@ -66,6 +67,13 @@ const Cart = () => {
     }
 
     // Open payment modal
+    if (isPostHogInitialized) {
+      posthog.capture('checkout_started', {
+        item_count: items.reduce((total, item) => total + item.quantity, 0),
+        cart_total: getTotalPrice(),
+        payment_method: 'tng'
+      });
+    }
     setShowPaymentModal(true);
   };
 
